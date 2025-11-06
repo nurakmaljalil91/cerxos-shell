@@ -10,7 +10,6 @@ import { RouterOutlet } from '@angular/router';
 export class App {
   // remoteComponent?: Type<unknown>;
   // constructor(private cdr: ChangeDetectorRef) { }
-
   // async ngOnInit(): Promise<void> {
   //   const module = await loadRemoteModule({
   //     type: 'module',
