@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TokenService } from './token.service';
+import { tap } from 'rxjs';
 
 interface LoginRequest {
   username: string;
@@ -24,18 +25,12 @@ export class AuthenticationService {
 
   login(request: LoginRequest) {
     {
-      return this.http.post<LoginResponse>('/api/login', request).subscribe({
-        next: (response) => {
+      return this.http.post<LoginResponse>('/api/login', request).pipe(
+        tap((response) => {
           this.tokenService.set(response.token);
           this._user.set(response);
-        },
-        error: (error) => {
-          console.error('Login failed', error);
-        },
-        complete: () => {
-          console.log('Login request completed');
-        }
-      });
+        })
+      );
     }
   }
 
