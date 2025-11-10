@@ -2,6 +2,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TokenService } from './token.service';
 import { tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 interface LoginRequest {
   username: string;
@@ -25,7 +26,7 @@ export class AuthenticationService {
 
   login(request: LoginRequest) {
     {
-      return this.http.post<LoginResponse>('/api/login', request).pipe(
+      return this.http.post<LoginResponse>(`${environment.apiBaseUrl}/login`, request).pipe(
         tap((response) => {
           this.tokenService.set(response.token);
           this._user.set(response);
