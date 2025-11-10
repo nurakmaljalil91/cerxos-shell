@@ -21,13 +21,13 @@ export class LoginPage {
 
   form = this.formBuilder.group({
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    username: ['', [Validators.required, Validators.minLength(6)]],
+    username: ['', [Validators.required]],
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    password: ['', [Validators.required]],
     remember: [true]
   });
 
-  readonly disabled = computed(() => this.loading() || this.form.invalid);
+  readonly disabled = computed(() => this.loading());
 
   onSubmit() {
     if (!this.form.valid) return;
