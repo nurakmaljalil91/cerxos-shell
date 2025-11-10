@@ -26,7 +26,7 @@ export class AuthenticationService {
 
   login(request: LoginRequest) {
     {
-      return this.http.post<LoginResponse>(`${environment.apiBaseUrl}/api/login`, request).pipe(
+      return this.http.post<LoginResponse>(`${environment.apiBaseUrl}/login`, request).pipe(
         tap((response) => {
           this.tokenService.set(response.token);
           this._user.set(response);
