@@ -11,6 +11,7 @@ import { AuthenticationMock } from './authentication.mock';
 })
 export class AuthenticationService {
   http = inject(HttpClient);
+  mock = inject(AuthenticationMock);
   tokenService = inject(TokenService);
 
   private _user = signal<LoginResponse | null>(null);
@@ -20,8 +21,7 @@ export class AuthenticationService {
   login(request: LoginRequest) {
     {
       if (environment.testMode) {
-        const mock = new AuthenticationMock();
-        return mock.login(request).pipe(
+        return this.mock.login(request).pipe(
           tap((response) => {
             this.tokenService.set(response.token);
             this._user.set(response);

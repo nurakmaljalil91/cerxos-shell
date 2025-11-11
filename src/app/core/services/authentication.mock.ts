@@ -1,6 +1,10 @@
 import { LoginRequest, LoginResponse } from '../../shared/models/model';
 import { Observable, throwError } from 'rxjs';
+import { Injectable } from '@angular/core';
 
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthenticationMock {
   login(request: LoginRequest) {
     if (request.username === 'test' && request.password === 'password') {
