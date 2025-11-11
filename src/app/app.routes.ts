@@ -1,21 +1,28 @@
 import { Routes } from '@angular/router';
 import { authenticationGuard } from './core/guards/authentication.guard';
+import { ApplicationLayout } from './shared/layouts/application-layout/application-layout';
 
 export const routes: Routes = [
-  {
-    path: '',
-    pathMatch: 'full',
-    redirectTo: 'dashboard',
-  },
   {
     path: 'login',
     loadComponent: () =>
       import('./features/authentication/login-page/login-page').then((m) => m.LoginPage)
   },
   {
-    path: 'dashboard',
+    path: '',
+    component: ApplicationLayout,
     canActivate: [authenticationGuard],
-    loadComponent: () =>
-      import('./features/dashboard-page/dashboard-page').then((m) => m.DashboardPage)
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/dashboard-page/dashboard-page').then((m) => m.DashboardPage)
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/profile-page/profile-page').then((m) => m.ProfilePage)
+      }
+    ]
   }
 ];
