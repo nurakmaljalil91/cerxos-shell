@@ -8,7 +8,7 @@
     <button class="p-2 sm:hidden rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
             (click)="openDrawer()" aria-label="Open navigation">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path [attr.d]="heroIconHelper('bars-3')" stroke-width="1.5" stroke-linecap="round"
+        <path [attr.d]="'bars-3' | heroIconHelper" stroke-width="1.5" stroke-linecap="round"
               stroke-linejoin="round"></path>
       </svg>
     </button>
@@ -17,9 +17,13 @@
     <button class="hidden sm:inline-flex p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
             (click)="toggleSidebar()" aria-label="Toggle sidebar">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path [attr.d]="heroIconHelper('chevron-double-left')" stroke-width="1.5" stroke-linecap="round"
-              stroke-linejoin="round"
-              [ngClass]="{'rotate-180 transform': collapsed()}"></path>
+        @for (
+          d of (collapsed() ? ('chevron-double-right' | heroIconHelper) : ('chevron-double-left' | heroIconHelper)); track d) {
+          <ng-container>
+            <path [attr.d]="d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+          </ng-container>
+        }
+
       </svg>
     </button>
 
@@ -45,8 +49,11 @@
                  class="mx-2 my-1 flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                 <!-- icon -->
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path [attr.d]="navigationItem.icon" stroke-width="1.5" stroke-linecap="round"
-                        stroke-linejoin="round"></path>
+                  @for (d of navigationItem.icon; track d) {
+                    <ng-container>
+                      <path [attr.d]="d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </ng-container>
+                  }
                 </svg>
                 <!-- label -->
                 <span class="whitespace-nowrap overflow-hidden transition-all"
@@ -76,7 +83,12 @@
       </div>
       <aside
         class="sm:hidden fixed inset-y-0 left-0 z-40 w-72 bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 p-3">
-        <button class="mb-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800" (click)="closeDrawer()">Close</button>
+        <button class="mb-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800" (click)="closeDrawer()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+               stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
         <nav>
           <ul>
             @for (navigationItem of navigations; track navigationItem.route) {
@@ -85,9 +97,13 @@
                    routerLinkActive="bg-gray-100 dark:bg-gray-800"
                    [routerLinkActiveOptions]="{ exact: navigationItem.route === '/' }"
                    class="my-1 flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path [attr.d]="navigationItem.icon" stroke-width="1.5" stroke-linecap="round"
-                          stroke-linejoin="round"></path>
+                  <!-- icon -->
+                  <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @for (d of navigationItem.icon; track d) {
+                      <ng-container>
+                        <path [attr.d]="d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </ng-container>
+                    }
                   </svg>
                   <span>{{ navigationItem.label }}</span>
                 </a>
