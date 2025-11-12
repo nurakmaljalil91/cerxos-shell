@@ -7,7 +7,7 @@ import { Injectable } from '@angular/core';
 })
 export class AuthenticationMock {
   login(request: LoginRequest) {
-    if (request.username === 'test' && request.password === 'password') {
+    if (request.username === 'admin' && request.password === 'Admin123#') {
       const response: LoginResponse = {
         token:
           'eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNzYyOTU1NjUxLCJpYXQiOjE3NjI5NTU2NTF9.DjZ1QgrbCxIXoBZt6-HF91ywW4q1V4FL2ZxR4CD6Fjk',

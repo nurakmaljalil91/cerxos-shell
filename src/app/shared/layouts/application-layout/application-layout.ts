@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { HeroIconHelperPipe } from '../../pipes/hero-icon-helper.pipe';
 import { heroIconHelper } from '../../functions/hero-icon-helper.fx';
 import { LayoutNotifications } from '../layout-notifications/layout-notifications';
+import { LayoutProfileMenu } from '../layout-profile-menu/layout-profile-menu';
 
 interface NavigationItem {
   label: string;
@@ -12,7 +13,14 @@ interface NavigationItem {
 
 @Component({
   selector: 'app-application-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, HeroIconHelperPipe, LayoutNotifications],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    HeroIconHelperPipe,
+    LayoutNotifications,
+    LayoutProfileMenu
+  ],
   templateUrl: './application-layout.html',
   styleUrl: './application-layout.css'
 })
@@ -48,6 +56,4 @@ export class ApplicationLayout {
   closeDrawer() {
     this.drawerOpened.set(false);
   }
-
-  protected readonly HeroIconHelperPipe = HeroIconHelperPipe;
 }

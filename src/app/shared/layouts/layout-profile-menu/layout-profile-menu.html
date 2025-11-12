@@ -1,0 +1,47 @@
+<div class="relative">
+  <button
+    class="flex items-center gap-2 pl-2 pr-2 sm:pl-3 sm:pr-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+    (click)="toggleProfile()"
+    (keydown.enter)="toggleProfile()"
+    (keydown.space)="toggleProfile()"
+    aria-label="Open profile menu"
+    aria-haspopup="menu"
+    [attr.aria-expanded]="profileOpen()"
+    type="button"
+  >
+    <!-- avatar (image or initials) -->
+    <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 text-sm font-semibold">
+        {{ userInitials() }}
+      </span>
+    <span class="hidden sm:block text-sm font-medium">{{ username }}</span>
+    <svg class="hidden sm:block w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path [attr.d]="'chevron-down' | heroIconHelper" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+  </button>
+
+  <!-- Profile menu -->
+  @if (profileOpen()) {
+    <!-- overlay to close on outside click -->
+    <div class="fixed inset-0 z-30" (click)="closeMenus()" aria-hidden="true"></div>
+
+    <div
+      class="absolute right-0 z-40 mt-2 w-56 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg py-2"
+      role="menu"
+    >
+      <div class="px-3 pb-2 border-b border-gray-100 dark:border-gray-800">
+        <p class="text-sm font-semibold truncate">{{ username }}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ email }}</p>
+      </div>
+
+      <a routerLink="/profile" class="block px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800" role="menuitem">Profile</a>
+      <a routerLink="/settings" class="block px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800" role="menuitem">Settings</a>
+      <a routerLink="/billing" class="block px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800" role="menuitem">Billing</a>
+
+      <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+
+      <button (click)="signOut()" class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800" type="button" role="menuitem">
+        Sign out
+      </button>
+    </div>
+  }
+</div>
