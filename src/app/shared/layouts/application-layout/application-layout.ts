@@ -2,6 +2,7 @@ import { Component, effect, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { HeroIconHelperPipe } from '../../pipes/hero-icon-helper.pipe';
 import { heroIconHelper } from '../../functions/hero-icon-helper.fx';
+import { LayoutNotifications } from '../layout-notifications/layout-notifications';
 
 interface NavigationItem {
   label: string;
@@ -11,7 +12,7 @@ interface NavigationItem {
 
 @Component({
   selector: 'app-application-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, HeroIconHelperPipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, HeroIconHelperPipe, LayoutNotifications],
   templateUrl: './application-layout.html',
   styleUrl: './application-layout.css'
 })

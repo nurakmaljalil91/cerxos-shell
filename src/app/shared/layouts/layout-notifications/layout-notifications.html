@@ -1,0 +1,66 @@
+<!-- Notifications -->
+<div class="relative">
+  <button
+    class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 relative"
+    (click)="toggleNotification()"
+    (keydown.enter)="toggleNotification()"
+    (keydown.space)="toggleNotification()"
+    aria-label="Open notifications"
+    aria-haspopup="menu"
+    [attr.aria-expanded]="notificationOpen()"
+    type="button"
+  >
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path [attr.d]="'bell' | heroIconHelper" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+    <!-- unread dot -->
+    @if (unreadCount() > 0) {
+      <span
+        class="absolute -top-0.5 -right-0.5 inline-flex h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-900"
+        aria-hidden="true"></span>
+      <span class="sr-only">{{ unreadCount() }} unread notifications</span>
+    }
+  </button>
+
+  <!-- Notifications menu -->
+  @if (notificationOpen()) {
+    <!-- overlay to close on outside click -->
+    <div class="fixed inset-0 z-30" (click)="closeMenus()" aria-hidden="true"></div>
+
+    <div
+      class="absolute right-0 z-40 mt-2 w-80 max-w-[90vw] rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg">
+      <div class="px-3 py-2 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+        <span class="text-sm font-semibold">Notifications</span>
+        <button class="text-xs px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                (click)="markAllRead()" type="button">
+          Mark all read
+        </button>
+      </div>
+
+      <ul class="max-h-80 overflow-y-auto">
+        @for (n of notifications; track n.id) {
+          <li>
+            <button
+              class="w-full text-left px-3 py-2 flex items-start gap-3 hover:bg-gray-50 dark:hover:bg-gray-800"
+              (click)="openNotification(n)"
+              type="button"
+            >
+                <span class="mt-1 h-2 w-2 rounded-full"
+                      [class.bg-blue-500]="!n.read"
+                      [class.bg-transparent]="n.read"
+                      aria-hidden="true"></span>
+              <div class="min-w-0">
+                <p class="text-sm font-medium truncate">{{ n.title }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ n.body }}</p>
+                <p class="text-[11px] text-gray-400 mt-0.5">{{ n.when }}</p>
+              </div>
+            </button>
+          </li>
+        }
+        @empty {
+          <li class="px-3 py-4 text-sm text-gray-500">No notifications</li>
+        }
+      </ul>
+    </div>
+  }
+</div>
