@@ -6,7 +6,7 @@ export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./features/authentication/login-page/login-page').then((m) => m.LoginPage)
+      import('./features/authentication/pages/login-page/login-page').then((m) => m.LoginPage)
   },
   {
     path: '',
@@ -16,17 +16,17 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () =>
-          import('./features/dashboard-page/dashboard-page').then((m) => m.DashboardPage)
+          import('./features/dashboard/pages/dashboard-page/dashboard-page').then((m) => m.DashboardPage)
       },
       {
         path: 'profile',
         loadComponent: () =>
-          import('./features/profile-page/profile-page').then((m) => m.ProfilePage)
+          import('./features/profile/pages/profile-page/profile-page').then((m) => m.ProfilePage)
       },
       {
         path: 'settings',
         loadComponent: () =>
-          import('./features/settings-page/settings-page').then((m) => m.SettingsPage)
+          import('./features/settings/pages/settings-page/settings-page').then((m) => m.SettingsPage)
       }
     ]
   }
