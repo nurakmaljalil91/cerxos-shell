@@ -16,7 +16,11 @@ export class AuthenticationService {
 
   private _user = signal<LoginResponse | null>(null);
   user = this._user.asReadonly();
-  isAuthenticated = computed(() => !!this.tokenService.get());
+  authenticating = computed(() => !!this.tokenService.get());
+
+  isAuthenticated(): boolean {
+    return this.authenticating();
+  }
 
   login(request: LoginRequest) {
     {
