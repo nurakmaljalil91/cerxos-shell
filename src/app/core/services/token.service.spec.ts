@@ -1,16 +1,54 @@
-import { TestBed } from '@angular/core/testing';
-
 import { TokenService } from './token.service';
 
 describe('TokenService', () => {
   let service: TokenService;
+  let getItemSpy: jasmine.Spy;
+  let setItemSpy: jasmine.Spy;
+  let removeItemSpy: jasmine.Spy;
+
+  const TOKEN_KEY = 'auth_token';
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(TokenService);
+    getItemSpy = spyOn(localStorage, 'getItem').and.returnValue(null);
+    setItemSpy = spyOn(localStorage, 'setItem');
+    removeItemSpy = spyOn(localStorage, 'removeItem');
+
+    service = new TokenService();
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
+  });
+
+  it('get() should call localStorage.getItem with correct key', () => {
+    service.get();
+    expect(getItemSpy).toHaveBeenCalledWith(TOKEN_KEY);
+  });
+
+  it('set() should store token in localStorage and update signal', () => {
+    service.set('abc123');
+
+    expect(setItemSpy).toHaveBeenCalledWith(TOKEN_KEY, 'abc123');
+    expect(service.token()).toBe('abc123');
+  });
+
+  it('clear() should remove token from localStorage and update signal to null', () => {
+    service.set('abc123'); // set something first
+
+    service.clear();
+
+    expect(removeItemSpy).toHaveBeenCalledWith(TOKEN_KEY);
+    expect(service.token()).toBeNull();
+  });
+
+  it('initial signal value should reflect value from localStorage', () => {
+    // Rebuild service with a different getItem behavior
+    getItemSpy.and.returnValue('stored-token');
+
+    const svc2 = new TokenService();
+
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(localStorage.getItem).toHaveBeenCalledWith(TOKEN_KEY);
+    expect(svc2.token()).toBe('stored-token');
   });
 });
