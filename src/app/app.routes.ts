@@ -16,7 +16,9 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () =>
-          import('./features/dashboard/pages/dashboard-page/dashboard-page').then((m) => m.DashboardPage)
+          import('./features/dashboard/pages/dashboard-page/dashboard-page').then(
+            (m) => m.DashboardPage
+          )
       },
       {
         path: 'profile',
@@ -26,8 +28,28 @@ export const routes: Routes = [
       {
         path: 'settings',
         loadComponent: () =>
-          import('./features/settings/pages/settings-page/settings-page').then((m) => m.SettingsPage)
+          import('./features/settings/pages/settings-page/settings-page').then(
+            (m) => m.SettingsPage
+          )
       }
     ]
+  },
+  {
+    path: 'maintenance',
+    loadComponent: () =>
+      import('./shared/pages/maintenance-page/maintenance-page').then((m) => m.MaintenancePage)
+  },
+  {
+    path: 'coming-soon',
+    loadComponent: () =>
+      import('./shared/pages/coming-soon-page/coming-soon-page').then((m) => m.ComingSoonPage)
+  },
+  {
+    path: 'error',
+    loadComponent: () => import('./shared/pages/error-page/error-page').then((m) => m.ErrorPage)
+  },
+  {
+    path: '**',
+    loadComponent: () => import('./shared/pages/error-page/error-page').then((m) => m.ErrorPage)
   }
 ];

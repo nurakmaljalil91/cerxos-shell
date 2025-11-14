@@ -1,0 +1,52 @@
+<div
+  class="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 flex items-center justify-center px-4">
+  <div class="max-w-lg w-full text-center">
+    <!-- Icon -->
+    <div
+      class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-300 mb-6">
+      <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M12 9v4m0 4h.01M4.93 19h14.14c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.2 16c-.77 1.33.19 3 1.73 3Z" />
+      </svg>
+    </div>
+
+    <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight mb-3">
+      Scheduled Maintenance
+    </h1>
+
+    <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-6">
+      We’re doing a bit of housekeeping to keep things fast, secure, and reliable.
+      The system will be temporarily unavailable during this maintenance window.
+    </p>
+
+    <!-- Optional time window info -->
+    <div
+      class="rounded-xl border border-amber-100 dark:border-amber-900/50 bg-white dark:bg-gray-900/60 px-4 py-3 text-left mb-6">
+      <p class="text-xs uppercase tracking-wide text-amber-500 font-semibold mb-1">
+        Planned downtime
+      </p>
+      <p class="text-sm text-gray-700 dark:text-gray-300">
+        Daily from <span class="font-semibold">12:00 AM</span> to <span class="font-semibold">12:30 AM</span> (MYT).
+      </p>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+      <button
+        type="button"
+        class="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white transition"
+        (click)="location.reload()">
+        Try again
+      </button>
+
+      <a
+        routerLink="/login"
+        class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 underline-offset-4 hover:underline">
+        Back to login
+      </a>
+    </div>
+
+    <p class="mt-6 text-xs text-gray-500 dark:text-gray-500">
+      If this takes longer than expected, please contact your administrator.
+    </p>
+  </div>
+</div>
