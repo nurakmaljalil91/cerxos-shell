@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { LayoutNotifications } from './layout-notifications';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 describe('LayoutNotifications', () => {
   let component: LayoutNotifications;
@@ -8,9 +8,9 @@ describe('LayoutNotifications', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LayoutNotifications]
-    })
-    .compileComponents();
+      imports: [LayoutNotifications],
+      providers: [provideZonelessChangeDetection()]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(LayoutNotifications);
     component = fixture.componentInstance;

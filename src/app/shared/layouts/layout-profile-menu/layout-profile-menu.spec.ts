@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { LayoutProfileMenu } from './layout-profile-menu';
+import { provideZonelessChangeDetection } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('LayoutProfileMenu', () => {
   let component: LayoutProfileMenu;
@@ -8,9 +9,9 @@ describe('LayoutProfileMenu', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LayoutProfileMenu]
-    })
-    .compileComponents();
+      imports: [LayoutProfileMenu],
+      providers: [provideZonelessChangeDetection(), provideHttpClient()]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(LayoutProfileMenu);
     component = fixture.componentInstance;
