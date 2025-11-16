@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, Type } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -8,16 +8,4 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.css'
 })
 export class App {
-  // remoteComponent?: Type<unknown>;
-  // constructor(private cdr: ChangeDetectorRef) { }
-  // async ngOnInit(): Promise<void> {
-  //   const module = await loadRemoteModule({
-  //     type: 'module',
-  //     remoteEntry: 'http://localhost:4201/remoteEntry.js',
-  //     exposedModule: './RemoteComponent'
-  //   });
-  //   console.log(Object.keys(module));
-  //   this.remoteComponent = (module as any).App;
-  //   this.cdr.markForCheck();
-  // }
 }

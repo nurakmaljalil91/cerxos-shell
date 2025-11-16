@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class AuthenticationMock {
-  login(request: LoginRequest) {
+  login(request: LoginRequest): Observable<LoginResponse> {
     if (request.username === 'admin' && request.password === 'Admin123#') {
       const response: LoginResponse = {
         token:

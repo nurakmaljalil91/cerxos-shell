@@ -1,12 +1,13 @@
 import { Routes } from '@angular/router';
 import { authenticationGuard } from './core/guards/authentication.guard';
 import { ApplicationLayout } from './shared/layouts/application-layout/application-layout';
+import { loadRemoteModule } from '@angular-architects/native-federation';
 
 export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./features/authentication/pages/login-page/login-page').then((m) => m.LoginPage)
+      import('./features/authentication/pages/login-page/login-page').then((m) => m.LoginPage),
   },
   {
     path: '',
@@ -17,39 +18,44 @@ export const routes: Routes = [
         path: '',
         loadComponent: () =>
           import('./features/dashboard/pages/dashboard-page/dashboard-page').then(
-            (m) => m.DashboardPage
-          )
+            (m) => m.DashboardPage,
+          ),
       },
       {
         path: 'profile',
         loadComponent: () =>
-          import('./features/profile/pages/profile-page/profile-page').then((m) => m.ProfilePage)
+          import('./features/profile/pages/profile-page/profile-page').then((m) => m.ProfilePage),
       },
       {
         path: 'settings',
         loadComponent: () =>
           import('./features/settings/pages/settings-page/settings-page').then(
-            (m) => m.SettingsPage
-          )
-      }
-    ]
+            (m) => m.SettingsPage,
+          ),
+      },
+      {
+        path: 'planning',
+        loadChildren: () =>
+          loadRemoteModule('planning-mfe', './Routes').then((m) => m.PLANNING_ROUTES),
+      },
+    ],
   },
   {
     path: 'maintenance',
     loadComponent: () =>
-      import('./shared/pages/maintenance-page/maintenance-page').then((m) => m.MaintenancePage)
+      import('./shared/pages/maintenance-page/maintenance-page').then((m) => m.MaintenancePage),
   },
   {
     path: 'coming-soon',
     loadComponent: () =>
-      import('./shared/pages/coming-soon-page/coming-soon-page').then((m) => m.ComingSoonPage)
+      import('./shared/pages/coming-soon-page/coming-soon-page').then((m) => m.ComingSoonPage),
   },
   {
     path: 'error',
-    loadComponent: () => import('./shared/pages/error-page/error-page').then((m) => m.ErrorPage)
+    loadComponent: () => import('./shared/pages/error-page/error-page').then((m) => m.ErrorPage),
   },
   {
     path: '**',
-    loadComponent: () => import('./shared/pages/error-page/error-page').then((m) => m.ErrorPage)
-  }
+    loadComponent: () => import('./shared/pages/error-page/error-page').then((m) => m.ErrorPage),
+  },
 ];

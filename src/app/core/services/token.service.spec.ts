@@ -47,7 +47,6 @@ describe('TokenService', () => {
 
     const svc2 = new TokenService();
 
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(localStorage.getItem).toHaveBeenCalledWith(TOKEN_KEY);
     expect(svc2.token()).toBe('stored-token');
   });

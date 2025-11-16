@@ -12,7 +12,6 @@ describe('authenticationInterceptor', () => {
   let tokenServiceSpy: jasmine.SpyObj<TokenService>;
 
   beforeEach(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     tokenServiceSpy = jasmine.createSpyObj(TokenService, ['get']);
 
     TestBed.configureTestingModule({

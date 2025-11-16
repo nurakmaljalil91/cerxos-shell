@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { CanActivateFn, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
 import { authenticationGuard } from './authentication.guard';
 import { AuthenticationService } from '../services/authentication.service';
 
@@ -12,10 +12,8 @@ describe('authenticationGuard', () => {
   let authenticationSpy: jasmine.SpyObj<AuthenticationService>;
 
   beforeEach(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
     routerSpy.navigateByUrl.and.returnValue(Promise.resolve(true));
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     authenticationSpy = jasmine.createSpyObj('AuthenticationService', ['isAuthenticated']);
 
     TestBed.configureTestingModule({
@@ -35,9 +33,7 @@ describe('authenticationGuard', () => {
       {} as RouterStateSnapshot
     );
     expect(result).toBeTrue();
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(authenticationSpy.isAuthenticated).toHaveBeenCalled();
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(routerSpy.navigateByUrl).not.toHaveBeenCalled();
   })
 
@@ -49,9 +45,7 @@ describe('authenticationGuard', () => {
       {} as RouterStateSnapshot
     );
     expect(result).toBeFalse();
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(authenticationSpy.isAuthenticated).toHaveBeenCalled();
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/login');
   });
 });

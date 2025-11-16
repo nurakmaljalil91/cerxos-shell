@@ -17,11 +17,8 @@ describe('AuthenticationService', () => {
 
   beforeEach(() => {
     originalTestMode = environment.testMode;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     httpClientSpy = jasmine.createSpyObj('HttpClient', ['post']);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     tokenServiceSpy = jasmine.createSpyObj('TokenService', ['get', 'set', 'clear']);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     authenticationMockSpy = jasmine.createSpyObj('AuthenticationMock', ['login']);
 
     TestBed.configureTestingModule({
@@ -101,7 +98,6 @@ describe('AuthenticationService', () => {
       httpClientSpy.post.and.returnValue(of(response));
 
       service.login(request).subscribe((res) => {
-        // eslint-disable-next-line @typescript-eslint/unbound-method
         expect(httpClientSpy.post).toHaveBeenCalledWith(
           `${environment.apiBaseUrl}/login`,
           request
@@ -115,7 +111,6 @@ describe('AuthenticationService', () => {
 
     it('should clear token and reset user on logout', () => {
       // Pretend user was logged in
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       (service as any)._user.set({
         token: 'existing-token',
         expiresIn: 100

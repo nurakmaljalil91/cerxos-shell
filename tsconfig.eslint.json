@@ -1,9 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.html",
-    "e2e/**/*.ts"
-  ],
-  "exclude": ["dist", "node_modules", ".angular"]
-}

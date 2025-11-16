@@ -34,26 +34,26 @@ export class ApplicationLayout {
     { label: 'Settings', route: '/settings', icon: heroIconHelper('cog-6-tooth') }
   ];
 
+  private saveCollapsedStateEffect = effect(() => {
+    localStorage.setItem('sidebar:collapsed', this.collapsed() ? '1' : '0');
+  });
+
   constructor() {
     const saveDrawerState = localStorage.getItem('sidebar:collapsed');
     if (saveDrawerState !== null) {
       this.collapsed.set(saveDrawerState === '1');
     }
-
-    effect(() => {
-      localStorage.setItem('sidebar:collapsed', this.collapsed() ? '1' : '0');
-    });
   }
 
-  toggleSidebar() {
+  toggleSidebar(): void {
     this.collapsed.update((value) => !value);
   }
 
-  openDrawer() {
+  openDrawer(): void {
     this.drawerOpened.set(true);
   }
 
-  closeDrawer() {
+  closeDrawer(): void {
     this.drawerOpened.set(false);
   }
 }
