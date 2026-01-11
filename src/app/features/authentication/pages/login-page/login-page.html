@@ -6,14 +6,14 @@
         <p class="text-sm text-gray-500">Sign in to your account</p>
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+      <form class="space-y-4" [formGroup]="form" (ngSubmit)="onSubmit()">
         <div>
-          <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="username">Username</label>
           <input
-            type="text"
-            formControlName="username"
             class="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="you@example.com" />
+            formControlName="username"
+            placeholder="you@example.com"
+            type="text" />
           @if (form.controls.username.touched && form.controls.username.invalid) {
             <p class="mt-1 text-xs text-red-600">Enter a valid username.</p>
           }
@@ -21,14 +21,14 @@
 
         <div>
           <div class="flex items-center justify-between">
-            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <a routerLink="/forgot" class="text-xs text-blue-600 hover:underline">Forgot?</a>
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="password">Password</label>
+            <a class="text-xs text-blue-600 hover:underline" routerLink="/forgot">Forgot?</a>
           </div>
           <input
-            type="password"
-            formControlName="password"
             class="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="••••••••" />
+            formControlName="password"
+            placeholder="••••••••"
+            type="password" />
           @if (form.controls.password.touched && form.controls.password.invalid) {
             <p class="mt-1 text-xs text-red-600">Min 6 characters.</p>
           }
@@ -36,21 +36,18 @@
         </div>
 
         <label class="flex items-center gap-2 text-sm">
-          <input type="checkbox" formControlName="remember" class="rounded border-gray-300" />
+          <input class="rounded border-gray-300" formControlName="remember" type="checkbox" />
           Remember me
         </label>
 
-        <button
-          class="w-full rounded-lg px-4 py-2 font-medium bg-blue-600 text-white disabled:opacity-50"
-          [disabled]="disabled()">
-
+        <cxs-button [disabled]="disabled()">
           @if (!loading()) {
             <span>Sign in</span>
 
           } @else {
             <span>Signing in…</span>
           }
-        </button>
+        </cxs-button>
 
         @if (error()) {
           <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -61,7 +58,7 @@
 
       <p class="mt-6 text-center text-sm text-gray-600">
         Don’t have an account?
-        <a routerLink="/register" class="text-blue-600 hover:underline">Create one</a>
+        <a class="text-blue-600 hover:underline" routerLink="/register">Create one</a>
       </p>
     </div>
 
