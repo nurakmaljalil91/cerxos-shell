@@ -14,9 +14,9 @@ export class AuthenticationService {
   mock = inject(AuthenticationMock);
   tokenService = inject(TokenService);
 
-  private _user = signal<LoginResponse | null>(null);
+  private readonly _user = signal<LoginResponse | null>(null);
   user = this._user.asReadonly();
-  authenticating = computed(() => !!this.tokenService.get());
+  readonly authenticating = computed(() => !!this.tokenService.get());
 
   isAuthenticated(): boolean {
     return this.authenticating();
