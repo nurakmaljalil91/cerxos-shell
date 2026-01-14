@@ -3,12 +3,27 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../../../core/services/authentication.service';
-import { CxsButtonComponent } from 'cerxos-ui';
+import {
+  CxsAlertComponent,
+  CxsButtonComponent,
+  CxsCardComponent,
+  CxsCheckboxComponent,
+  CxsInputComponent
+} from 'cerxos-ui';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,selector: 'app-login-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, CxsButtonComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    CxsAlertComponent,
+    CxsButtonComponent,
+    CxsCardComponent,
+    CxsCheckboxComponent,
+    CxsInputComponent
+  ],
   templateUrl: './login-page.html',
   styleUrl: './login-page.css',
 })
