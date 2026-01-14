@@ -2,6 +2,13 @@
   <div class="w-full max-w-md">
     <cxs-card size="lg">
       <div class="mb-6 text-center">
+        <img
+          alt="Cerxos"
+          class="mx-auto mb-4 h-auto w-24"
+          height="413"
+          ngSrc="/branding/logo.png"
+          width="420"
+        />
         <h1 class="text-2xl font-semibold tracking-tight">Welcome back</h1>
         <p class="text-sm text-gray-500">Sign in to your account</p>
       </div>
@@ -54,7 +61,7 @@
         </cxs-button>
 
         @if (error()) {
-          <cxs-alert class="mt-4" variant="danger">
+          <cxs-alert class="mt-4 block" variant="danger">
             {{ error() }}
           </cxs-alert>
         }

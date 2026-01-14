@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../../../core/services/authentication.service';
@@ -16,6 +16,7 @@ import {
   standalone: true,
   imports: [
     CommonModule,
+    NgOptimizedImage,
     ReactiveFormsModule,
     RouterLink,
     CxsAlertComponent,
