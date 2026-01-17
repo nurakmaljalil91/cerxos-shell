@@ -7,6 +7,7 @@ describe('TokenService', () => {
   let removeItemSpy: jasmine.Spy;
 
   const TOKEN_KEY = 'auth_token';
+  const REFRESH_TOKEN_KEY = 'refresh_token';
 
   beforeEach(() => {
     getItemSpy = spyOn(localStorage, 'getItem').and.returnValue(null);
@@ -32,12 +33,25 @@ describe('TokenService', () => {
     expect(service.token()).toBe('abc123');
   });
 
+  it('setRefreshToken() should store refresh token in localStorage', () => {
+    service.setRefreshToken('refresh-abc');
+
+    expect(setItemSpy).toHaveBeenCalledWith(REFRESH_TOKEN_KEY, 'refresh-abc');
+  });
+
+  it('getRefreshToken() should call localStorage.getItem with refresh token key', () => {
+    service.getRefreshToken();
+
+    expect(getItemSpy).toHaveBeenCalledWith(REFRESH_TOKEN_KEY);
+  });
+
   it('clear() should remove token from localStorage and update signal to null', () => {
     service.set('abc123'); // set something first
 
     service.clear();
 
     expect(removeItemSpy).toHaveBeenCalledWith(TOKEN_KEY);
+    expect(removeItemSpy).toHaveBeenCalledWith(REFRESH_TOKEN_KEY);
     expect(service.token()).toBeNull();
   });
 

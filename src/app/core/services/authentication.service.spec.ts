@@ -5,21 +5,27 @@ import { TokenService } from './token.service';
 import { AuthenticationMock } from './authentication.mock';
 import { environment } from '../../../environments/environment';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { LoginCommand, LoginResponse } from '../../shared/models/model';
+import { BaseResponseOfLoginResponse, LoginCommand } from '../../shared/models/model';
 import { of } from 'rxjs';
 
 describe('AuthenticationService', () => {
   let service: AuthenticationService;
   let httpClientSpy: jasmine.SpyObj<HttpClient>;
-  let tokenServiceSpy: jasmine.SpyObj<Pick<TokenService, 'get' | 'set' | 'clear'>>;
-  let authenticationMockSpy: jasmine.SpyObj<Pick<AuthenticationMock, 'login'>>;
+  let tokenServiceSpy: jasmine.SpyObj<Pick<TokenService, 'get' | 'set' | 'setRefreshToken' | 'clear' | 'getRefreshToken'>>;
+  let authenticationMockSpy: jasmine.SpyObj<Pick<AuthenticationMock, 'login' | 'refresh'>>;
   let originalTestMode: boolean;
 
   beforeEach(() => {
     originalTestMode = environment.testMode;
     httpClientSpy = jasmine.createSpyObj('HttpClient', ['post']);
-    tokenServiceSpy = jasmine.createSpyObj('TokenService', ['get', 'set', 'clear']);
-    authenticationMockSpy = jasmine.createSpyObj('AuthenticationMock', ['login']);
+    tokenServiceSpy = jasmine.createSpyObj('TokenService', [
+      'get',
+      'set',
+      'setRefreshToken',
+      'getRefreshToken',
+      'clear'
+    ]);
+    authenticationMockSpy = jasmine.createSpyObj('AuthenticationMock', ['login', 'refresh']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -67,15 +73,21 @@ describe('AuthenticationService', () => {
         password: 'Admin123#'
       };
 
-      const mockResponse: LoginResponse = {
-        token: 'mock-token',
-        expiresAt: new Date()
+      const mockResponse: BaseResponseOfLoginResponse = {
+        success: true,
+        data: {
+          token: 'mock-token',
+          refreshToken: 'refresh-token',
+          expiresAt: new Date(),
+          refreshTokenExpiresAt: new Date()
+        }
       };
 
       authenticationMockSpy.login.and.returnValue(of(mockResponse));
       service.login(mockRequest).subscribe((response) => {
         expect(authenticationMockSpy.login).toHaveBeenCalledWith(mockRequest);
         expect(tokenServiceSpy.set).toHaveBeenCalledWith('mock-token');
+        expect(tokenServiceSpy.setRefreshToken).toHaveBeenCalledWith('refresh-token');
         expect(response).toEqual(mockResponse);
         expect(service.user()).toEqual(mockResponse);
         done();
@@ -90,19 +102,25 @@ describe('AuthenticationService', () => {
         password: 'password'
       };
 
-      const response: LoginResponse = {
-        token: 'api-token',
-        expiresAt: new Date()
+      const response: BaseResponseOfLoginResponse = {
+        success: true,
+        data: {
+          token: 'api-token',
+          refreshToken: 'refresh-token',
+          expiresAt: new Date(),
+          refreshTokenExpiresAt: new Date()
+        }
       };
 
       httpClientSpy.post.and.returnValue(of(response));
 
       service.login(request).subscribe((res) => {
         expect(httpClientSpy.post).toHaveBeenCalledWith(
-          `${environment.apiBaseUrl}/login`,
+          `${environment.apiBaseUrl}/api/authentications/login`,
           request
         );
         expect(tokenServiceSpy.set).toHaveBeenCalledWith('api-token');
+        expect(tokenServiceSpy.setRefreshToken).toHaveBeenCalledWith('refresh-token');
         expect(res).toEqual(response);
         expect(service.user()).toEqual(response);
         done();
@@ -112,14 +130,79 @@ describe('AuthenticationService', () => {
     it('should clear token and reset user on logout', () => {
       // Pretend user was logged in
       (service as any)._user.set({
-        token: 'existing-token',
-        expiresIn: 100
-      } as LoginResponse);
+        token: 'existing-token'
+      } as BaseResponseOfLoginResponse);
 
       service.logout();
 
       expect(tokenServiceSpy.clear).toHaveBeenCalled();
       expect(service.user()).toBeNull();
+    });
+  });
+
+  describe('refreshTokens', () => {
+    it('should call refresh endpoint and store tokens', (done) => {
+      environment.testMode = false;
+      tokenServiceSpy.getRefreshToken.and.returnValue('refresh-token');
+
+      const response: BaseResponseOfLoginResponse = {
+        success: true,
+        data: {
+          token: 'new-token',
+          refreshToken: 'new-refresh',
+          expiresAt: new Date(),
+          refreshTokenExpiresAt: new Date()
+        }
+      };
+
+      httpClientSpy.post.and.returnValue(of(response));
+
+      service.refreshTokens().subscribe((result) => {
+        expect(httpClientSpy.post).toHaveBeenCalledWith(
+          `${environment.apiBaseUrl}/api/authentications/refresh`,
+          { refreshToken: 'refresh-token' }
+        );
+        expect(tokenServiceSpy.set).toHaveBeenCalledWith('new-token');
+        expect(tokenServiceSpy.setRefreshToken).toHaveBeenCalledWith('new-refresh');
+        expect(result).toEqual(response);
+        done();
+      });
+    });
+
+    it('should error when refresh token is missing', (done) => {
+      tokenServiceSpy.getRefreshToken.and.returnValue(null);
+
+      service.refreshTokens().subscribe({
+        error: (err) => {
+          expect(err).toBeTruthy();
+          done();
+        }
+      });
+    });
+
+    it('should use AuthenticationMock when in test mode', (done) => {
+      environment.testMode = true;
+      tokenServiceSpy.getRefreshToken.and.returnValue('refresh-token');
+
+      const response: BaseResponseOfLoginResponse = {
+        success: true,
+        data: {
+          token: 'new-token',
+          refreshToken: 'new-refresh',
+          expiresAt: new Date(),
+          refreshTokenExpiresAt: new Date()
+        }
+      };
+
+      authenticationMockSpy.refresh.and.returnValue(of(response));
+
+      service.refreshTokens().subscribe((result) => {
+        expect(authenticationMockSpy.refresh).toHaveBeenCalledWith('refresh-token');
+        expect(tokenServiceSpy.set).toHaveBeenCalledWith('new-token');
+        expect(tokenServiceSpy.setRefreshToken).toHaveBeenCalledWith('new-refresh');
+        expect(result).toEqual(response);
+        done();
+      });
     });
   });
 });

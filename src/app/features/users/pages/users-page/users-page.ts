@@ -17,7 +17,9 @@ import {
   CxsDataTableSort,
   CxsDataTableSortDirection,
 } from 'cerxos-ui';
-import { UserDto } from '../../../../shared/models/model';
+import { PermissionDto, RoleDto, UserDto } from '../../../../shared/models/model';
+import { PermissionsService } from '../../services/permissions.service';
+import { RolesService } from '../../services/roles.service';
 import { UsersService } from '../../services/users.service';
 
 @Component({
@@ -30,10 +32,17 @@ import { UsersService } from '../../services/users.service';
 })
 export class UsersPage implements OnInit {
   private readonly usersService = inject(UsersService);
+  private readonly rolesService = inject(RolesService);
+  private readonly permissionsService = inject(PermissionsService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
+  readonly rolesLoading = signal(false);
+  readonly rolesError = signal<string | null>(null);
+  readonly permissionsLoading = signal(false);
+  readonly permissionsError = signal<string | null>(null);
+
   readonly pageIndex = signal(1);
   readonly pageSize = signal(10);
   readonly totalCount = signal(0);
@@ -41,6 +50,8 @@ export class UsersPage implements OnInit {
   readonly sortDirection = signal<CxsDataTableSortDirection>('asc');
 
   private readonly users = signal<UserDto[]>([]);
+  private readonly roles = signal<RoleDto[]>([]);
+  private readonly permissions = signal<PermissionDto[]>([]);
 
   readonly columns: CxsDataTableColumn[] = [
     { key: 'username', label: 'Username', filterable: true, sortable: true },
@@ -49,6 +60,17 @@ export class UsersPage implements OnInit {
     { key: 'roles', label: 'Roles', filterable: true, sortable: true },
     { key: 'locked', label: 'Locked', align: 'right' },
     { key: 'actions', label: 'Actions', align: 'right' },
+  ];
+
+  readonly roleColumns: CxsDataTableColumn[] = [
+    { key: 'name', label: 'Role', sortable: true, filterable: true },
+    { key: 'description', label: 'Description' },
+    { key: 'permissions', label: 'Permissions' },
+  ];
+
+  readonly permissionColumns: CxsDataTableColumn[] = [
+    { key: 'name', label: 'Permission', sortable: true, filterable: true },
+    { key: 'description', label: 'Description' },
   ];
 
   readonly rows = computed(() =>
@@ -63,8 +85,27 @@ export class UsersPage implements OnInit {
     })),
   );
 
+  readonly roleRows = computed(() =>
+    this.roles().map((role) => ({
+      id: role.id ?? '',
+      name: role.name ?? '',
+      description: role.description ?? '',
+      permissions: role.permissions?.length ? role.permissions.join(', ') : undefined,
+    })),
+  );
+
+  readonly permissionRows = computed(() =>
+    this.permissions().map((permission) => ({
+      id: permission.id ?? '',
+      name: permission.name ?? '',
+      description: permission.description ?? '',
+    })),
+  );
+
   ngOnInit(): void {
     this.loadUsers();
+    this.loadRoles();
+    this.loadPermissions();
   }
 
   onPageChange(page: number): void {
@@ -134,6 +175,70 @@ export class UsersPage implements OnInit {
           this.users.set([]);
           this.totalCount.set(0);
           this.error.set(err?.error?.message ?? 'Failed to load users.');
+        },
+      });
+  }
+
+  private loadRoles(): void {
+    this.rolesLoading.set(true);
+    this.rolesError.set(null);
+
+    this.rolesService
+      .getRoles({
+        page: 1,
+        total: 1000,
+        sortBy: 'name',
+        descending: false,
+      })
+      .pipe(
+        finalize(() => this.rolesLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response?.success || !response.data?.items) {
+            this.roles.set([]);
+            this.rolesError.set(response?.message ?? 'Failed to load roles.');
+            return;
+          }
+
+          this.roles.set(response.data.items);
+        },
+        error: (err) => {
+          this.roles.set([]);
+          this.rolesError.set(err?.error?.message ?? 'Failed to load roles.');
+        },
+      });
+  }
+
+  private loadPermissions(): void {
+    this.permissionsLoading.set(true);
+    this.permissionsError.set(null);
+
+    this.permissionsService
+      .getPermissions({
+        page: 1,
+        total: 1000,
+        sortBy: 'name',
+        descending: false,
+      })
+      .pipe(
+        finalize(() => this.permissionsLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response?.success || !response.data?.items) {
+            this.permissions.set([]);
+            this.permissionsError.set(response?.message ?? 'Failed to load permissions.');
+            return;
+          }
+
+          this.permissions.set(response.data.items);
+        },
+        error: (err) => {
+          this.permissions.set([]);
+          this.permissionsError.set(err?.error?.message ?? 'Failed to load permissions.');
         },
       });
   }

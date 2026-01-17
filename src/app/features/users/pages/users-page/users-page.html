@@ -83,4 +83,60 @@
       </div>
     </ng-template>
   </cxs-data-table>
+
+  <div class="grid gap-4 lg:grid-cols-2">
+    <div class="space-y-2">
+      <div>
+        <h2 class="text-sm font-semibold text-gray-900">Roles</h2>
+        <p class="text-xs text-gray-500">All roles currently available.</p>
+      </div>
+      @if (rolesError()) {
+        <div
+          class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700"
+        >
+          {{ rolesError() }}
+        </div>
+      }
+      <cxs-data-table
+        caption="Roles"
+        [bordered]="true"
+        [columns]="roleColumns"
+        [data]="roleRows()"
+        [loading]="rolesLoading()"
+        [showToolbar]="false"
+        [showPagination]="false"
+        [showFilters]="false"
+        [showGlobalSearch]="false"
+        [striped]="true"
+        emptyMessage="No roles found"
+      />
+    </div>
+
+    <div class="space-y-2">
+      <div>
+        <h2 class="text-sm font-semibold text-gray-900">Permissions</h2>
+        <p class="text-xs text-gray-500">All permissions currently available.</p>
+      </div>
+      @if (permissionsError()) {
+        <div
+          class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700"
+        >
+          {{ permissionsError() }}
+        </div>
+      }
+      <cxs-data-table
+        caption="Permissions"
+        [bordered]="true"
+        [columns]="permissionColumns"
+        [data]="permissionRows()"
+        [loading]="permissionsLoading()"
+        [showToolbar]="false"
+        [showPagination]="false"
+        [showFilters]="false"
+        [showGlobalSearch]="false"
+        [striped]="true"
+        emptyMessage="No permissions found"
+      />
+    </div>
+  </div>
 </section>

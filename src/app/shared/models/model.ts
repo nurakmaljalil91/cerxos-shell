@@ -25,6 +25,8 @@ export interface BaseResponseOfLoginResponse {
 export interface LoginResponse {
     token?: string | undefined;
     expiresAt?: Date;
+    refreshToken?: string | undefined;
+    refreshTokenExpiresAt?: Date;
 }
 
 /** Command to authenticate a user. */
@@ -57,6 +59,12 @@ export interface RegisterCommand {
     email?: string | undefined;
     /** Gets or sets the password for the new user. */
     password?: string | undefined;
+}
+
+/** Command to refresh an access token using a refresh token. */
+export interface RefreshTokenCommand {
+    /** Gets or sets the refresh token. */
+    refreshToken?: string | undefined;
 }
 
 /** Command to reset a user's password. */
