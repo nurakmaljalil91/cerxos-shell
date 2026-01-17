@@ -2,7 +2,11 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { BaseResponseOfPaginatedEnumerableOfPermissionDto } from '../../../shared/models/model';
+import {
+  BaseResponseOfPaginatedEnumerableOfPermissionDto,
+  BaseResponseOfPermissionDto,
+  CreatePermissionCommand
+} from '../../../shared/models/model';
 import { PermissionsMock } from './permissions.mock';
 
 export type PermissionsQuery = {
@@ -39,5 +43,13 @@ export class PermissionsService {
       this.permissionsEndpoint,
       { params }
     );
+  }
+
+  createPermission(command: CreatePermissionCommand): Observable<BaseResponseOfPermissionDto> {
+    if (environment.testMode) {
+      return this.mock.createPermission(command);
+    }
+
+    return this.http.post<BaseResponseOfPermissionDto>(this.permissionsEndpoint, command);
   }
 }

@@ -3,20 +3,20 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { of } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { BaseResponseOfPaginatedEnumerableOfUserDto } from '../../../shared/models/model';
+import { BaseResponseOfPaginatedEnumerableOfUserDto, BaseResponseOfUserDto, CreateUserCommand } from '../../../shared/models/model';
 import { UsersMock } from './users.mock';
 import { UsersQuery, UsersService } from './users.service';
 
 describe('UsersService', () => {
   let service: UsersService;
   let httpClientSpy: jasmine.SpyObj<HttpClient>;
-  let usersMockSpy: jasmine.SpyObj<Pick<UsersMock, 'getUsers'>>;
+  let usersMockSpy: jasmine.SpyObj<Pick<UsersMock, 'getUsers' | 'createUser'>>;
   let originalTestMode: boolean;
 
   beforeEach(() => {
     originalTestMode = environment.testMode;
-    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get']);
-    usersMockSpy = jasmine.createSpyObj('UsersMock', ['getUsers']);
+    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post']);
+    usersMockSpy = jasmine.createSpyObj('UsersMock', ['getUsers', 'createUser']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -102,6 +102,64 @@ describe('UsersService', () => {
 
       expect(url).toBe(`${environment.apiBaseUrl}/api/users`);
       expect(options.params.toString()).toBe(expectedParams.toString());
+      done();
+    });
+  });
+
+  it('should use UsersMock to create a user when testMode is enabled', (done) => {
+    environment.testMode = true;
+
+    const command: CreateUserCommand = {
+      username: 'new-user',
+      email: 'new-user@example.com',
+      password: 'Password123!'
+    };
+
+    const response: BaseResponseOfUserDto = {
+      success: true,
+      data: {
+        id: '1',
+        username: 'new-user',
+        email: 'new-user@example.com'
+      }
+    };
+
+    usersMockSpy.createUser.and.returnValue(of(response));
+
+    service.createUser(command).subscribe((result) => {
+      expect(usersMockSpy.createUser).toHaveBeenCalledWith(command);
+      expect(httpClientSpy.post).not.toHaveBeenCalled();
+      expect(result).toEqual(response);
+      done();
+    });
+  });
+
+  it('should call HttpClient to create a user when testMode is disabled', (done) => {
+    environment.testMode = false;
+
+    const command: CreateUserCommand = {
+      username: 'new-user',
+      email: 'new-user@example.com',
+      password: 'Password123!'
+    };
+
+    const response: BaseResponseOfUserDto = {
+      success: true,
+      data: {
+        id: '1',
+        username: 'new-user',
+        email: 'new-user@example.com'
+      }
+    };
+
+    httpClientSpy.post.and.returnValue(of(response));
+
+    service.createUser(command).subscribe((result) => {
+      expect(httpClientSpy.post).toHaveBeenCalledWith(
+        `${environment.apiBaseUrl}/api/users`,
+        command
+      );
+      expect(result).toEqual(response);
       done();
     });
   });

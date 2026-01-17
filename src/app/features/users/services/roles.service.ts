@@ -2,7 +2,11 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { BaseResponseOfPaginatedEnumerableOfRoleDto } from '../../../shared/models/model';
+import {
+  BaseResponseOfPaginatedEnumerableOfRoleDto,
+  BaseResponseOfRoleDto,
+  CreateRoleCommand
+} from '../../../shared/models/model';
 import { RolesMock } from './roles.mock';
 
 export type RolesQuery = {
@@ -36,5 +40,13 @@ export class RolesService {
     }
 
     return this.http.get<BaseResponseOfPaginatedEnumerableOfRoleDto>(this.rolesEndpoint, { params });
+  }
+
+  createRole(command: CreateRoleCommand): Observable<BaseResponseOfRoleDto> {
+    if (environment.testMode) {
+      return this.mock.createRole(command);
+    }
+
+    return this.http.post<BaseResponseOfRoleDto>(this.rolesEndpoint, command);
   }
 }

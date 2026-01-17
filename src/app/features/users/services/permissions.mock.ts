@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
   BaseResponseOfPaginatedEnumerableOfPermissionDto,
+  BaseResponseOfPermissionDto,
+  CreatePermissionCommand,
   PaginatedEnumerableOfPermissionDto,
   PermissionDto
 } from '../../../shared/models/model';
@@ -44,6 +46,29 @@ export class PermissionsMock {
     };
 
     return new Observable<BaseResponseOfPaginatedEnumerableOfPermissionDto>((observer) => {
+      setTimeout(() => {
+        observer.next(response);
+        observer.complete();
+      }, 300);
+    });
+  }
+
+  createPermission(command: CreatePermissionCommand): Observable<BaseResponseOfPermissionDto> {
+    const newPermission: PermissionDto = {
+      id: crypto.randomUUID(),
+      name: command.name ?? '',
+      description: command.description ?? ''
+    };
+
+    this.permissions.unshift(newPermission);
+
+    const response: BaseResponseOfPermissionDto = {
+      success: true,
+      message: 'Mock permission created.',
+      data: newPermission
+    };
+
+    return new Observable<BaseResponseOfPermissionDto>((observer) => {
       setTimeout(() => {
         observer.next(response);
         observer.complete();

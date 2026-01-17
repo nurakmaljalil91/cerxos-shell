@@ -8,16 +8,29 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import {
+  CxsButtonComponent,
   CxsDataTableCellDirective,
   CxsDataTableColumn,
   CxsDataTableComponent,
   CxsDataTableSort,
   CxsDataTableSortDirection,
+  CxsDialogComponent,
+  CxsInputComponent,
+  CxsToastComponent,
+  CxsToastVariant,
 } from 'cerxos-ui';
-import { PermissionDto, RoleDto, UserDto } from '../../../../shared/models/model';
+import {
+  CreatePermissionCommand,
+  CreateRoleCommand,
+  CreateUserCommand,
+  PermissionDto,
+  RoleDto,
+  UserDto,
+} from '../../../../shared/models/model';
 import { PermissionsService } from '../../services/permissions.service';
 import { RolesService } from '../../services/roles.service';
 import { UsersService } from '../../services/users.service';
@@ -26,11 +39,21 @@ import { UsersService } from '../../services/users.service';
   selector: 'app-users-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, CxsDataTableComponent, CxsDataTableCellDirective],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    CxsButtonComponent,
+    CxsDataTableComponent,
+    CxsDataTableCellDirective,
+    CxsDialogComponent,
+    CxsInputComponent,
+    CxsToastComponent,
+  ],
   templateUrl: './users-page.html',
   styleUrl: './users-page.css',
 })
 export class UsersPage implements OnInit {
+  private readonly formBuilder = inject(FormBuilder);
   private readonly usersService = inject(UsersService);
   private readonly rolesService = inject(RolesService);
   private readonly permissionsService = inject(PermissionsService);
@@ -42,6 +65,19 @@ export class UsersPage implements OnInit {
   readonly rolesError = signal<string | null>(null);
   readonly permissionsLoading = signal(false);
   readonly permissionsError = signal<string | null>(null);
+  readonly addUserOpen = signal(false);
+  readonly addUserLoading = signal(false);
+  readonly addUserError = signal<string | null>(null);
+  readonly addRoleOpen = signal(false);
+  readonly addRoleLoading = signal(false);
+  readonly addRoleError = signal<string | null>(null);
+  readonly addPermissionOpen = signal(false);
+  readonly addPermissionLoading = signal(false);
+  readonly addPermissionError = signal<string | null>(null);
+  readonly toastOpen = signal(false);
+  readonly toastTitle = signal('');
+  readonly toastMessage = signal('');
+  readonly toastVariant = signal<CxsToastVariant>('info');
 
   readonly pageIndex = signal(1);
   readonly pageSize = signal(10);
@@ -52,6 +88,23 @@ export class UsersPage implements OnInit {
   private readonly users = signal<UserDto[]>([]);
   private readonly roles = signal<RoleDto[]>([]);
   private readonly permissions = signal<PermissionDto[]>([]);
+
+  readonly addUserForm = this.formBuilder.group({
+    username: ['', [Validators.required]],
+    email: ['', [Validators.required, Validators.email]],
+    phoneNumber: [''],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+  });
+
+  readonly addRoleForm = this.formBuilder.group({
+    name: ['', [Validators.required]],
+    description: [''],
+  });
+
+  readonly addPermissionForm = this.formBuilder.group({
+    name: ['', [Validators.required]],
+    description: [''],
+  });
 
   readonly columns: CxsDataTableColumn[] = [
     { key: 'username', label: 'Username', filterable: true, sortable: true },
@@ -66,11 +119,13 @@ export class UsersPage implements OnInit {
     { key: 'name', label: 'Role', sortable: true, filterable: true },
     { key: 'description', label: 'Description' },
     { key: 'permissions', label: 'Permissions' },
+    { key: 'actions', label: 'Actions', align: 'right' },
   ];
 
   readonly permissionColumns: CxsDataTableColumn[] = [
     { key: 'name', label: 'Permission', sortable: true, filterable: true },
     { key: 'description', label: 'Description' },
+    { key: 'actions', label: 'Actions', align: 'right' },
   ];
 
   readonly rows = computed(() =>
@@ -141,6 +196,231 @@ export class UsersPage implements OnInit {
 
   onChangePassword(userId: string): void {
     void userId;
+  }
+
+  onEditRole(roleId: string): void {
+    void roleId;
+  }
+
+  onDeleteRole(roleId: string): void {
+    void roleId;
+  }
+
+  onEditPermission(permissionId: string): void {
+    void permissionId;
+  }
+
+  onDeletePermission(permissionId: string): void {
+    void permissionId;
+  }
+
+  onOpenAddUser(): void {
+    this.addUserError.set(null);
+    this.addUserOpen.set(true);
+  }
+
+  onCloseAddUser(): void {
+    this.addUserOpen.set(false);
+    this.addUserLoading.set(false);
+    this.addUserError.set(null);
+    this.addUserForm.reset({
+      username: '',
+      email: '',
+      phoneNumber: '',
+      password: '',
+    });
+  }
+
+  onOpenAddRole(): void {
+    this.addRoleError.set(null);
+    this.addRoleOpen.set(true);
+  }
+
+  onCloseAddRole(): void {
+    this.addRoleOpen.set(false);
+    this.addRoleLoading.set(false);
+    this.addRoleError.set(null);
+    this.addRoleForm.reset({
+      name: '',
+      description: '',
+    });
+  }
+
+  onOpenAddPermission(): void {
+    this.addPermissionError.set(null);
+    this.addPermissionOpen.set(true);
+  }
+
+  onCloseAddPermission(): void {
+    this.addPermissionOpen.set(false);
+    this.addPermissionLoading.set(false);
+    this.addPermissionError.set(null);
+    this.addPermissionForm.reset({
+      name: '',
+      description: '',
+    });
+  }
+
+  onSubmitAddUser(): void {
+    if (this.addUserLoading()) {
+      return;
+    }
+
+    if (this.addUserForm.invalid) {
+      this.addUserForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.addUserForm.getRawValue();
+    const command: CreateUserCommand = {
+      username: formValue.username ?? '',
+      email: formValue.email ?? '',
+      phoneNumber: formValue.phoneNumber ?? '',
+      password: formValue.password ?? '',
+    };
+
+    this.addUserLoading.set(true);
+    this.addUserError.set(null);
+
+    this.usersService
+      .createUser(command)
+      .pipe(
+        finalize(() => this.addUserLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response?.success) {
+            const message = response?.message ?? 'Failed to create user.';
+            this.addUserError.set(message);
+            this.showToast('User not created', message, 'danger');
+            return;
+          }
+
+          this.addUserForm.reset({
+            username: '',
+            email: '',
+            phoneNumber: '',
+            password: '',
+          });
+          this.addUserOpen.set(false);
+          this.showToast('User created', response?.message ?? 'User added successfully.', 'info');
+          this.loadUsers();
+        },
+        error: (err) => {
+          const message = err?.error?.message ?? 'Failed to create user.';
+          this.addUserError.set(message);
+          this.showToast('User not created', message, 'danger');
+        },
+      });
+  }
+
+  onSubmitAddRole(): void {
+    if (this.addRoleLoading()) {
+      return;
+    }
+
+    if (this.addRoleForm.invalid) {
+      this.addRoleForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.addRoleForm.getRawValue();
+    const command: CreateRoleCommand = {
+      name: formValue.name ?? '',
+      description: formValue.description ?? '',
+    };
+
+    this.addRoleLoading.set(true);
+    this.addRoleError.set(null);
+
+    this.rolesService
+      .createRole(command)
+      .pipe(
+        finalize(() => this.addRoleLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response?.success) {
+            const message = response?.message ?? 'Failed to create role.';
+            this.addRoleError.set(message);
+            this.showToast('Role not created', message, 'danger');
+            return;
+          }
+
+          this.addRoleForm.reset({
+            name: '',
+            description: '',
+          });
+          this.addRoleOpen.set(false);
+          this.showToast('Role created', response?.message ?? 'Role added successfully.', 'info');
+          this.loadRoles();
+        },
+        error: (err) => {
+          const message = err?.error?.message ?? 'Failed to create role.';
+          this.addRoleError.set(message);
+          this.showToast('Role not created', message, 'danger');
+        },
+      });
+  }
+
+  onSubmitAddPermission(): void {
+    if (this.addPermissionLoading()) {
+      return;
+    }
+
+    if (this.addPermissionForm.invalid) {
+      this.addPermissionForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.addPermissionForm.getRawValue();
+    const command: CreatePermissionCommand = {
+      name: formValue.name ?? '',
+      description: formValue.description ?? '',
+    };
+
+    this.addPermissionLoading.set(true);
+    this.addPermissionError.set(null);
+
+    this.permissionsService
+      .createPermission(command)
+      .pipe(
+        finalize(() => this.addPermissionLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response?.success) {
+            const message = response?.message ?? 'Failed to create permission.';
+            this.addPermissionError.set(message);
+            this.showToast('Permission not created', message, 'danger');
+            return;
+          }
+
+          this.addPermissionForm.reset({
+            name: '',
+            description: '',
+          });
+          this.addPermissionOpen.set(false);
+          this.showToast(
+            'Permission created',
+            response?.message ?? 'Permission added successfully.',
+            'info',
+          );
+          this.loadPermissions();
+        },
+        error: (err) => {
+          const message = err?.error?.message ?? 'Failed to create permission.';
+          this.addPermissionError.set(message);
+          this.showToast('Permission not created', message, 'danger');
+        },
+      });
+  }
+
+  onToastOpenChange(open: boolean): void {
+    this.toastOpen.set(open);
   }
 
   private loadUsers(): void {
@@ -241,5 +521,12 @@ export class UsersPage implements OnInit {
           this.permissionsError.set(err?.error?.message ?? 'Failed to load permissions.');
         },
       });
+  }
+
+  private showToast(title: string, message: string, variant: CxsToastVariant): void {
+    this.toastTitle.set(title);
+    this.toastMessage.set(message);
+    this.toastVariant.set(variant);
+    this.toastOpen.set(true);
   }
 }

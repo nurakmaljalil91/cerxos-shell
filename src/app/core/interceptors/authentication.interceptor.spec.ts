@@ -7,6 +7,7 @@ import {
   HttpRequest
 } from '@angular/common/http';
 import { provideZonelessChangeDetection } from '@angular/core';
+import { Router } from '@angular/router';
 import { authenticationInterceptor } from './authentication.interceptor';
 import { TokenService } from '../services/token.service';
 import { AuthenticationService } from '../services/authentication.service';
@@ -18,16 +19,20 @@ describe('authenticationInterceptor', () => {
 
   let tokenServiceSpy: jasmine.SpyObj<TokenService>;
   let authServiceSpy: jasmine.SpyObj<Pick<AuthenticationService, 'refreshTokens' | 'logout'>>;
+  let routerSpy: jasmine.SpyObj<Pick<Router, 'navigate'> & { url: string }>;
 
   beforeEach(() => {
     tokenServiceSpy = jasmine.createSpyObj(TokenService, ['get']);
     authServiceSpy = jasmine.createSpyObj('AuthenticationService', ['refreshTokens', 'logout']);
+    routerSpy = jasmine.createSpyObj<Pick<Router, 'navigate'> & { url: string }>('Router', ['navigate']);
+    routerSpy.url = '/';
 
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
         { provide: TokenService, useValue: tokenServiceSpy },
-        { provide: AuthenticationService, useValue: authServiceSpy }
+        { provide: AuthenticationService, useValue: authServiceSpy },
+        { provide: Router, useValue: routerSpy }
       ]
     });
   });
@@ -100,6 +105,9 @@ describe('authenticationInterceptor', () => {
     interceptor(mockRequest, next).subscribe({
       error: () => {
         expect(authServiceSpy.logout).toHaveBeenCalled();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/login'], {
+          queryParams: { reason: 'session-expired' }
+        });
         done();
       }
     });

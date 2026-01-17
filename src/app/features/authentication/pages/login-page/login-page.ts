@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../../../core/services/authentication.service';
 import {
   CxsAlertComponent,
@@ -29,10 +29,11 @@ import { BaseResponseOfLoginResponse, LoginResponse } from '../../../../shared/m
   templateUrl: './login-page.html',
   styleUrl: './login-page.css',
 })
-export class LoginPage {
+export class LoginPage implements OnInit {
   private formBuilder = inject(FormBuilder);
   private authenticationService = inject(AuthenticationService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   readonly loading = signal<boolean>(false);
   readonly error = signal<string | null>(null);
@@ -46,6 +47,13 @@ export class LoginPage {
   });
 
   readonly disabled = computed(() => this.loading());
+
+  ngOnInit(): void {
+    const reason = this.route.snapshot.queryParamMap.get('reason');
+    if (reason === 'session-expired') {
+      this.error.set('Your session expired. Please sign in again.');
+    }
+  }
 
   onSubmit(): void {
     if (!this.form.valid) {return;}

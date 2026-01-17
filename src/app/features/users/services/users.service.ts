@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { BaseResponseOfPaginatedEnumerableOfUserDto } from '../../../shared/models/model';
+import { BaseResponseOfPaginatedEnumerableOfUserDto, BaseResponseOfUserDto, CreateUserCommand } from '../../../shared/models/model';
 import { UsersMock } from './users.mock';
 
 export type UsersQuery = {
@@ -36,5 +36,13 @@ export class UsersService {
     }
 
     return this.http.get<BaseResponseOfPaginatedEnumerableOfUserDto>(this.usersEndpoint, { params });
+  }
+
+  createUser(command: CreateUserCommand): Observable<BaseResponseOfUserDto> {
+    if (environment.testMode) {
+      return this.mock.createUser(command);
+    }
+
+    return this.http.post<BaseResponseOfUserDto>(this.usersEndpoint, command);
   }
 }

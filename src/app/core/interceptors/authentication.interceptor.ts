@@ -1,5 +1,6 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthenticationService } from '../services/authentication.service';
 import { TokenService } from '../services/token.service';
@@ -7,6 +8,7 @@ import { TokenService } from '../services/token.service';
 export const authenticationInterceptor: HttpInterceptorFn = (request, next) => {
   const tokenService = inject(TokenService);
   const authService = inject(AuthenticationService);
+  const router = inject(Router);
   const token = tokenService.get();
 
   const authRequest = token
@@ -45,6 +47,11 @@ export const authenticationInterceptor: HttpInterceptorFn = (request, next) => {
         }),
         catchError((refreshError) => {
           authService.logout();
+          if (!router.url.includes('/login')) {
+            void router.navigate(['/login'], {
+              queryParams: { reason: 'session-expired' },
+            });
+          }
           return throwError(() => refreshError);
         }),
       );

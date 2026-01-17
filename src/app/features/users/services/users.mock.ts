@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
   BaseResponseOfPaginatedEnumerableOfUserDto,
+  BaseResponseOfUserDto,
+  CreateUserCommand,
   PaginatedEnumerableOfUserDto,
   UserDto
 } from '../../../shared/models/model';
@@ -97,6 +99,32 @@ export class UsersMock {
     };
 
     return new Observable<BaseResponseOfPaginatedEnumerableOfUserDto>((observer) => {
+      setTimeout(() => {
+        observer.next(response);
+        observer.complete();
+      }, 300);
+    });
+  }
+
+  createUser(command: CreateUserCommand): Observable<BaseResponseOfUserDto> {
+    const newUser: UserDto = {
+      id: crypto.randomUUID(),
+      username: command.username ?? '',
+      email: command.email ?? '',
+      phoneNumber: command.phoneNumber ?? '',
+      roles: [],
+      isLocked: false
+    };
+
+    this.users.unshift(newUser);
+
+    const response: BaseResponseOfUserDto = {
+      success: true,
+      message: 'Mock user created.',
+      data: newUser
+    };
+
+    return new Observable<BaseResponseOfUserDto>((observer) => {
       setTimeout(() => {
         observer.next(response);
         observer.complete();

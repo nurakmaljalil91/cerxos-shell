@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
   BaseResponseOfPaginatedEnumerableOfRoleDto,
+  BaseResponseOfRoleDto,
+  CreateRoleCommand,
   PaginatedEnumerableOfRoleDto,
   RoleDto
 } from '../../../shared/models/model';
@@ -57,6 +59,30 @@ export class RolesMock {
     };
 
     return new Observable<BaseResponseOfPaginatedEnumerableOfRoleDto>((observer) => {
+      setTimeout(() => {
+        observer.next(response);
+        observer.complete();
+      }, 300);
+    });
+  }
+
+  createRole(command: CreateRoleCommand): Observable<BaseResponseOfRoleDto> {
+    const newRole: RoleDto = {
+      id: crypto.randomUUID(),
+      name: command.name ?? '',
+      description: command.description ?? '',
+      permissions: []
+    };
+
+    this.roles.unshift(newRole);
+
+    const response: BaseResponseOfRoleDto = {
+      success: true,
+      message: 'Mock role created.',
+      data: newRole
+    };
+
+    return new Observable<BaseResponseOfRoleDto>((observer) => {
       setTimeout(() => {
         observer.next(response);
         observer.complete();
