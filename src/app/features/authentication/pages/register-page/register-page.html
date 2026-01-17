@@ -1,0 +1,100 @@
+<div class="min-h-screen grid place-items-center bg-gray-50 px-4">
+  <div class="w-full max-w-md">
+    <cxs-card size="lg">
+      <div class="mb-6 text-center">
+        <img
+          alt="Cerxos"
+          class="mx-auto mb-4 h-auto w-24"
+          height="413"
+          ngSrc="/branding/logo.png"
+          width="420"
+        />
+        <h1 class="text-2xl font-semibold tracking-tight">Create your account</h1>
+        <p class="text-sm text-gray-500">Join Cerxos to get started</p>
+      </div>
+
+      <form class="space-y-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700" for="username">Username</label>
+          <cxs-input
+            autocomplete="username"
+            formControlName="username"
+            id="username"
+            placeholder="yourname"
+            type="text"
+            [invalid]="form.controls.username.touched && form.controls.username.invalid"
+          />
+          @if (form.controls.username.touched && form.controls.username.invalid) {
+            <p class="text-xs text-red-600">Enter a username.</p>
+          }
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700" for="email">Email</label>
+          <cxs-input
+            autocomplete="email"
+            formControlName="email"
+            id="email"
+            placeholder="you@example.com"
+            type="email"
+            [invalid]="form.controls.email.touched && form.controls.email.invalid"
+          />
+          @if (form.controls.email.touched && form.controls.email.invalid) {
+            <p class="text-xs text-red-600">Enter a valid email.</p>
+          }
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700" for="password">Password</label>
+          <cxs-input
+            autocomplete="new-password"
+            formControlName="password"
+            id="password"
+            placeholder="********"
+            type="password"
+            [invalid]="form.controls.password.touched && form.controls.password.invalid"
+          />
+          @if (form.controls.password.touched && form.controls.password.invalid) {
+            <p class="text-xs text-red-600">Min 6 characters.</p>
+          }
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700" for="confirmPassword">
+            Confirm password
+          </label>
+          <cxs-input
+            autocomplete="new-password"
+            formControlName="confirmPassword"
+            id="confirmPassword"
+            placeholder="********"
+            type="password"
+            [invalid]="form.controls.confirmPassword.touched && form.controls.confirmPassword.invalid"
+          />
+          @if (form.controls.confirmPassword.touched && form.controls.confirmPassword.invalid) {
+            <p class="text-xs text-red-600">Confirm your password.</p>
+          }
+        </div>
+
+        <cxs-button class="w-full" type="submit" variant="primary" [disabled]="disabled()">
+          @if (!loading()) {
+            <span>Create account</span>
+          } @else {
+            <span>Creating account.</span>
+          }
+        </cxs-button>
+
+        @if (error()) {
+          <cxs-alert class="mt-4 block" variant="danger">
+            {{ error() }}
+          </cxs-alert>
+        }
+      </form>
+
+      <p class="mt-6 text-center text-sm text-gray-600">
+        Already have an account?
+        <a class="text-blue-600 hover:underline" routerLink="/login">Sign in</a>
+      </p>
+    </cxs-card>
+  </div>
+</div>

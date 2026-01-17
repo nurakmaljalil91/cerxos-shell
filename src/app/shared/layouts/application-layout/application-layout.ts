@@ -1,18 +1,18 @@
-import { Component, effect, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { HeroIconHelperPipe } from '../../pipes/hero-icon-helper.pipe';
 import { heroIconHelper } from '../../functions/hero-icon-helper.fx';
 import { LayoutNotifications } from '../layout-notifications/layout-notifications';
 import { LayoutProfileMenu } from '../layout-profile-menu/layout-profile-menu';
 
-interface NavigationItem {
+type NavigationItem = {
   label: string;
   route: string;
   icon?: string[];
 }
 
 @Component({
-  selector: 'app-application-layout',
+  changeDetection: ChangeDetectionStrategy.OnPush,selector: 'app-application-layout',
   imports: [
     RouterOutlet,
     RouterLink,
@@ -25,11 +25,12 @@ interface NavigationItem {
   styleUrl: './application-layout.css'
 })
 export class ApplicationLayout {
-  collapsed = signal<boolean>(false);
-  drawerOpened = signal<boolean>(false);
+  readonly collapsed = signal<boolean>(false);
+  readonly drawerOpened = signal<boolean>(false);
 
   navigations: NavigationItem[] = [
     { label: 'Dashboard', route: '/', icon: heroIconHelper('home') },
+    { label: 'Users', route: '/users', icon: heroIconHelper('user-group') },
     { label: 'Profile', route: '/profile', icon: heroIconHelper('user') },
     { label: 'Settings', route: '/settings', icon: heroIconHelper('cog-6-tooth') }
   ];

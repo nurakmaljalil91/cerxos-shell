@@ -10,6 +10,11 @@ export const routes: Routes = [
       import('./features/authentication/pages/login-page/login-page').then((m) => m.LoginPage),
   },
   {
+    path: 'register',
+    loadComponent: () =>
+      import('./features/authentication/pages/register-page/register-page').then((m) => m.RegisterPage),
+  },
+  {
     path: '',
     component: ApplicationLayout,
     canActivate: [authenticationGuard],
@@ -20,6 +25,11 @@ export const routes: Routes = [
           import('./features/dashboard/pages/dashboard-page/dashboard-page').then(
             (m) => m.DashboardPage,
           ),
+      },
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./features/users/pages/users-page/users-page').then((m) => m.UsersPage),
       },
       {
         path: 'profile',

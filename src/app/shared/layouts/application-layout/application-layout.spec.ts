@@ -29,8 +29,8 @@ describe('ApplicationLayout', () => {
   });
 
   it('should define navigation items for dashboard, profile, and settings', () => {
-    expect(component.navigations.length).toBe(3);
-    expect(component.navigations.map((n) => n.route)).toEqual(['/', '/profile', '/settings']);
+    expect(component.navigations.length).toBe(4);
+    expect(component.navigations.map((n) => n.route)).toEqual(['/', '/users','/profile', '/settings']);
   });
 
   it('should toggle sidebar collapsed state', () => {

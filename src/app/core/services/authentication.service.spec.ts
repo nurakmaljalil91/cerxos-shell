@@ -5,7 +5,7 @@ import { TokenService } from './token.service';
 import { AuthenticationMock } from './authentication.mock';
 import { environment } from '../../../environments/environment';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { LoginRequest, LoginResponse } from '../../shared/models/model';
+import { LoginCommand, LoginResponse } from '../../shared/models/model';
 import { of } from 'rxjs';
 
 describe('AuthenticationService', () => {
@@ -62,14 +62,14 @@ describe('AuthenticationService', () => {
     it('should use AuthenticationMock and set token/user on login when in test mode', (done) => {
       environment.testMode = true;
 
-      const mockRequest: LoginRequest = {
+      const mockRequest: LoginCommand = {
         username: 'admin',
         password: 'Admin123#'
       };
 
       const mockResponse: LoginResponse = {
         token: 'mock-token',
-        expiresIn: 3600
+        expiresAt: new Date()
       };
 
       authenticationMockSpy.login.and.returnValue(of(mockResponse));
@@ -85,14 +85,14 @@ describe('AuthenticationService', () => {
     it('should call HttpClient and set token/user when not in testMode', (done) => {
       environment.testMode = false;
 
-      const request: LoginRequest = {
+      const request: LoginCommand = {
         username: 'user',
         password: 'password'
       };
 
       const response: LoginResponse = {
         token: 'api-token',
-        expiresIn: 1800
+        expiresAt: new Date()
       };
 
       httpClientSpy.post.and.returnValue(of(response));
