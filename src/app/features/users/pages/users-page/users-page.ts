@@ -1,8 +1,22 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
-import { CxsDataTableColumn, CxsDataTableComponent, CxsDataTableSort, CxsDataTableSortDirection } from 'cerxos-ui';
+import {
+  CxsDataTableCellDirective,
+  CxsDataTableColumn,
+  CxsDataTableComponent,
+  CxsDataTableSort,
+  CxsDataTableSortDirection,
+} from 'cerxos-ui';
 import { UserDto } from '../../../../shared/models/model';
 import { UsersService } from '../../services/users.service';
 
@@ -10,7 +24,7 @@ import { UsersService } from '../../services/users.service';
   selector: 'app-users-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, CxsDataTableComponent],
+  imports: [CommonModule, CxsDataTableComponent, CxsDataTableCellDirective],
   templateUrl: './users-page.html',
   styleUrl: './users-page.css',
 })
@@ -29,11 +43,12 @@ export class UsersPage implements OnInit {
   private readonly users = signal<UserDto[]>([]);
 
   readonly columns: CxsDataTableColumn[] = [
-    { key: 'username', label: 'Username', sortable: true },
-    { key: 'email', label: 'Email', sortable: true },
+    { key: 'username', label: 'Username', filterable: true, sortable: true },
+    { key: 'email', label: 'Email', sortable: true, filterable: true },
     { key: 'phoneNumber', label: 'Phone' },
-    { key: 'roles', label: 'Roles' },
-    { key: 'locked', label: 'Locked', align: 'center' }
+    { key: 'roles', label: 'Roles', filterable: true, sortable: true },
+    { key: 'locked', label: 'Locked', align: 'right' },
+    { key: 'actions', label: 'Actions', align: 'right' },
   ];
 
   readonly rows = computed(() =>
@@ -43,8 +58,9 @@ export class UsersPage implements OnInit {
       email: user.email ?? '',
       phoneNumber: user.phoneNumber ?? '',
       roles: user.roles?.length ? user.roles.join(', ') : undefined,
-      locked: user.isLocked ? 'Yes' : 'No'
-    }))
+      locked: user.isLocked ? 'Yes' : 'No',
+      isLocked: user.isLocked ?? false,
+    })),
   );
 
   ngOnInit(): void {
@@ -69,6 +85,23 @@ export class UsersPage implements OnInit {
     this.loadUsers();
   }
 
+  onEditUser(userId: string): void {
+    void userId;
+  }
+
+  onDeleteUser(userId: string): void {
+    void userId;
+  }
+
+  onToggleLockUser(userId: string, isLocked: boolean): void {
+    void userId;
+    void isLocked;
+  }
+
+  onChangePassword(userId: string): void {
+    void userId;
+  }
+
   private loadUsers(): void {
     this.loading.set(true);
     this.error.set(null);
@@ -79,11 +112,11 @@ export class UsersPage implements OnInit {
         page: this.pageIndex(),
         total: this.pageSize(),
         sortBy: sortKey,
-        descending: this.sortDirection() === 'desc'
+        descending: this.sortDirection() === 'desc',
       })
       .pipe(
         finalize(() => this.loading.set(false)),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (response) => {
@@ -101,8 +134,7 @@ export class UsersPage implements OnInit {
           this.users.set([]);
           this.totalCount.set(0);
           this.error.set(err?.error?.message ?? 'Failed to load users.');
-        }
+        },
       });
   }
-
 }

@@ -3,18 +3,24 @@ import { HttpClient } from '@angular/common/http';
 import { TokenService } from './token.service';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { BaseResponseOfString, LoginCommand, LoginResponse, RegisterCommand } from '../../shared/models/model';
+import {
+  BaseResponseOfLoginResponse,
+  BaseResponseOfString,
+  LoginCommand,
+  RegisterCommand,
+} from '../../shared/models/model';
 import { AuthenticationMock } from './authentication.mock';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthenticationService {
   http = inject(HttpClient);
   mock = inject(AuthenticationMock);
   tokenService = inject(TokenService);
+  authenticationEndpoint = `${environment.apiBaseUrl}/api/authentications`;
 
-  private readonly _user = signal<LoginResponse | null>(null);
+  private readonly _user = signal<BaseResponseOfLoginResponse | null>(null);
   user = this._user.asReadonly();
   readonly authenticating = computed(() => !!this.tokenService.get());
 
@@ -22,22 +28,24 @@ export class AuthenticationService {
     return this.authenticating();
   }
 
-  login(request: LoginCommand): Observable<LoginResponse> {
+  login(request: LoginCommand): Observable<BaseResponseOfLoginResponse> {
     {
       if (environment.testMode) {
         return this.mock.login(request).pipe(
           tap((response) => {
-            this.tokenService.set(response?.token ?? '');
+            this.tokenService.set(response?.data?.token ?? '');
             this._user.set(response);
-          })
+          }),
         );
       }
-      return this.http.post<LoginResponse>(`${environment.apiBaseUrl}/login`, request).pipe(
-        tap((response) => {
-          this.tokenService.set(response?.token ?? '');
-          this._user.set(response);
-        })
-      );
+      return this.http
+        .post<BaseResponseOfLoginResponse>(`${this.authenticationEndpoint}/login`, request)
+        .pipe(
+          tap((response) => {
+            this.tokenService.set(response?.data?.token ?? '');
+            this._user.set(response);
+          }),
+        );
     }
   }
 
@@ -45,7 +53,7 @@ export class AuthenticationService {
     if (environment.testMode) {
       return this.mock.register(request);
     }
-    return this.http.post<BaseResponseOfString>(`${environment.apiBaseUrl}/register`, request);
+    return this.http.post<BaseResponseOfString>(`${this.authenticationEndpoint}/register`, request);
   }
 
   logout(): void {

@@ -8,8 +8,9 @@ import {
   CxsButtonComponent,
   CxsCardComponent,
   CxsCheckboxComponent,
-  CxsInputComponent
+  CxsInputComponent,
 } from 'cerxos-ui';
+import { BaseResponseOfLoginResponse, LoginResponse } from '../../../../shared/models/model';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,selector: 'app-login-page',
@@ -58,7 +59,8 @@ export class LoginPage {
       return;
     }
     this.authenticationService.login({ username, password }).subscribe({
-      next: () => {
+      next: (response: BaseResponseOfLoginResponse) => {
+        console.log(response);
         void this.router.navigate(['/']);
       },
       error: (err) => {
