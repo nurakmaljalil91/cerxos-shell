@@ -60,6 +60,39 @@
           }
         </cxs-button>
 
+        <div class="flex items-center gap-3 text-xs text-gray-400 mt-4">
+          <span class="h-px flex-1 bg-gray-200"></span>
+          <span>Or</span>
+          <span class="h-px flex-1 bg-gray-200"></span>
+        </div>
+
+        <cxs-button class="w-full" type="button" variant="secondary">
+          <svg
+            cxsButtonIcon
+            aria-hidden="true"
+            class="h-5 w-5"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M23.49 12.27c0-.81-.07-1.58-.2-2.33H12v4.41h6.47a5.53 5.53 0 0 1-2.4 3.63v3.01h3.88c2.27-2.09 3.54-5.17 3.54-8.72Z"
+              fill="#4285F4"
+            />
+            <path
+              d="M12 24c3.24 0 5.96-1.07 7.95-2.9l-3.88-3.01c-1.08.73-2.47 1.16-4.07 1.16-3.12 0-5.76-2.1-6.7-4.93H1.29v3.09A12 12 0 0 0 12 24Z"
+              fill="#34A853"
+            />
+            <path
+              d="M5.3 14.32a7.2 7.2 0 0 1 0-4.64V6.59H1.29a12 12 0 0 0 0 10.82l4.01-3.09Z"
+              fill="#FBBC05"
+            />
+            <path
+              d="M12 4.77c1.77 0 3.35.61 4.6 1.81l3.45-3.45C17.96 1.19 15.24 0 12 0A12 12 0 0 0 1.29 6.59L5.3 9.68C6.24 6.85 8.88 4.77 12 4.77Z"
+              fill="#EA4335"
+            />
+          </svg>
+          <span>Sign in with Google</span>
+        </cxs-button>
+
         @if (error()) {
           <cxs-alert class="mt-4 block" variant="danger">
             {{ error() }}
