@@ -8,10 +8,11 @@ import { UserSessionService } from '../../../core/services/user-session.service'
 
 type NavigationItem = {
   label: string;
-  route: string;
+  route?: string;
   icon?: string[];
   requiredRoles?: string[];
   requiredPermissions?: string[];
+  children?: NavigationItem[];
 }
 
 @Component({
@@ -31,16 +32,39 @@ export class ApplicationLayout {
   readonly collapsed = signal<boolean>(false);
   readonly drawerOpened = signal<boolean>(false);
   private userSessionService = inject(UserSessionService);
+  private readonly expandedGroups = signal<Record<string, boolean>>({
+    'Identity Management': true,
+  });
 
   navigations: NavigationItem[] = [
     { label: 'Dashboard', route: '/', icon: heroIconHelper('home') },
-    { label: 'Users', route: '/users', icon: heroIconHelper('user-group') },
+    {
+      label: 'Identity Management',
+      icon: heroIconHelper('user-group'),
+      children: [
+        { label: 'Users', route: '/identity/users', icon: heroIconHelper('user-group') },
+        { label: 'Groups', route: '/identity/groups', icon: heroIconHelper('user-group') },
+        { label: 'Roles', route: '/identity/roles', icon: heroIconHelper('user') },
+        { label: 'Permissions', route: '/identity/permissions', icon: heroIconHelper('cog-6-tooth') },
+      ],
+    },
     { label: 'Profile', route: '/profile', icon: heroIconHelper('user') },
-    { label: 'Settings', route: '/settings', icon: heroIconHelper('cog-6-tooth') }
+    { label: 'Settings', route: '/settings', icon: heroIconHelper('cog-6-tooth') },
   ];
 
   readonly filteredNavigations = computed(() =>
-    this.navigations.filter((item) => this.canAccess(item)),
+    this.navigations
+      .map((item) => {
+        if (!item.children?.length) {
+          return this.canAccess(item) ? item : null;
+        }
+        const children = item.children.filter((child) => this.canAccess(child));
+        if (!children.length) {
+          return null;
+        }
+        return { ...item, children };
+      })
+      .filter((item): item is NavigationItem => !!item),
   );
 
   private saveCollapsedStateEffect = effect(() => {
@@ -64,6 +88,21 @@ export class ApplicationLayout {
 
   closeDrawer(): void {
     this.drawerOpened.set(false);
+  }
+
+  toggleGroup(label: string): void {
+    this.expandedGroups.update((state) => ({
+      ...state,
+      [label]: !this.isGroupExpanded(label),
+    }));
+  }
+
+  isGroupExpanded(label: string): boolean {
+    const state = this.expandedGroups();
+    if (Object.prototype.hasOwnProperty.call(state, label)) {
+      return !!state[label];
+    }
+    return true;
   }
 
   private canAccess(item: NavigationItem): boolean {

@@ -18,14 +18,12 @@ describe('LoginPage', () => {
     authenticationService = jasmine.createSpyObj('AuthenticationService', ['login']);
 
     await TestBed.configureTestingModule({
-      imports: [
-        LoginPage,
-      ],
+      imports: [LoginPage],
       providers: [
         provideZonelessChangeDetection(),
         provideRouter([]),
-        { provide: AuthenticationService, useValue: authenticationService }
-      ]
+        { provide: AuthenticationService, useValue: authenticationService },
+      ],
     }).compileComponents();
 
     router = TestBed.inject(Router);
@@ -44,7 +42,7 @@ describe('LoginPage', () => {
     expect(component.form.value).toEqual({
       username: '',
       password: '',
-      remember: true
+      remember: true,
     });
   });
 
@@ -62,11 +60,22 @@ describe('LoginPage', () => {
   });
 
   it('should call authenticationService.login when form is valid', () => {
-    authenticationService.login.and.returnValue(of({ token: 'abc', expiresIn: 3600 }));
+    authenticationService.login.and.returnValue(
+      of({
+        success: true,
+        message: 'Login successful.',
+        data: {
+          token: 'abc',
+          expiresAt: new Date(),
+          refreshToken: 'refresh-abc',
+          refreshTokenExpiresAt: new Date(),
+        },
+      }),
+    );
 
     component.form.patchValue({
       username: 'admin',
-      password: 'Admin123#'
+      password: 'Admin123#',
     });
 
     component.onSubmit();
@@ -74,16 +83,27 @@ describe('LoginPage', () => {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(authenticationService.login).toHaveBeenCalledWith({
       username: 'admin',
-      password: 'Admin123#'
+      password: 'Admin123#',
     });
   });
 
   it('should navigate to / after successful login', () => {
-    authenticationService.login.and.returnValue(of({ token: 'abc', expiresIn: 3600 }));
+    authenticationService.login.and.returnValue(
+      of({
+        success: true,
+        message: 'Login successful.',
+        data: {
+          token: 'abc',
+          expiresAt: new Date(),
+          refreshToken: 'refresh-abc',
+          refreshTokenExpiresAt: new Date(),
+        },
+      }),
+    );
 
     component.form.patchValue({
       username: 'admin',
-      password: 'Admin123#'
+      password: 'Admin123#',
     });
 
     component.onSubmit();
@@ -94,13 +114,13 @@ describe('LoginPage', () => {
   it('should show error message on login failure', () => {
     authenticationService.login.and.returnValue(
       throwError(() => ({
-        error: { message: 'Invalid username or password.' }
-      }))
+        error: { message: 'Invalid username or password.' },
+      })),
     );
 
     component.form.patchValue({
       username: 'bad',
-      password: 'wrong'
+      password: 'wrong',
     });
 
     component.onSubmit();
@@ -114,7 +134,7 @@ describe('LoginPage', () => {
 
     component.form.patchValue({
       username: 'test',
-      password: 'test'
+      password: 'test',
     });
 
     component.onSubmit();
@@ -123,11 +143,22 @@ describe('LoginPage', () => {
   });
 
   it('should set loading=true while submitting', () => {
-    authenticationService.login.and.returnValue(of({ token: 'abc', expiresIn: 3600 }));
+    authenticationService.login.and.returnValue(
+      of({
+        success: true,
+        message: 'Login successful.',
+        data: {
+          token: 'abc',
+          expiresAt: new Date(),
+          refreshToken: 'refresh-abc',
+          refreshTokenExpiresAt: new Date(),
+        },
+      }),
+    );
 
     component.form.patchValue({
       username: 'user',
-      password: 'pass'
+      password: 'pass',
     });
 
     component.onSubmit();

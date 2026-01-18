@@ -27,9 +27,38 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'users',
-        loadComponent: () =>
-          import('./features/users/pages/users-page/users-page').then((m) => m.UsersPage),
+        path: 'identity',
+        children: [
+          {
+            path: '',
+            pathMatch: 'full',
+            redirectTo: 'users',
+          },
+          {
+            path: 'users',
+            loadComponent: () =>
+              import('./features/users/pages/users-page/users-page').then((m) => m.UsersPage),
+          },
+          {
+            path: 'groups',
+            loadComponent: () =>
+              import('./features/identity/pages/groups-page/groups-page').then(
+                (m) => m.GroupsPage,
+              ),
+          },
+          {
+            path: 'roles',
+            loadComponent: () =>
+              import('./features/identity/pages/roles-page/roles-page').then((m) => m.RolesPage),
+          },
+          {
+            path: 'permissions',
+            loadComponent: () =>
+              import('./features/identity/pages/permissions-page/permissions-page').then(
+                (m) => m.PermissionsPage,
+              ),
+          },
+        ],
       },
       {
         path: 'profile',

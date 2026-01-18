@@ -1,0 +1,93 @@
+<section class="space-y-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold text-gray-900">Roles</h1>
+      <p class="text-sm text-gray-500">Manage role definitions and permissions.</p>
+    </div>
+    <cxs-button size="sm" (click)="onOpenAddRole()">Add role</cxs-button>
+  </div>
+
+  @if (error()) {
+    <div class="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+      {{ error() }}
+    </div>
+  }
+
+  <cxs-data-table
+    caption="Roles"
+    emptyMessage="No roles found"
+    [bordered]="true"
+    [columns]="columns"
+    [data]="rows()"
+    [loading]="loading()"
+    [showFilters]="false"
+    [showGlobalSearch]="false"
+    [showPagination]="false"
+    [showToolbar]="false"
+    [striped]="true"
+  >
+    <ng-template cxsDataTableCell="actions" let-row>
+      <div class="flex flex-wrap items-center justify-end gap-2">
+        <button
+          class="rounded px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
+          type="button"
+          (click)="onEditRole($any(row).id)"
+        >
+          Edit
+        </button>
+        <button
+          class="rounded px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+          type="button"
+          (click)="onDeleteRole($any(row).id)"
+        >
+          Delete
+        </button>
+      </div>
+    </ng-template>
+  </cxs-data-table>
+
+  <cxs-dialog
+    description="Create a new role."
+    title="Add role"
+    [open]="addRoleOpen()"
+    (openChange)="onCloseAddRole()"
+  >
+    <form class="grid gap-4" [formGroup]="addRoleForm" (ngSubmit)="onSubmitAddRole()">
+      <label class="grid gap-1 text-sm">
+        <span class="text-gray-700">Role name</span>
+        <cxs-input formControlName="name" placeholder="Role name" />
+      </label>
+      <label class="grid gap-1 text-sm">
+        <span class="text-gray-700">Description</span>
+        <cxs-input formControlName="description" placeholder="Description" />
+      </label>
+    </form>
+
+    @if (addRoleError()) {
+      <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+        {{ addRoleError() }}
+      </div>
+    }
+
+    <div cxsDialogActions>
+      <cxs-button variant="secondary" (click)="onCloseAddRole()">Cancel</cxs-button>
+      <cxs-button
+        type="submit"
+        [disabled]="addRoleLoading()"
+        [loading]="addRoleLoading()"
+        (click)="onSubmitAddRole()"
+      >
+        Create role
+      </cxs-button>
+    </div>
+  </cxs-dialog>
+
+  <cxs-toast
+    [duration]="3500"
+    [message]="toastMessage()"
+    [open]="toastOpen()"
+    [title]="toastTitle()"
+    [variant]="toastVariant()"
+    (openChange)="onToastOpenChange($event)"
+  />
+</section>

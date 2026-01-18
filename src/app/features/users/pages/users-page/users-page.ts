@@ -23,16 +23,7 @@ import {
   CxsToastComponent,
   CxsToastVariant,
 } from 'cerxos-ui';
-import {
-  CreatePermissionCommand,
-  CreateRoleCommand,
-  CreateUserCommand,
-  PermissionDto,
-  RoleDto,
-  UserDto,
-} from '../../../../shared/models/model';
-import { PermissionsService } from '../../services/permissions.service';
-import { RolesService } from '../../services/roles.service';
+import { CreateUserCommand, UserDto } from '../../../../shared/models/model';
 import { UsersService } from '../../services/users.service';
 
 @Component({
@@ -55,25 +46,13 @@ import { UsersService } from '../../services/users.service';
 export class UsersPage implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly usersService = inject(UsersService);
-  private readonly rolesService = inject(RolesService);
-  private readonly permissionsService = inject(PermissionsService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
-  readonly rolesLoading = signal(false);
-  readonly rolesError = signal<string | null>(null);
-  readonly permissionsLoading = signal(false);
-  readonly permissionsError = signal<string | null>(null);
   readonly addUserOpen = signal(false);
   readonly addUserLoading = signal(false);
   readonly addUserError = signal<string | null>(null);
-  readonly addRoleOpen = signal(false);
-  readonly addRoleLoading = signal(false);
-  readonly addRoleError = signal<string | null>(null);
-  readonly addPermissionOpen = signal(false);
-  readonly addPermissionLoading = signal(false);
-  readonly addPermissionError = signal<string | null>(null);
   readonly toastOpen = signal(false);
   readonly toastTitle = signal('');
   readonly toastMessage = signal('');
@@ -86,24 +65,11 @@ export class UsersPage implements OnInit {
   readonly sortDirection = signal<CxsDataTableSortDirection>('asc');
 
   private readonly users = signal<UserDto[]>([]);
-  private readonly roles = signal<RoleDto[]>([]);
-  private readonly permissions = signal<PermissionDto[]>([]);
-
   readonly addUserForm = this.formBuilder.group({
     username: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
     phoneNumber: [''],
     password: ['', [Validators.required, Validators.minLength(6)]],
-  });
-
-  readonly addRoleForm = this.formBuilder.group({
-    name: ['', [Validators.required]],
-    description: [''],
-  });
-
-  readonly addPermissionForm = this.formBuilder.group({
-    name: ['', [Validators.required]],
-    description: [''],
   });
 
   readonly columns: CxsDataTableColumn[] = [
@@ -115,18 +81,6 @@ export class UsersPage implements OnInit {
     { key: 'actions', label: 'Actions', align: 'right' },
   ];
 
-  readonly roleColumns: CxsDataTableColumn[] = [
-    { key: 'name', label: 'Role', sortable: true, filterable: true },
-    { key: 'description', label: 'Description' },
-    { key: 'permissions', label: 'Permissions' },
-    { key: 'actions', label: 'Actions', align: 'right' },
-  ];
-
-  readonly permissionColumns: CxsDataTableColumn[] = [
-    { key: 'name', label: 'Permission', sortable: true, filterable: true },
-    { key: 'description', label: 'Description' },
-    { key: 'actions', label: 'Actions', align: 'right' },
-  ];
 
   readonly rows = computed(() =>
     this.users().map((user) => ({
@@ -140,27 +94,8 @@ export class UsersPage implements OnInit {
     })),
   );
 
-  readonly roleRows = computed(() =>
-    this.roles().map((role) => ({
-      id: role.id ?? '',
-      name: role.name ?? '',
-      description: role.description ?? '',
-      permissions: role.permissions?.length ? role.permissions.join(', ') : undefined,
-    })),
-  );
-
-  readonly permissionRows = computed(() =>
-    this.permissions().map((permission) => ({
-      id: permission.id ?? '',
-      name: permission.name ?? '',
-      description: permission.description ?? '',
-    })),
-  );
-
   ngOnInit(): void {
     this.loadUsers();
-    this.loadRoles();
-    this.loadPermissions();
   }
 
   onPageChange(page: number): void {
@@ -198,22 +133,6 @@ export class UsersPage implements OnInit {
     void userId;
   }
 
-  onEditRole(roleId: string): void {
-    void roleId;
-  }
-
-  onDeleteRole(roleId: string): void {
-    void roleId;
-  }
-
-  onEditPermission(permissionId: string): void {
-    void permissionId;
-  }
-
-  onDeletePermission(permissionId: string): void {
-    void permissionId;
-  }
-
   onOpenAddUser(): void {
     this.addUserError.set(null);
     this.addUserOpen.set(true);
@@ -228,36 +147,6 @@ export class UsersPage implements OnInit {
       email: '',
       phoneNumber: '',
       password: '',
-    });
-  }
-
-  onOpenAddRole(): void {
-    this.addRoleError.set(null);
-    this.addRoleOpen.set(true);
-  }
-
-  onCloseAddRole(): void {
-    this.addRoleOpen.set(false);
-    this.addRoleLoading.set(false);
-    this.addRoleError.set(null);
-    this.addRoleForm.reset({
-      name: '',
-      description: '',
-    });
-  }
-
-  onOpenAddPermission(): void {
-    this.addPermissionError.set(null);
-    this.addPermissionOpen.set(true);
-  }
-
-  onCloseAddPermission(): void {
-    this.addPermissionOpen.set(false);
-    this.addPermissionLoading.set(false);
-    this.addPermissionError.set(null);
-    this.addPermissionForm.reset({
-      name: '',
-      description: '',
     });
   }
 
@@ -315,110 +204,6 @@ export class UsersPage implements OnInit {
       });
   }
 
-  onSubmitAddRole(): void {
-    if (this.addRoleLoading()) {
-      return;
-    }
-
-    if (this.addRoleForm.invalid) {
-      this.addRoleForm.markAllAsTouched();
-      return;
-    }
-
-    const formValue = this.addRoleForm.getRawValue();
-    const command: CreateRoleCommand = {
-      name: formValue.name ?? '',
-      description: formValue.description ?? '',
-    };
-
-    this.addRoleLoading.set(true);
-    this.addRoleError.set(null);
-
-    this.rolesService
-      .createRole(command)
-      .pipe(
-        finalize(() => this.addRoleLoading.set(false)),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe({
-        next: (response) => {
-          if (!response?.success) {
-            const message = response?.message ?? 'Failed to create role.';
-            this.addRoleError.set(message);
-            this.showToast('Role not created', message, 'danger');
-            return;
-          }
-
-          this.addRoleForm.reset({
-            name: '',
-            description: '',
-          });
-          this.addRoleOpen.set(false);
-          this.showToast('Role created', response?.message ?? 'Role added successfully.', 'info');
-          this.loadRoles();
-        },
-        error: (err) => {
-          const message = err?.error?.message ?? 'Failed to create role.';
-          this.addRoleError.set(message);
-          this.showToast('Role not created', message, 'danger');
-        },
-      });
-  }
-
-  onSubmitAddPermission(): void {
-    if (this.addPermissionLoading()) {
-      return;
-    }
-
-    if (this.addPermissionForm.invalid) {
-      this.addPermissionForm.markAllAsTouched();
-      return;
-    }
-
-    const formValue = this.addPermissionForm.getRawValue();
-    const command: CreatePermissionCommand = {
-      name: formValue.name ?? '',
-      description: formValue.description ?? '',
-    };
-
-    this.addPermissionLoading.set(true);
-    this.addPermissionError.set(null);
-
-    this.permissionsService
-      .createPermission(command)
-      .pipe(
-        finalize(() => this.addPermissionLoading.set(false)),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe({
-        next: (response) => {
-          if (!response?.success) {
-            const message = response?.message ?? 'Failed to create permission.';
-            this.addPermissionError.set(message);
-            this.showToast('Permission not created', message, 'danger');
-            return;
-          }
-
-          this.addPermissionForm.reset({
-            name: '',
-            description: '',
-          });
-          this.addPermissionOpen.set(false);
-          this.showToast(
-            'Permission created',
-            response?.message ?? 'Permission added successfully.',
-            'info',
-          );
-          this.loadPermissions();
-        },
-        error: (err) => {
-          const message = err?.error?.message ?? 'Failed to create permission.';
-          this.addPermissionError.set(message);
-          this.showToast('Permission not created', message, 'danger');
-        },
-      });
-  }
-
   onToastOpenChange(open: boolean): void {
     this.toastOpen.set(open);
   }
@@ -455,70 +240,6 @@ export class UsersPage implements OnInit {
           this.users.set([]);
           this.totalCount.set(0);
           this.error.set(err?.error?.message ?? 'Failed to load users.');
-        },
-      });
-  }
-
-  private loadRoles(): void {
-    this.rolesLoading.set(true);
-    this.rolesError.set(null);
-
-    this.rolesService
-      .getRoles({
-        page: 1,
-        total: 1000,
-        sortBy: 'name',
-        descending: false,
-      })
-      .pipe(
-        finalize(() => this.rolesLoading.set(false)),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe({
-        next: (response) => {
-          if (!response?.success || !response.data?.items) {
-            this.roles.set([]);
-            this.rolesError.set(response?.message ?? 'Failed to load roles.');
-            return;
-          }
-
-          this.roles.set(response.data.items);
-        },
-        error: (err) => {
-          this.roles.set([]);
-          this.rolesError.set(err?.error?.message ?? 'Failed to load roles.');
-        },
-      });
-  }
-
-  private loadPermissions(): void {
-    this.permissionsLoading.set(true);
-    this.permissionsError.set(null);
-
-    this.permissionsService
-      .getPermissions({
-        page: 1,
-        total: 1000,
-        sortBy: 'name',
-        descending: false,
-      })
-      .pipe(
-        finalize(() => this.permissionsLoading.set(false)),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe({
-        next: (response) => {
-          if (!response?.success || !response.data?.items) {
-            this.permissions.set([]);
-            this.permissionsError.set(response?.message ?? 'Failed to load permissions.');
-            return;
-          }
-
-          this.permissions.set(response.data.items);
-        },
-        error: (err) => {
-          this.permissions.set([]);
-          this.permissionsError.set(err?.error?.message ?? 'Failed to load permissions.');
         },
       });
   }

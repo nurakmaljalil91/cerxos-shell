@@ -1,0 +1,93 @@
+<section class="space-y-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold text-gray-900">Groups</h1>
+      <p class="text-sm text-gray-500">Manage group membership and role assignments.</p>
+    </div>
+    <cxs-button size="sm" (click)="onOpenAddGroup()">Add group</cxs-button>
+  </div>
+
+  @if (error()) {
+    <div class="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+      {{ error() }}
+    </div>
+  }
+
+  <cxs-data-table
+    caption="Groups"
+    emptyMessage="No groups found"
+    [bordered]="true"
+    [columns]="columns"
+    [data]="rows()"
+    [loading]="loading()"
+    [showFilters]="false"
+    [showGlobalSearch]="false"
+    [showPagination]="false"
+    [showToolbar]="false"
+    [striped]="true"
+  >
+    <ng-template cxsDataTableCell="actions" let-row>
+      <div class="flex flex-wrap items-center justify-end gap-2">
+        <button
+          class="rounded px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
+          type="button"
+          (click)="onEditGroup($any(row).id)"
+        >
+          Edit
+        </button>
+        <button
+          class="rounded px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+          type="button"
+          (click)="onDeleteGroup($any(row).id)"
+        >
+          Delete
+        </button>
+      </div>
+    </ng-template>
+  </cxs-data-table>
+
+  <cxs-dialog
+    description="Create a new group."
+    title="Add group"
+    [open]="addGroupOpen()"
+    (openChange)="onCloseAddGroup()"
+  >
+    <form class="grid gap-4" [formGroup]="addGroupForm" (ngSubmit)="onSubmitAddGroup()">
+      <label class="grid gap-1 text-sm">
+        <span class="text-gray-700">Group name</span>
+        <cxs-input formControlName="name" placeholder="Group name" />
+      </label>
+      <label class="grid gap-1 text-sm">
+        <span class="text-gray-700">Description</span>
+        <cxs-input formControlName="description" placeholder="Description" />
+      </label>
+    </form>
+
+    @if (addGroupError()) {
+      <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+        {{ addGroupError() }}
+      </div>
+    }
+
+    <div cxsDialogActions>
+      <cxs-button variant="secondary" (click)="onCloseAddGroup()">Cancel</cxs-button>
+      <cxs-button
+        type="submit"
+        [disabled]="addGroupLoading()"
+        [loading]="addGroupLoading()"
+        (click)="onSubmitAddGroup()"
+      >
+        Create group
+      </cxs-button>
+    </div>
+  </cxs-dialog>
+
+  <cxs-toast
+    [duration]="3500"
+    [message]="toastMessage()"
+    [open]="toastOpen()"
+    [title]="toastTitle()"
+    [variant]="toastVariant()"
+    (openChange)="onToastOpenChange($event)"
+  />
+</section>
