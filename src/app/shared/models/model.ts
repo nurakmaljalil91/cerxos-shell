@@ -10,6 +10,132 @@
 
 
 /** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
+export interface BaseResponseOfPaginatedEnumerableOfAddressDto {
+    /** Gets a value indicating whether the operation was successful. */
+    success?: boolean;
+    /** Gets an optional message describing the result. */
+    message?: string | undefined;
+    /** Gets the data payload of the response. */
+    data?: PaginatedEnumerableOfAddressDto | undefined;
+    /** Validation or business errors grouped by field/property name. */
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Represents a paginated collection of items with pagination metadata. */
+export interface PaginatedEnumerableOfAddressDto {
+    /** Gets or sets the items for the current page. */
+    items?: AddressDto[] | undefined;
+    /** Gets or sets the current page number. */
+    pageNumber?: number;
+    /** Gets or sets the total number of pages. */
+    totalPages?: number;
+    /** Gets or sets the total number of items. */
+    totalCount?: number;
+    /** Gets a value indicating whether there is a previous page. */
+    hasPreviousPage?: boolean;
+    /** Gets a value indicating whether there is a next page. */
+    hasNextPage?: boolean;
+}
+
+/** Represents an address summary for API responses. */
+export interface AddressDto {
+    /** Gets the address identifier. */
+    id?: string;
+    /** Gets the user identifier. */
+    userId?: string;
+    /** Gets the address label. */
+    label?: string | undefined;
+    /** Gets the address type (home, work, etc.). */
+    type?: string | undefined;
+    /** Gets the first address line. */
+    line1?: string | undefined;
+    /** Gets the second address line. */
+    line2?: string | undefined;
+    /** Gets the city. */
+    city?: string | undefined;
+    /** Gets the state or region. */
+    state?: string | undefined;
+    /** Gets the postal code. */
+    postalCode?: string | undefined;
+    /** Gets the country. */
+    country?: string | undefined;
+    /** Gets whether this address is the default. */
+    isDefault?: boolean;
+}
+
+/** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
+export interface BaseResponseOfAddressDto {
+    /** Gets a value indicating whether the operation was successful. */
+    success?: boolean;
+    /** Gets an optional message describing the result. */
+    message?: string | undefined;
+    /** Gets the data payload of the response. */
+    data?: AddressDto | undefined;
+    /** Validation or business errors grouped by field/property name. */
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Command to create a new address. */
+export interface CreateAddressCommand {
+    /** Gets or sets the user identifier. */
+    userId?: string;
+    /** Gets or sets the address label. */
+    label?: string | undefined;
+    /** Gets or sets the address type (home, work, etc.). */
+    type?: string | undefined;
+    /** Gets or sets the first address line. */
+    line1?: string | undefined;
+    /** Gets or sets the second address line. */
+    line2?: string | undefined;
+    /** Gets or sets the city. */
+    city?: string | undefined;
+    /** Gets or sets the state or region. */
+    state?: string | undefined;
+    /** Gets or sets the postal code. */
+    postalCode?: string | undefined;
+    /** Gets or sets the country. */
+    country?: string | undefined;
+    /** Gets or sets whether this address is the default. */
+    isDefault?: boolean;
+}
+
+/** Command to update an existing address. */
+export interface UpdateAddressCommand {
+    /** Gets or sets the address identifier. */
+    id?: string;
+    /** Gets or sets the address label. */
+    label?: string | undefined;
+    /** Gets or sets the address type (home, work, etc.). */
+    type?: string | undefined;
+    /** Gets or sets the first address line. */
+    line1?: string | undefined;
+    /** Gets or sets the second address line. */
+    line2?: string | undefined;
+    /** Gets or sets the city. */
+    city?: string | undefined;
+    /** Gets or sets the state or region. */
+    state?: string | undefined;
+    /** Gets or sets the postal code. */
+    postalCode?: string | undefined;
+    /** Gets or sets the country. */
+    country?: string | undefined;
+    /** Gets or sets whether this address is the default. */
+    isDefault?: boolean | undefined;
+}
+
+/** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
+export interface BaseResponseOfString {
+    /** Gets a value indicating whether the operation was successful. */
+    success?: boolean;
+    /** Gets an optional message describing the result. */
+    message?: string | undefined;
+    /** Gets the data payload of the response. */
+    data?: string | undefined;
+    /** Validation or business errors grouped by field/property name. */
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
 export interface BaseResponseOfLoginResponse {
     /** Gets a value indicating whether the operation was successful. */
     success?: boolean;
@@ -39,18 +165,6 @@ export interface LoginCommand {
     password?: string | undefined;
 }
 
-/** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
-export interface BaseResponseOfString {
-    /** Gets a value indicating whether the operation was successful. */
-    success?: boolean;
-    /** Gets an optional message describing the result. */
-    message?: string | undefined;
-    /** Gets the data payload of the response. */
-    data?: string | undefined;
-    /** Validation or business errors grouped by field/property name. */
-    errors?: { [key: string]: string[]; } | undefined;
-}
-
 /** Command to register a new user. */
 export interface RegisterCommand {
     /** Gets or sets the username for the new user. */
@@ -75,6 +189,182 @@ export interface ResetPasswordCommand {
     resetToken?: string | undefined;
     /** Gets or sets the new password. */
     newPassword?: string | undefined;
+}
+
+/** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
+export interface BaseResponseOfPaginatedEnumerableOfConsentDto {
+    /** Gets a value indicating whether the operation was successful. */
+    success?: boolean;
+    /** Gets an optional message describing the result. */
+    message?: string | undefined;
+    /** Gets the data payload of the response. */
+    data?: PaginatedEnumerableOfConsentDto | undefined;
+    /** Validation or business errors grouped by field/property name. */
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Represents a paginated collection of items with pagination metadata. */
+export interface PaginatedEnumerableOfConsentDto {
+    /** Gets or sets the items for the current page. */
+    items?: ConsentDto[] | undefined;
+    /** Gets or sets the current page number. */
+    pageNumber?: number;
+    /** Gets or sets the total number of pages. */
+    totalPages?: number;
+    /** Gets or sets the total number of items. */
+    totalCount?: number;
+    /** Gets a value indicating whether there is a previous page. */
+    hasPreviousPage?: boolean;
+    /** Gets a value indicating whether there is a next page. */
+    hasNextPage?: boolean;
+}
+
+/** Represents a consent summary for API responses. */
+export interface ConsentDto {
+    /** Gets the consent identifier. */
+    id?: string;
+    /** Gets the user identifier. */
+    userId?: string;
+    /** Gets the consent type. */
+    type?: string | undefined;
+    /** Gets whether the consent is granted. */
+    isGranted?: boolean;
+    /** Gets when the consent was granted or revoked in UTC. */
+    grantedAt?: string | undefined;
+    /** Gets the consent version. */
+    version?: string | undefined;
+    /** Gets the source of the consent. */
+    source?: string | undefined;
+}
+
+/** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
+export interface BaseResponseOfConsentDto {
+    /** Gets a value indicating whether the operation was successful. */
+    success?: boolean;
+    /** Gets an optional message describing the result. */
+    message?: string | undefined;
+    /** Gets the data payload of the response. */
+    data?: ConsentDto | undefined;
+    /** Validation or business errors grouped by field/property name. */
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Command to create a new consent. */
+export interface CreateConsentCommand {
+    /** Gets or sets the user identifier. */
+    userId?: string;
+    /** Gets or sets the consent type. */
+    type?: string | undefined;
+    /** Gets or sets whether the consent is granted. */
+    isGranted?: boolean;
+    /** Gets or sets when the consent was granted or revoked in UTC (yyyy-MM-ddTHH:mm:ssZ). */
+    grantedAt?: string | undefined;
+    /** Gets or sets the consent version. */
+    version?: string | undefined;
+    /** Gets or sets the source of the consent. */
+    source?: string | undefined;
+}
+
+/** Command to update an existing consent. */
+export interface UpdateConsentCommand {
+    /** Gets or sets the consent identifier. */
+    id?: string;
+    /** Gets or sets the consent type. */
+    type?: string | undefined;
+    /** Gets or sets whether the consent is granted. */
+    isGranted?: boolean | undefined;
+    /** Gets or sets when the consent was granted or revoked in UTC (yyyy-MM-ddTHH:mm:ssZ). */
+    grantedAt?: string | undefined;
+    /** Gets or sets the consent version. */
+    version?: string | undefined;
+    /** Gets or sets the source of the consent. */
+    source?: string | undefined;
+}
+
+/** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
+export interface BaseResponseOfPaginatedEnumerableOfContactMethodDto {
+    /** Gets a value indicating whether the operation was successful. */
+    success?: boolean;
+    /** Gets an optional message describing the result. */
+    message?: string | undefined;
+    /** Gets the data payload of the response. */
+    data?: PaginatedEnumerableOfContactMethodDto | undefined;
+    /** Validation or business errors grouped by field/property name. */
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Represents a paginated collection of items with pagination metadata. */
+export interface PaginatedEnumerableOfContactMethodDto {
+    /** Gets or sets the items for the current page. */
+    items?: ContactMethodDto[] | undefined;
+    /** Gets or sets the current page number. */
+    pageNumber?: number;
+    /** Gets or sets the total number of pages. */
+    totalPages?: number;
+    /** Gets or sets the total number of items. */
+    totalCount?: number;
+    /** Gets a value indicating whether there is a previous page. */
+    hasPreviousPage?: boolean;
+    /** Gets a value indicating whether there is a next page. */
+    hasNextPage?: boolean;
+}
+
+/** Represents a contact method summary for API responses. */
+export interface ContactMethodDto {
+    /** Gets the contact method identifier. */
+    id?: string;
+    /** Gets the user identifier. */
+    userId?: string;
+    /** Gets the contact method type. */
+    type?: string | undefined;
+    /** Gets the contact value (email or phone number). */
+    value?: string | undefined;
+    /** Gets the normalized contact value for lookup. */
+    normalizedValue?: string | undefined;
+    /** Gets whether the contact method is verified. */
+    isVerified?: boolean;
+    /** Gets whether the contact method is the primary one. */
+    isPrimary?: boolean;
+}
+
+/** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
+export interface BaseResponseOfContactMethodDto {
+    /** Gets a value indicating whether the operation was successful. */
+    success?: boolean;
+    /** Gets an optional message describing the result. */
+    message?: string | undefined;
+    /** Gets the data payload of the response. */
+    data?: ContactMethodDto | undefined;
+    /** Validation or business errors grouped by field/property name. */
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Command to create a new contact method. */
+export interface CreateContactMethodCommand {
+    /** Gets or sets the user identifier. */
+    userId?: string;
+    /** Gets or sets the contact method type. */
+    type?: string | undefined;
+    /** Gets or sets the contact value (email or phone number). */
+    value?: string | undefined;
+    /** Gets or sets whether the contact method is verified. */
+    isVerified?: boolean;
+    /** Gets or sets whether the contact method is the primary one. */
+    isPrimary?: boolean;
+}
+
+/** Command to update an existing contact method. */
+export interface UpdateContactMethodCommand {
+    /** Gets or sets the contact method identifier. */
+    id?: string;
+    /** Gets or sets the contact method type. */
+    type?: string | undefined;
+    /** Gets or sets the contact value (email or phone number). */
+    value?: string | undefined;
+    /** Gets or sets whether the contact method is verified. */
+    isVerified?: boolean | undefined;
+    /** Gets or sets whether the contact method is the primary one. */
+    isPrimary?: boolean | undefined;
 }
 
 /** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
@@ -165,6 +455,94 @@ export interface ExternalAccessTokenDto {
     accessToken?: string;
     /** Gets the UTC timestamp when the access token expires. */
     expiresAtUtc?: Date;
+}
+
+/** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
+export interface BaseResponseOfPaginatedEnumerableOfGroupDto {
+    /** Gets a value indicating whether the operation was successful. */
+    success?: boolean;
+    /** Gets an optional message describing the result. */
+    message?: string | undefined;
+    /** Gets the data payload of the response. */
+    data?: PaginatedEnumerableOfGroupDto | undefined;
+    /** Validation or business errors grouped by field/property name. */
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Represents a paginated collection of items with pagination metadata. */
+export interface PaginatedEnumerableOfGroupDto {
+    /** Gets or sets the items for the current page. */
+    items?: GroupDto[] | undefined;
+    /** Gets or sets the current page number. */
+    pageNumber?: number;
+    /** Gets or sets the total number of pages. */
+    totalPages?: number;
+    /** Gets or sets the total number of items. */
+    totalCount?: number;
+    /** Gets a value indicating whether there is a previous page. */
+    hasPreviousPage?: boolean;
+    /** Gets a value indicating whether there is a next page. */
+    hasNextPage?: boolean;
+}
+
+/** Represents a group summary for API responses. */
+export interface GroupDto {
+    /** Gets the group identifier. */
+    id?: string;
+    /** Gets the group name. */
+    name?: string | undefined;
+    /** Gets the normalized group name. */
+    normalizedName?: string | undefined;
+    /** Gets the group description. */
+    description?: string | undefined;
+    /** Gets the group roles by name. */
+    roles?: string[];
+}
+
+/** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
+export interface BaseResponseOfGroupDto {
+    /** Gets a value indicating whether the operation was successful. */
+    success?: boolean;
+    /** Gets an optional message describing the result. */
+    message?: string | undefined;
+    /** Gets the data payload of the response. */
+    data?: GroupDto | undefined;
+    /** Validation or business errors grouped by field/property name. */
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Command to create a new group. */
+export interface CreateGroupCommand {
+    /** Gets or sets the group name. */
+    name?: string | undefined;
+    /** Gets or sets the group description. */
+    description?: string | undefined;
+}
+
+/** Command to assign a role to a group. */
+export interface AssignRoleToGroupCommand {
+    /** Gets or sets the group identifier. */
+    groupId?: string;
+    /** Gets or sets the role identifier. */
+    roleId?: string;
+}
+
+/** Command to assign a user to a group. */
+export interface AssignUserToGroupCommand {
+    /** Gets or sets the group identifier. */
+    groupId?: string;
+    /** Gets or sets the user identifier. */
+    userId?: string;
+}
+
+/** Command to update an existing group. */
+export interface UpdateGroupCommand {
+    /** Gets or sets the group identifier. */
+    id?: string;
+    /** Gets or sets the group name. */
+    name?: string | undefined;
+    /** Gets or sets the group description. */
+    description?: string | undefined;
 }
 
 /** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
@@ -299,22 +677,30 @@ export interface UpdateRoleCommand {
     description?: string | undefined;
 }
 
+/** Command to assign a permission to a role. */
+export interface AssignPermissionToRoleCommand {
+    /** Gets or sets the role identifier. */
+    roleId?: string;
+    /** Gets or sets the permission identifier. */
+    permissionId?: string;
+}
+
 /** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
-export interface BaseResponseOfPaginatedEnumerableOfTodoItemDto {
+export interface BaseResponseOfPaginatedEnumerableOfSessionDto {
     /** Gets a value indicating whether the operation was successful. */
     success?: boolean;
     /** Gets an optional message describing the result. */
     message?: string | undefined;
     /** Gets the data payload of the response. */
-    data?: PaginatedEnumerableOfTodoItemDto | undefined;
+    data?: PaginatedEnumerableOfSessionDto | undefined;
     /** Validation or business errors grouped by field/property name. */
     errors?: { [key: string]: string[]; } | undefined;
 }
 
 /** Represents a paginated collection of items with pagination metadata. */
-export interface PaginatedEnumerableOfTodoItemDto {
+export interface PaginatedEnumerableOfSessionDto {
     /** Gets or sets the items for the current page. */
-    items?: TodoItemDto[] | undefined;
+    items?: SessionDto[] | undefined;
     /** Gets or sets the current page number. */
     pageNumber?: number;
     /** Gets or sets the total number of pages. */
@@ -327,73 +713,94 @@ export interface PaginatedEnumerableOfTodoItemDto {
     hasNextPage?: boolean;
 }
 
-/** Data Transfer Object representing a to-do item. */
-export interface TodoItemDto {
-    /** Gets or sets the unique identifier of the to-do item. */
-    id?: number;
-    /** Gets or sets the identifier of the to-do list to which this item belongs. */
-    listId?: number;
-    /** Gets or sets the title of the to-do item. */
-    title?: string | undefined;
-    /** Gets a value indicating whether the to-do item is completed. */
-    done?: boolean;
+/** Represents a session summary for API responses. */
+export interface SessionDto {
+    /** Gets the session identifier. */
+    id?: string;
+    /** Gets the user identifier. */
+    userId?: string;
+    /** Gets the refresh token for the session. */
+    refreshToken?: string | undefined;
+    /** Gets the expiration date for the session in UTC. */
+    expiresAt?: string | undefined;
+    /** Gets the time the session was revoked in UTC. */
+    revokedAt?: string | undefined;
+    /** Gets the IP address associated with the session. */
+    ipAddress?: string | undefined;
+    /** Gets the user agent associated with the session. */
+    userAgent?: string | undefined;
+    /** Gets the device name associated with the session. */
+    deviceName?: string | undefined;
+    /** Gets whether the session is revoked. */
+    isRevoked?: boolean;
 }
 
 /** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
-export interface BaseResponseOfTodoItemDto {
+export interface BaseResponseOfSessionDto {
     /** Gets a value indicating whether the operation was successful. */
     success?: boolean;
     /** Gets an optional message describing the result. */
     message?: string | undefined;
     /** Gets the data payload of the response. */
-    data?: TodoItemDto | undefined;
+    data?: SessionDto | undefined;
     /** Validation or business errors grouped by field/property name. */
     errors?: { [key: string]: string[]; } | undefined;
 }
 
-export interface CreateTodoItemCommand {
-    /** Gets or sets the title of the to-do item. */
-    title?: string | undefined;
-    /** Gets or sets the ID of the to-do list to which the item belongs. */
-    listId?: number;
+/** Command to create a new session. */
+export interface CreateSessionCommand {
+    /** Gets or sets the user identifier. */
+    userId?: string;
+    /** Gets or sets the refresh token for the session. */
+    refreshToken?: string | undefined;
+    /** Gets or sets the expiration date for the session in UTC (yyyy-MM-ddTHH:mm:ssZ). */
+    expiresAt?: string | undefined;
+    /** Gets or sets the revocation time in UTC (yyyy-MM-ddTHH:mm:ssZ). */
+    revokedAt?: string | undefined;
+    /** Gets or sets the IP address associated with the session. */
+    ipAddress?: string | undefined;
+    /** Gets or sets the user agent associated with the session. */
+    userAgent?: string | undefined;
+    /** Gets or sets the device name associated with the session. */
+    deviceName?: string | undefined;
 }
 
-/** Command to update a todos item. */
-export interface UpdateTodoItemComand {
-    /** Gets or sets the identifier of the todos item. */
-    id?: number;
-    /** Gets or sets the new title of the todos item. */
-    title?: string | undefined;
+/** Command to update an existing session. */
+export interface UpdateSessionCommand {
+    /** Gets or sets the session identifier. */
+    id?: string;
+    /** Gets or sets the refresh token for the session. */
+    refreshToken?: string | undefined;
+    /** Gets or sets the expiration date for the session in UTC (yyyy-MM-ddTHH:mm:ssZ). */
+    expiresAt?: string | undefined;
+    /** Gets or sets the revocation time in UTC (yyyy-MM-ddTHH:mm:ssZ). */
+    revokedAt?: string | undefined;
+    /** Gets or sets the IP address associated with the session. */
+    ipAddress?: string | undefined;
+    /** Gets or sets the user agent associated with the session. */
+    userAgent?: string | undefined;
+    /** Gets or sets the device name associated with the session. */
+    deviceName?: string | undefined;
+    /** Gets or sets whether the session is revoked. */
+    isRevoked?: boolean | undefined;
 }
 
 /** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
-export interface BaseResponseOfObject {
+export interface BaseResponseOfPaginatedEnumerableOfUserPreferenceDto {
     /** Gets a value indicating whether the operation was successful. */
     success?: boolean;
     /** Gets an optional message describing the result. */
     message?: string | undefined;
     /** Gets the data payload of the response. */
-    data?: any | undefined;
-    /** Validation or business errors grouped by field/property name. */
-    errors?: { [key: string]: string[]; } | undefined;
-}
-
-/** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
-export interface BaseResponseOfPaginatedEnumerableOfTodoListDto {
-    /** Gets a value indicating whether the operation was successful. */
-    success?: boolean;
-    /** Gets an optional message describing the result. */
-    message?: string | undefined;
-    /** Gets the data payload of the response. */
-    data?: PaginatedEnumerableOfTodoListDto | undefined;
+    data?: PaginatedEnumerableOfUserPreferenceDto | undefined;
     /** Validation or business errors grouped by field/property name. */
     errors?: { [key: string]: string[]; } | undefined;
 }
 
 /** Represents a paginated collection of items with pagination metadata. */
-export interface PaginatedEnumerableOfTodoListDto {
+export interface PaginatedEnumerableOfUserPreferenceDto {
     /** Gets or sets the items for the current page. */
-    items?: TodoListDto[] | undefined;
+    items?: UserPreferenceDto[] | undefined;
     /** Gets or sets the current page number. */
     pageNumber?: number;
     /** Gets or sets the total number of pages. */
@@ -406,42 +813,192 @@ export interface PaginatedEnumerableOfTodoListDto {
     hasNextPage?: boolean;
 }
 
-/** Data Transfer Object (DTO) for a to-do list, including its items. */
-export interface TodoListDto {
-    /** Gets the unique identifier of the to-do list. */
-    id?: number;
-    /** Gets the title of the to-do list. */
-    title?: string | undefined;
-    /** Gets the color associated with the to-do list. */
-    colour?: string | undefined;
-    /** Gets the collection of to-do items in the list. */
-    items?: TodoItemDto[];
+/** Represents a user preference summary for API responses. */
+export interface UserPreferenceDto {
+    /** Gets the user preference identifier. */
+    id?: string;
+    /** Gets the user identifier. */
+    userId?: string;
+    /** Gets the preference key. */
+    key?: string | undefined;
+    /** Gets the preference value. */
+    value?: string | undefined;
 }
 
 /** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
-export interface BaseResponseOfTodoListDto {
+export interface BaseResponseOfUserPreferenceDto {
     /** Gets a value indicating whether the operation was successful. */
     success?: boolean;
     /** Gets an optional message describing the result. */
     message?: string | undefined;
     /** Gets the data payload of the response. */
-    data?: TodoListDto | undefined;
+    data?: UserPreferenceDto | undefined;
     /** Validation or business errors grouped by field/property name. */
     errors?: { [key: string]: string[]; } | undefined;
 }
 
-/** Command to create a new Todos List. */
-export interface CreateTodoListCommand {
-    /** Gets or sets the title of the Todos List. */
-    title?: string | undefined;
+/** Command to create a new user preference. */
+export interface CreateUserPreferenceCommand {
+    /** Gets or sets the user identifier. */
+    userId?: string;
+    /** Gets or sets the preference key. */
+    key?: string | undefined;
+    /** Gets or sets the preference value. */
+    value?: string | undefined;
 }
 
-/** Command to update a TodoList. */
-export interface UpdateTodoListCommand {
-    /** Gets or sets the identifier of the TodoList to update. */
-    id?: number;
-    /** Gets or sets the new title for the TodoList. */
-    title?: string | undefined;
+/** Command to update an existing user preference. */
+export interface UpdateUserPreferenceCommand {
+    /** Gets or sets the user preference identifier. */
+    id?: string;
+    /** Gets or sets the preference key. */
+    key?: string | undefined;
+    /** Gets or sets the preference value. */
+    value?: string | undefined;
+}
+
+/** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
+export interface BaseResponseOfPaginatedEnumerableOfUserProfileDto {
+    /** Gets a value indicating whether the operation was successful. */
+    success?: boolean;
+    /** Gets an optional message describing the result. */
+    message?: string | undefined;
+    /** Gets the data payload of the response. */
+    data?: PaginatedEnumerableOfUserProfileDto | undefined;
+    /** Validation or business errors grouped by field/property name. */
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Represents a paginated collection of items with pagination metadata. */
+export interface PaginatedEnumerableOfUserProfileDto {
+    /** Gets or sets the items for the current page. */
+    items?: UserProfileDto[] | undefined;
+    /** Gets or sets the current page number. */
+    pageNumber?: number;
+    /** Gets or sets the total number of pages. */
+    totalPages?: number;
+    /** Gets or sets the total number of items. */
+    totalCount?: number;
+    /** Gets a value indicating whether there is a previous page. */
+    hasPreviousPage?: boolean;
+    /** Gets a value indicating whether there is a next page. */
+    hasNextPage?: boolean;
+}
+
+/** Represents a user profile summary for API responses. */
+export interface UserProfileDto {
+    /** Gets the user profile identifier. */
+    id?: string;
+    /** Gets the user identifier. */
+    userId?: string;
+    /** Gets the display name shown to other users. */
+    displayName?: string | undefined;
+    /** Gets the user's first name. */
+    firstName?: string | undefined;
+    /** Gets the user's last name. */
+    lastName?: string | undefined;
+    /** Gets the national identity card number. */
+    identityCardNumber?: string | undefined;
+    /** Gets the passport number. */
+    passportNumber?: string | undefined;
+    /** Gets the date of birth in yyyy-MM-dd format. */
+    dateOfBirth?: string | undefined;
+    /** Gets the place of birth. */
+    birthPlace?: string | undefined;
+    /** Gets the shoe size. */
+    shoeSize?: string | undefined;
+    /** Gets the clothing size. */
+    clothingSize?: string | undefined;
+    /** Gets the waist size. */
+    waistSize?: string | undefined;
+    /** Gets the profile bio. */
+    bio?: string | undefined;
+    /** Gets the profile image URL. */
+    imageUrl?: string | undefined;
+    /** Gets the profile tag. */
+    tag?: string | undefined;
+    /** Gets the blood type recorded for the user. */
+    bloodType?: string | undefined;
+}
+
+/** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
+export interface BaseResponseOfUserProfileDto {
+    /** Gets a value indicating whether the operation was successful. */
+    success?: boolean;
+    /** Gets an optional message describing the result. */
+    message?: string | undefined;
+    /** Gets the data payload of the response. */
+    data?: UserProfileDto | undefined;
+    /** Validation or business errors grouped by field/property name. */
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Command to create a new user profile. */
+export interface CreateUserProfileCommand {
+    /** Gets or sets the user identifier. */
+    userId?: string;
+    /** Gets or sets the display name shown to other users. */
+    displayName?: string | undefined;
+    /** Gets or sets the user's first name. */
+    firstName?: string | undefined;
+    /** Gets or sets the user's last name. */
+    lastName?: string | undefined;
+    /** Gets or sets the national identity card number. */
+    identityCardNumber?: string | undefined;
+    /** Gets or sets the passport number. */
+    passportNumber?: string | undefined;
+    /** Gets or sets the date of birth in yyyy-MM-dd format. */
+    dateOfBirth?: string | undefined;
+    /** Gets or sets the place of birth. */
+    birthPlace?: string | undefined;
+    /** Gets or sets the shoe size. */
+    shoeSize?: string | undefined;
+    /** Gets or sets the clothing size. */
+    clothingSize?: string | undefined;
+    /** Gets or sets the waist size. */
+    waistSize?: string | undefined;
+    /** Gets or sets the profile bio. */
+    bio?: string | undefined;
+    /** Gets or sets the profile image URL. */
+    imageUrl?: string | undefined;
+    /** Gets or sets the profile tag. */
+    tag?: string | undefined;
+    /** Gets or sets the blood type recorded for the user. */
+    bloodType?: string | undefined;
+}
+
+/** Command to update an existing user profile. */
+export interface UpdateUserProfileCommand {
+    /** Gets or sets the user profile identifier. */
+    id?: string;
+    /** Gets or sets the display name shown to other users. */
+    displayName?: string | undefined;
+    /** Gets or sets the user's first name. */
+    firstName?: string | undefined;
+    /** Gets or sets the user's last name. */
+    lastName?: string | undefined;
+    /** Gets or sets the national identity card number. */
+    identityCardNumber?: string | undefined;
+    /** Gets or sets the passport number. */
+    passportNumber?: string | undefined;
+    /** Gets or sets the date of birth in yyyy-MM-dd format. */
+    dateOfBirth?: string | undefined;
+    /** Gets or sets the place of birth. */
+    birthPlace?: string | undefined;
+    /** Gets or sets the shoe size. */
+    shoeSize?: string | undefined;
+    /** Gets or sets the clothing size. */
+    clothingSize?: string | undefined;
+    /** Gets or sets the waist size. */
+    waistSize?: string | undefined;
+    /** Gets or sets the profile bio. */
+    bio?: string | undefined;
+    /** Gets or sets the profile image URL. */
+    imageUrl?: string | undefined;
+    /** Gets or sets the profile tag. */
+    tag?: string | undefined;
+    /** Gets or sets the blood type recorded for the user. */
+    bloodType?: string | undefined;
 }
 
 /** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
@@ -508,6 +1065,14 @@ export interface CreateUserCommand {
     email?: string | undefined;
     phoneNumber?: string | undefined;
     password?: string | undefined;
+}
+
+/** Command to assign a role to a user. */
+export interface AssignRoleToUserCommand {
+    /** Gets or sets the user identifier. */
+    userId?: string;
+    /** Gets or sets the role identifier. */
+    roleId?: string;
 }
 
 /** Command to update an existing user. */

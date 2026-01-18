@@ -1,2 +1,122 @@
-<p>profile-page works!</p>
-<h1>Profile page</h1>
+<section class="space-y-6">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold text-gray-900">Profile</h1>
+      <p class="text-sm text-gray-500">Review your personal details and identifiers.</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <cxs-button size="sm" variant="secondary" [loading]="loading()" (click)="onRefresh()">
+        Refresh
+      </cxs-button>
+      <cxs-button size="sm" variant="primary" [disabled]="true">Edit profile</cxs-button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+      {{ error() }}
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm text-gray-500">
+      Loading profile details...
+    </div>
+  }
+
+  @if (profile()) {
+    <cxs-card ariaLabel="Profile summary" size="lg">
+      <div class="flex flex-wrap items-center gap-4">
+        <cxs-avatar
+          size="lg"
+          [name]="displayName()"
+          [src]="profile()?.imageUrl"
+        />
+        <div class="min-w-0 space-y-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="text-xl font-semibold text-gray-900">{{ displayName() }}</h2>
+            @if (profile()?.tag) {
+              <cxs-badge variant="neutral">{{ profile()?.tag }}</cxs-badge>
+            }
+            @if (profile()?.bloodType) {
+              <cxs-badge variant="primary">Blood {{ profile()?.bloodType }}</cxs-badge>
+            }
+          </div>
+          <p class="text-sm text-gray-500">
+            User ID: {{ profile()?.userId ?? 'N/A' }}
+          </p>
+        </div>
+      </div>
+    </cxs-card>
+
+    <div class="grid gap-4 md:grid-cols-2 mt-4">
+      <cxs-card>
+        <div class="space-y-3">
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900">Personal</h3>
+            <p class="text-xs text-gray-500">The essentials we have on file.</p>
+          </div>
+          <dl class="grid gap-3 text-sm">
+            @for (item of personalDetails(); track item.label) {
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-gray-500">{{ item.label }}</dt>
+                <dd class="text-right text-gray-900">{{ item.value }}</dd>
+              </div>
+            }
+          </dl>
+        </div>
+      </cxs-card>
+
+      <cxs-card>
+        <div class="space-y-3">
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900">Identifiers</h3>
+            <p class="text-xs text-gray-500">Verification and account references.</p>
+          </div>
+          <dl class="grid gap-3 text-sm">
+            @for (item of identityDetails(); track item.label) {
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-gray-500">{{ item.label }}</dt>
+                <dd class="text-right text-gray-900">{{ item.value }}</dd>
+              </div>
+            }
+          </dl>
+        </div>
+      </cxs-card>
+
+      <cxs-card>
+        <div class="space-y-3">
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900">Sizing</h3>
+            <p class="text-xs text-gray-500">Optional measurements for personalization.</p>
+          </div>
+          <dl class="grid gap-3 text-sm">
+            @for (item of sizeDetails(); track item.label) {
+              <div class="flex items-start justify-between gap-4">
+                <dt class="text-gray-500">{{ item.label }}</dt>
+                <dd class="text-right text-gray-900">{{ item.value }}</dd>
+              </div>
+            }
+          </dl>
+        </div>
+      </cxs-card>
+
+      <cxs-card>
+        <div class="space-y-3">
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900">Bio</h3>
+            <p class="text-xs text-gray-500">Share a quick overview about yourself.</p>
+          </div>
+          <p class="text-sm text-gray-700">{{ bio() }}</p>
+        </div>
+      </cxs-card>
+    </div>
+  } @else if (empty()) {
+    <cxs-card ariaLabel="Empty profile state">
+      <div class="space-y-2 text-sm text-gray-600">
+        <p>No profile data is available yet.</p>
+        <p>Once your profile is created, it will appear here automatically.</p>
+      </div>
+    </cxs-card>
+  }
+</section>
