@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+@custom-variant dark (&:where(.cxs-theme-dark, .cxs-theme-dark *));
 @import "tailwindcss";
 @import "cerxos-ui/styles/tailwind.css";
 @source "./**/*.{html,ts}";

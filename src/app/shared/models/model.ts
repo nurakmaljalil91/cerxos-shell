@@ -1083,3 +1083,33 @@ export interface UpdateUserCommand {
     phoneNumber?: string | undefined;
     isLocked?: boolean | undefined;
 }
+
+/** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
+export interface BaseResponseOfUserSessionDto {
+    /** Gets a value indicating whether the operation was successful. */
+    success?: boolean;
+    /** Gets an optional message describing the result. */
+    message?: string | undefined;
+    /** Gets the data payload of the response. */
+    data?: UserSessionDto | undefined;
+    /** Validation or business errors grouped by field/property name. */
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Represents a user session response containing user context and preferences. */
+export interface UserSessionDto {
+    /** Gets the user details. */
+    user?: UserDto;
+    /** Gets the user profile details. */
+    profile?: UserProfileDto;
+    /** Gets the user preference entries. */
+    preferences?: UserPreferenceDto[];
+    /** Gets the role names assigned to the user. */
+    roles?: string[];
+    /** Gets the permission names available to the user. */
+    permissions?: string[];
+    /** Gets the group names the user belongs to. */
+    groups?: string[];
+    /** Gets the roles grouped by group name. */
+    groupRoles?: { [key: string]: string[]; };
+}

@@ -43,7 +43,7 @@
            [class.w-16]="collapsed()">
       <nav class="h-full overflow-y-auto">
         <ul class="py-3">
-          @for (navigationItem of navigations; track navigationItem.route) {
+          @for (navigationItem of filteredNavigations(); track navigationItem.route) {
             <li>
               <a [routerLink]="navigationItem.route"
                  routerLinkActive="bg-gray-100 dark:bg-gray-800"
@@ -94,7 +94,7 @@
         </button>
         <nav>
           <ul>
-            @for (navigationItem of navigations; track navigationItem.route) {
+            @for (navigationItem of filteredNavigations(); track navigationItem.route) {
               <li>
                 <a [routerLink]="navigationItem.route" (click)="closeDrawer()"
                    routerLinkActive="bg-gray-100 dark:bg-gray-800"

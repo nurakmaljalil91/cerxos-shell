@@ -9,11 +9,8 @@
     [attr.aria-expanded]="profileOpen()"
     type="button"
   >
-    <!-- avatar (image or initials) -->
-    <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 text-sm font-semibold">
-        {{ userInitials() }}
-      </span>
-    <span class="hidden sm:block text-sm font-medium">{{ username }}</span>
+    <cxs-avatar [src]="avatarSrc()" [name]="displayName()" size="sm"></cxs-avatar>
+    <span class="hidden sm:block text-sm font-medium">{{ displayName() }}</span>
     <svg class="hidden sm:block w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
       <path [attr.d]="'chevron-down' | heroIconHelper" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
     </svg>
@@ -29,8 +26,8 @@
       role="menu"
     >
       <div class="px-3 pb-2 border-b border-gray-100 dark:border-gray-800">
-        <p class="text-sm font-semibold truncate">{{ username }}</p>
-        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ email }}</p>
+        <p class="text-sm font-semibold truncate">{{ displayName() }}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ email() }}</p>
       </div>
 
       <a routerLink="/profile" class="block px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800" role="menuitem">Profile</a>

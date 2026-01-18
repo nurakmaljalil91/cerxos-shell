@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TokenService } from './token.service';
-import { Observable, finalize, shareReplay, tap, throwError } from 'rxjs';
+import { Observable, catchError, finalize, map, of, shareReplay, switchMap, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   BaseResponseOfLoginResponse,
@@ -10,6 +10,7 @@ import {
   RegisterCommand,
 } from '../../shared/models/model';
 import { AuthenticationMock } from './authentication.mock';
+import { UserSessionService } from './user-session.service';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +19,7 @@ export class AuthenticationService {
   http = inject(HttpClient);
   mock = inject(AuthenticationMock);
   tokenService = inject(TokenService);
+  userSessionService = inject(UserSessionService);
   authenticationEndpoint = `${environment.apiBaseUrl}/api/authentications`;
 
   private readonly _user = signal<BaseResponseOfLoginResponse | null>(null);
@@ -36,6 +38,7 @@ export class AuthenticationService {
           tap((response) => {
             this.storeTokens(response);
           }),
+          switchMap((response) => this.refreshSession(response)),
         );
       }
       return this.http
@@ -44,6 +47,7 @@ export class AuthenticationService {
           tap((response) => {
             this.storeTokens(response);
           }),
+          switchMap((response) => this.refreshSession(response)),
         );
     }
   }
@@ -87,6 +91,7 @@ export class AuthenticationService {
   logout(): void {
     this.tokenService.clear();
     this._user.set(null);
+    this.userSessionService.clear();
   }
 
   private storeTokens(response: BaseResponseOfLoginResponse): void {
@@ -98,5 +103,17 @@ export class AuthenticationService {
       this.tokenService.setRefreshToken(response.data.refreshToken);
     }
     this._user.set(response);
+  }
+
+  private refreshSession(
+    response: BaseResponseOfLoginResponse,
+  ): Observable<BaseResponseOfLoginResponse> {
+    if (!response?.success) {
+      return of(response);
+    }
+    return this.userSessionService.refresh().pipe(
+      map(() => response),
+      catchError(() => of(response)),
+    );
   }
 }

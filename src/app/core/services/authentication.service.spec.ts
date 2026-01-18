@@ -7,12 +7,14 @@ import { environment } from '../../../environments/environment';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { BaseResponseOfLoginResponse, LoginCommand } from '../../shared/models/model';
 import { of } from 'rxjs';
+import { UserSessionService } from './user-session.service';
 
 describe('AuthenticationService', () => {
   let service: AuthenticationService;
   let httpClientSpy: jasmine.SpyObj<HttpClient>;
   let tokenServiceSpy: jasmine.SpyObj<Pick<TokenService, 'get' | 'set' | 'setRefreshToken' | 'clear' | 'getRefreshToken'>>;
   let authenticationMockSpy: jasmine.SpyObj<Pick<AuthenticationMock, 'login' | 'refresh'>>;
+  let userSessionServiceSpy: jasmine.SpyObj<Pick<UserSessionService, 'refresh' | 'clear'>>;
   let originalTestMode: boolean;
 
   beforeEach(() => {
@@ -26,13 +28,15 @@ describe('AuthenticationService', () => {
       'clear'
     ]);
     authenticationMockSpy = jasmine.createSpyObj('AuthenticationMock', ['login', 'refresh']);
+    userSessionServiceSpy = jasmine.createSpyObj('UserSessionService', ['refresh', 'clear']);
 
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
         { provide: HttpClient, useValue: httpClientSpy },
         { provide: TokenService, useValue: tokenServiceSpy },
-        { provide: AuthenticationMock, useValue: authenticationMockSpy }
+        { provide: AuthenticationMock, useValue: authenticationMockSpy },
+        { provide: UserSessionService, useValue: userSessionServiceSpy }
       ]
     });
     service = TestBed.inject(AuthenticationService);
@@ -84,10 +88,12 @@ describe('AuthenticationService', () => {
       };
 
       authenticationMockSpy.login.and.returnValue(of(mockResponse));
+      userSessionServiceSpy.refresh.and.returnValue(of({ success: true }));
       service.login(mockRequest).subscribe((response) => {
         expect(authenticationMockSpy.login).toHaveBeenCalledWith(mockRequest);
         expect(tokenServiceSpy.set).toHaveBeenCalledWith('mock-token');
         expect(tokenServiceSpy.setRefreshToken).toHaveBeenCalledWith('refresh-token');
+        expect(userSessionServiceSpy.refresh).toHaveBeenCalled();
         expect(response).toEqual(mockResponse);
         expect(service.user()).toEqual(mockResponse);
         done();
@@ -113,6 +119,7 @@ describe('AuthenticationService', () => {
       };
 
       httpClientSpy.post.and.returnValue(of(response));
+      userSessionServiceSpy.refresh.and.returnValue(of({ success: true }));
 
       service.login(request).subscribe((res) => {
         expect(httpClientSpy.post).toHaveBeenCalledWith(
@@ -121,6 +128,7 @@ describe('AuthenticationService', () => {
         );
         expect(tokenServiceSpy.set).toHaveBeenCalledWith('api-token');
         expect(tokenServiceSpy.setRefreshToken).toHaveBeenCalledWith('refresh-token');
+        expect(userSessionServiceSpy.refresh).toHaveBeenCalled();
         expect(res).toEqual(response);
         expect(service.user()).toEqual(response);
         done();
@@ -136,6 +144,7 @@ describe('AuthenticationService', () => {
       service.logout();
 
       expect(tokenServiceSpy.clear).toHaveBeenCalled();
+      expect(userSessionServiceSpy.clear).toHaveBeenCalled();
       expect(service.user()).toBeNull();
     });
   });
