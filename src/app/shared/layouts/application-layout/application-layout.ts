@@ -32,8 +32,8 @@ export class ApplicationLayout {
   readonly collapsed = signal<boolean>(false);
   readonly drawerOpened = signal<boolean>(false);
   private userSessionService = inject(UserSessionService);
-  private readonly expandedGroups = signal<Record<string, boolean>>({
-    'Identity Management': true,
+  readonly expandedGroups = signal<Record<string, boolean>>({
+    'Identity Management': false,
   });
 
   navigations: NavigationItem[] = [
@@ -70,6 +70,7 @@ export class ApplicationLayout {
   private saveCollapsedStateEffect = effect(() => {
     localStorage.setItem('sidebar:collapsed', this.collapsed() ? '1' : '0');
   });
+  
 
   constructor() {
     const saveDrawerState = localStorage.getItem('sidebar:collapsed');
@@ -80,6 +81,9 @@ export class ApplicationLayout {
 
   toggleSidebar(): void {
     this.collapsed.update((value) => !value);
+    if (this.collapsed()) {
+      this.collapseAllGroups();
+    }
   }
 
   openDrawer(): void {
@@ -95,26 +99,33 @@ export class ApplicationLayout {
       ...state,
       [label]: !this.isGroupExpanded(label),
     }));
+    if (this.collapsed()){
+      this.toggleSidebar();
+    }
   }
 
   isGroupExpanded(label: string): boolean {
     const state = this.expandedGroups();
     if (Object.prototype.hasOwnProperty.call(state, label)) {
-      return !!state[label];
+      return state[label];
     }
     return true;
+  }
+
+  private collapseAllGroups(): void {
+    const groups = this.expandedGroups();
+    const nextState: Record<string, boolean> = {};
+    for (const key of Object.keys(groups)) {
+      nextState[key] = false;
+    }
+    this.expandedGroups.set(nextState);
   }
 
   private canAccess(item: NavigationItem): boolean {
     if (item.requiredRoles?.length && !this.userSessionService.hasAnyRole(item.requiredRoles)) {
       return false;
     }
-    if (
-      item.requiredPermissions?.length &&
-      !this.userSessionService.hasAnyPermission(item.requiredPermissions)
-    ) {
-      return false;
-    }
-    return true;
+    return !(item.requiredPermissions?.length &&
+      !this.userSessionService.hasAnyPermission(item.requiredPermissions));
   }
 }
