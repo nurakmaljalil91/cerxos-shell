@@ -7,7 +7,7 @@ import {
   PaginatedEnumerableOfUserDto,
   UserDto
 } from '../../../shared/models/model';
-import type { UsersQuery } from './users.service';
+import { QueryRequest } from '../../../shared/models/query-request';
 
 @Injectable({
   providedIn: 'root'
@@ -56,11 +56,11 @@ export class UsersMock {
     }
   ];
 
-  getUsers(query: UsersQuery): Observable<BaseResponseOfPaginatedEnumerableOfUserDto> {
+  getUsers(query: QueryRequest): Observable<BaseResponseOfPaginatedEnumerableOfUserDto> {
     const page = Math.max(query.page ?? 1, 1);
     const total = Math.max(query.total ?? 10, 1);
 
-    let items = [...this.users];
+    const items = [...this.users];
     if (query.sortBy) {
       const key = query.sortBy as keyof UserDto;
       items.sort((a, b) => {

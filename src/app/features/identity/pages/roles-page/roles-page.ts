@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   computed,
+  DestroyRef,
   inject,
   OnInit,
   signal,
@@ -22,7 +22,7 @@ import {
   CxsToastVariant,
 } from 'cerxos-ui';
 import { CreateRoleCommand, RoleDto } from '../../../../shared/models/model';
-import { RolesService } from '../../../users/services/roles.service';
+import { RolesService } from '../../services/roles.service';
 
 @Component({
   selector: 'app-roles-page',

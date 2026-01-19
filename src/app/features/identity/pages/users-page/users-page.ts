@@ -13,6 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import {
   CxsButtonComponent,
+  CxsCardComponent,
   CxsDataTableCellDirective,
   CxsDataTableColumn,
   CxsDataTableComponent,
@@ -39,6 +40,7 @@ import { UsersService } from '../../services/users.service';
     CxsDialogComponent,
     CxsInputComponent,
     CxsToastComponent,
+    CxsCardComponent,
   ],
   templateUrl: './users-page.html',
   styleUrl: './users-page.css',
@@ -63,6 +65,7 @@ export class UsersPage implements OnInit {
   readonly totalCount = signal(0);
   readonly sortKey = signal<string | undefined>('username');
   readonly sortDirection = signal<CxsDataTableSortDirection>('asc');
+  readonly filter = signal<string | undefined>(undefined);
 
   private readonly users = signal<UserDto[]>([]);
   readonly addUserForm = this.formBuilder.group({
@@ -77,10 +80,26 @@ export class UsersPage implements OnInit {
     { key: 'email', label: 'Email', sortable: true, filterable: true },
     { key: 'phoneNumber', label: 'Phone' },
     { key: 'roles', label: 'Roles', filterable: true, sortable: true },
-    { key: 'locked', label: 'Locked', align: 'right' },
+    {
+      key: 'locked',
+      label: 'Locked',
+      align: 'right',
+      filterable: true,
+      sortable: true,
+      filterType: 'select',
+      filterOptions: [
+        {
+          label: 'Yes',
+          value: 'Yes',
+        },
+        {
+          label: 'No',
+          value: 'No',
+        },
+      ],
+    },
     { key: 'actions', label: 'Actions', align: 'right' },
   ];
-
 
   readonly rows = computed(() =>
     this.users().map((user) => ({
@@ -112,6 +131,25 @@ export class UsersPage implements OnInit {
   onSortChange(sort: CxsDataTableSort): void {
     this.sortKey.set(sort.key);
     this.sortDirection.set(sort.direction);
+    this.pageIndex.set(1);
+    this.loadUsers();
+  }
+
+  onFilterChange(filters: { global: string; columns: Record<string, string> }): void {
+    const username = filters.columns['username']?.trim();
+    const email = filters.columns['email']?.trim();
+    const parts: string[] = [];
+
+    if (username) {
+      parts.push(`username contains '${this.escapeFilterValue(username)}'`);
+    }
+
+    if (email) {
+      parts.push(`email contains '${this.escapeFilterValue(email)}'`);
+    }
+
+    const filter = parts.length ? parts.join(' and ') : undefined;
+    this.filter.set(filter);
     this.pageIndex.set(1);
     this.loadUsers();
   }
@@ -219,6 +257,7 @@ export class UsersPage implements OnInit {
         total: this.pageSize(),
         sortBy: sortKey,
         descending: this.sortDirection() === 'desc',
+        filter: this.filter(),
       })
       .pipe(
         finalize(() => this.loading.set(false)),
@@ -249,5 +288,9 @@ export class UsersPage implements OnInit {
     this.toastMessage.set(message);
     this.toastVariant.set(variant);
     this.toastOpen.set(true);
+  }
+
+  private escapeFilterValue(value: string): string {
+    return value.replace(/'/g, "''");
   }
 }

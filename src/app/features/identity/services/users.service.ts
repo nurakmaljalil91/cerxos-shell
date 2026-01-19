@@ -2,40 +2,40 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { BaseResponseOfPaginatedEnumerableOfUserDto, BaseResponseOfUserDto, CreateUserCommand } from '../../../shared/models/model';
+import {
+  BaseResponseOfPaginatedEnumerableOfUserDto,
+  BaseResponseOfUserDto,
+  CreateUserCommand,
+} from '../../../shared/models/model';
 import { UsersMock } from './users.mock';
-
-export type UsersQuery = {
-  page: number;
-  total: number;
-  sortBy?: string;
-  descending?: boolean;
-}
+import { QueryRequest } from '../../../shared/models/query-request';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UsersService {
   private readonly http = inject(HttpClient);
   private readonly mock = inject(UsersMock);
   private readonly usersEndpoint = `${environment.apiBaseUrl}/api/users`;
 
-  getUsers(query: UsersQuery): Observable<BaseResponseOfPaginatedEnumerableOfUserDto> {
+  getUsers(query: QueryRequest): Observable<BaseResponseOfPaginatedEnumerableOfUserDto> {
     if (environment.testMode) {
       return this.mock.getUsers(query);
     }
 
-    let params = new HttpParams()
-      .set('page', String(query.page))
-      .set('total', String(query.total));
+    let params = new HttpParams().set('page', String(query.page)).set('total', String(query.total));
 
     if (query.sortBy) {
-      params = params
-        .set('sortBy', query.sortBy)
-        .set('descending', String(!!query.descending));
+      params = params.set('sortBy', query.sortBy).set('descending', String(!!query.descending));
     }
 
-    return this.http.get<BaseResponseOfPaginatedEnumerableOfUserDto>(this.usersEndpoint, { params });
+    if (query.filter) {
+      params = params.set('filter', query.filter);
+    }
+
+    return this.http.get<BaseResponseOfPaginatedEnumerableOfUserDto>(this.usersEndpoint, {
+      params,
+    });
   }
 
   createUser(command: CreateUserCommand): Observable<BaseResponseOfUserDto> {

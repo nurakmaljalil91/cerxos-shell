@@ -11,7 +11,7 @@
   </div>
 
   <div class="grid gap-4 lg:grid-cols-3">
-    <div class="space-y-4 lg:col-span-2">
+    <div class="grid gap-4 lg:col-span-2">
       <cxs-card ariaLabel="Account settings" size="lg">
         <div class="space-y-4">
           <div>
@@ -43,7 +43,7 @@
       </cxs-card>
 
       <cxs-card ariaLabel="Preferences" class="space-y-4" size="lg">
-        <div class="space-y-4">
+        <div class="space-y-4 mt-4">
           <div>
             <h2 class="text-base font-semibold text-gray-900">Preferences</h2>
             <p class="text-sm text-gray-500">Control how the workspace looks and behaves.</p>
@@ -124,61 +124,64 @@
     </div>
 
     <div class="space-y-4">
-      <cxs-card ariaLabel="Security">
-        <div class="space-y-4">
-          <div>
-            <h2 class="text-base font-semibold text-gray-900">Security</h2>
-            <p class="text-sm text-gray-500">Protect access with stronger controls.</p>
-          </div>
-          <div class="space-y-3">
-            <div class="flex items-start justify-between gap-4">
-              <div>
-                <p class="text-sm font-medium text-gray-900">Two-factor authentication</p>
-                <p class="text-xs text-gray-500">Require a verification code on sign in.</p>
+      <div class="mb-4">
+        <cxs-card ariaLabel="Security">
+          <div class="space-y-4">
+            <div>
+              <h2 class="text-base font-semibold text-gray-900">Security</h2>
+              <p class="text-sm text-gray-500">Protect access with stronger controls.</p>
+            </div>
+            <div class="space-y-3">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <p class="text-sm font-medium text-gray-900">Two-factor authentication</p>
+                  <p class="text-xs text-gray-500">Require a verification code on sign in.</p>
+                </div>
+                <cxs-toggle ariaLabel="Two-factor authentication" [checked]="true" />
               </div>
-              <cxs-toggle ariaLabel="Two-factor authentication" [checked]="true" />
-            </div>
-            <div class="flex items-start justify-between gap-4">
-              <div>
-                <p class="text-sm font-medium text-gray-900">Session timeout</p>
-                <p class="text-xs text-gray-500">Automatically sign out after inactivity.</p>
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <p class="text-sm font-medium text-gray-900">Session timeout</p>
+                  <p class="text-xs text-gray-500">Automatically sign out after inactivity.</p>
+                </div>
+                <cxs-toggle ariaLabel="Session timeout" />
               </div>
-              <cxs-toggle ariaLabel="Session timeout" />
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <cxs-button size="sm" variant="secondary">Update password</cxs-button>
+              <cxs-button size="sm" variant="ghost">Download recovery codes</cxs-button>
             </div>
           </div>
-          <div class="flex flex-wrap gap-2">
-            <cxs-button size="sm" variant="secondary">Update password</cxs-button>
-            <cxs-button size="sm" variant="ghost">Download recovery codes</cxs-button>
-          </div>
-        </div>
-      </cxs-card>
+        </cxs-card>
+      </div>
 
-      <cxs-card ariaLabel="Workspace">
-        <div class="space-y-4">
-          <div>
-            <h2 class="text-base font-semibold text-gray-900">Workspace</h2>
-            <p class="text-sm text-gray-500">Configure defaults that affect the whole team.</p>
-          </div>
-          <div class="space-y-3">
-            <cxs-input label="Workspace name" placeholder="Add a workspace name" value="Cerxos HQ" />
-            <cxs-select label="Default project" placeholder="Select a project">
-              <option value="ops">Operations Hub</option>
-              <option value="plan">Planning MFE</option>
-              <option value="fin">Financial Suite</option>
-            </cxs-select>
-          </div>
-          <div class="rounded-md border border-gray-200 bg-gray-50 px-3 py-3 text-xs text-gray-500">
-            <div class="flex items-center justify-between">
-              <span>Storage usage</span>
-              <span class="text-gray-600">8.2 GB of 20 GB</span>
+      <div class="mb-4">
+        <cxs-card ariaLabel="Workspace">
+          <div class="space-y-4">
+            <div>
+              <h2 class="text-base font-semibold text-gray-900">Workspace</h2>
+              <p class="text-sm text-gray-500">Configure defaults that affect the whole team.</p>
             </div>
-            <div class="mt-2 h-2 w-full rounded-full bg-gray-200">
-              <div class="h-2 w-2/3 rounded-full bg-[var(--cxs-color-primary)]"></div>
+            <div class="space-y-3">
+              <cxs-input label="Workspace name" placeholder="Add a workspace name" value="Cerxos HQ" />
+              <cxs-select label="Default project" placeholder="Select a project">
+                <option value="ops">Operations Hub</option>
+                <option value="plan">Planning MFE</option>
+                <option value="fin">Financial Suite</option>
+              </cxs-select>
+            </div>
+            <div class="rounded-md border border-gray-200 bg-gray-50 px-3 py-3 text-xs text-gray-500">
+              <div class="flex items-center justify-between">
+                <span>Storage usage</span>
+                <span class="text-gray-600">8.2 GB of 20 GB</span>
+              </div>
+              <div class="mt-2 h-2 w-full rounded-full bg-gray-200">
+                <div class="h-2 w-2/3 rounded-full bg-(--cxs-color-primary)"></div>
+              </div>
             </div>
           </div>
-        </div>
-      </cxs-card>
-
+        </cxs-card>
+      </div>
       <cxs-card ariaLabel="Danger zone" variant="outline" [elevated]="false">
         <div class="space-y-3">
           <div>

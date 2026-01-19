@@ -3,7 +3,7 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { of } from 'rxjs';
 
 import { RolesPage } from './roles-page';
-import { RolesService } from '../../../users/services/roles.service';
+import { RolesService } from '../../services/roles.service';
 import { BaseResponseOfPaginatedEnumerableOfRoleDto } from '../../../../shared/models/model';
 
 describe('RolesPage', () => {

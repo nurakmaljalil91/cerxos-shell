@@ -37,7 +37,7 @@ export const routes: Routes = [
           {
             path: 'users',
             loadComponent: () =>
-              import('./features/users/pages/users-page/users-page').then((m) => m.UsersPage),
+              import('./features/identity/pages/users-page/users-page').then((m) => m.UsersPage),
           },
           {
             path: 'groups',

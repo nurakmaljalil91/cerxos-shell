@@ -22,7 +22,7 @@ import {
   CxsToastVariant,
 } from 'cerxos-ui';
 import { CreatePermissionCommand, PermissionDto } from '../../../../shared/models/model';
-import { PermissionsService } from '../../../users/services/permissions.service';
+import { PermissionsService } from '../../services/permissions.service';
 
 @Component({
   selector: 'app-permissions-page',

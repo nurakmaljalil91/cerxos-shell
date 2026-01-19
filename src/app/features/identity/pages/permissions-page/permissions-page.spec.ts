@@ -3,7 +3,7 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { of } from 'rxjs';
 
 import { PermissionsPage } from './permissions-page';
-import { PermissionsService } from '../../../users/services/permissions.service';
+import { PermissionsService } from '../../services/permissions.service';
 import { BaseResponseOfPaginatedEnumerableOfPermissionDto } from '../../../../shared/models/model';
 
 describe('PermissionsPage', () => {
