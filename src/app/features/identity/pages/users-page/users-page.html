@@ -41,13 +41,63 @@
       (sortChange)="onSortChange($event)"
     >
       <ng-template cxsDataTableCell="actions" let-row>
-        <div class="flex items-center justify-end">
-          <cxs-action-menu
-            align="end"
-            [floating]="true"
-            [items]="actionMenuItems"
-            (itemSelected)="onActionSelected($event, $any(row).id)"
-          />
+        <div class="relative flex justify-end">
+          <button
+            type="button"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+            [attr.aria-expanded]="openMenuId() === $any(row).id"
+            aria-haspopup="true"
+            aria-label="Open actions menu"
+            (click)="onToggleActionMenu($any(row).id, $event)"
+          >
+            <svg
+              class="h-4 w-4"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <circle cx="8" cy="3.5" r="1.5" />
+              <circle cx="8" cy="8" r="1.5" />
+              <circle cx="8" cy="12.5" r="1.5" />
+            </svg>
+          </button>
+          @if (openMenuId() === $any(row).id && menuPosition()) {
+            <div
+              class="fixed z-50 w-44 rounded-md border border-gray-200 bg-white py-1 text-sm shadow-lg"
+              [style.top.px]="menuPosition()!.top"
+              [style.left.px]="menuPosition()!.left"
+              (click)="$event.stopPropagation()"
+            >
+              <button
+                type="button"
+                class="flex w-full items-center px-3 py-2 text-left text-gray-700 hover:bg-gray-50"
+                (click)="onEditUser($any(row).id); onCloseActionMenu()"
+              >
+                Edit user
+              </button>
+              <button
+                type="button"
+                class="flex w-full items-center px-3 py-2 text-left text-gray-700 hover:bg-gray-50"
+                (click)="onEditRoles($any(row).id); onCloseActionMenu()"
+              >
+                Edit roles
+              </button>
+              <button
+                type="button"
+                class="flex w-full items-center px-3 py-2 text-left text-gray-700 hover:bg-gray-50"
+                (click)="onEditGroups($any(row).id); onCloseActionMenu()"
+              >
+                Edit groups
+              </button>
+              <button
+                type="button"
+                class="flex w-full items-center px-3 py-2 text-left text-red-600 hover:bg-red-50"
+                (click)="onDeleteUser($any(row).id); onCloseActionMenu()"
+              >
+                Delete user
+              </button>
+            </div>
+          }
         </div>
       </ng-template>
     </cxs-data-table>

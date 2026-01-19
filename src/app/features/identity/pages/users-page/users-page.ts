@@ -4,6 +4,7 @@ import {
   Component,
   computed,
   DestroyRef,
+  HostListener,
   inject,
   OnInit,
   signal,
@@ -12,8 +13,6 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import {
-  CxsActionMenuComponent,
-  CxsActionMenuItem,
   CxsButtonComponent,
   CxsCardComponent,
   CxsDataTableCellDirective,
@@ -37,7 +36,6 @@ import { UsersService } from '../../services/users.service';
     CommonModule,
     ReactiveFormsModule,
     CxsButtonComponent,
-    CxsActionMenuComponent,
     CxsDataTableComponent,
     CxsDataTableCellDirective,
     CxsDialogComponent,
@@ -69,6 +67,8 @@ export class UsersPage implements OnInit {
   readonly sortKey = signal<string | undefined>('username');
   readonly sortDirection = signal<CxsDataTableSortDirection>('asc');
   readonly filter = signal<string | undefined>(undefined);
+  readonly openMenuId = signal<string | null>(null);
+  readonly menuPosition = signal<{ top: number; left: number } | null>(null);
 
   private readonly users = signal<UserDto[]>([]);
   readonly addUserForm = this.formBuilder.group({
@@ -127,13 +127,6 @@ export class UsersPage implements OnInit {
       label: 'Access Failed Count',
     },
     { key: 'actions', label: 'Actions', align: 'right' },
-  ];
-
-  readonly actionMenuItems: CxsActionMenuItem[] = [
-    { label: 'Edit user', value: 'edit-user' },
-    { label: 'Edit roles', value: 'edit-roles' },
-    { label: 'Edit groups', value: 'edit-groups' },
-    { label: 'Delete user', value: 'delete-user', tone: 'danger' },
   ];
 
   readonly rows = computed(() =>
@@ -219,21 +212,45 @@ export class UsersPage implements OnInit {
     void userId;
   }
 
-  onActionSelected(action: CxsActionMenuItem, userId: string): void {
-    switch (action.value) {
-      case 'edit-user':
-        this.onEditUser(userId);
-        break;
-      case 'edit-roles':
-        this.onEditRoles(userId);
-        break;
-      case 'edit-groups':
-        this.onEditGroups(userId);
-        break;
-      case 'delete-user':
-        this.onDeleteUser(userId);
-        break;
+  onToggleActionMenu(userId: string, event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.openMenuId() === userId) {
+      this.openMenuId.set(null);
+      this.menuPosition.set(null);
+      return;
     }
+
+    const button = event.currentTarget as HTMLElement | null;
+    if (!button) {
+      this.openMenuId.set(userId);
+      this.menuPosition.set(null);
+      return;
+    }
+
+    const rect = button.getBoundingClientRect();
+    const menuWidth = 176;
+    const top = rect.bottom + 8;
+    const left = Math.max(8, rect.right - menuWidth);
+
+    this.openMenuId.set(userId);
+    this.menuPosition.set({ top, left });
+  }
+
+  onCloseActionMenu(): void {
+    this.openMenuId.set(null);
+    this.menuPosition.set(null);
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.openMenuId.set(null);
+    this.menuPosition.set(null);
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    this.openMenuId.set(null);
+    this.menuPosition.set(null);
   }
 
   onOpenAddUser(): void {
