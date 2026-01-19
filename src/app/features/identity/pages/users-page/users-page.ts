@@ -12,6 +12,8 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import {
+  CxsActionMenuComponent,
+  CxsActionMenuItem,
   CxsButtonComponent,
   CxsCardComponent,
   CxsDataTableCellDirective,
@@ -35,6 +37,7 @@ import { UsersService } from '../../services/users.service';
     CommonModule,
     ReactiveFormsModule,
     CxsButtonComponent,
+    CxsActionMenuComponent,
     CxsDataTableComponent,
     CxsDataTableCellDirective,
     CxsDialogComponent,
@@ -126,6 +129,13 @@ export class UsersPage implements OnInit {
     { key: 'actions', label: 'Actions', align: 'right' },
   ];
 
+  readonly actionMenuItems: CxsActionMenuItem[] = [
+    { label: 'Edit user', value: 'edit-user' },
+    { label: 'Edit roles', value: 'edit-roles' },
+    { label: 'Edit groups', value: 'edit-groups' },
+    { label: 'Delete user', value: 'delete-user', tone: 'danger' },
+  ];
+
   readonly rows = computed(() =>
     this.users().map((user) => ({
       id: user.id ?? '',
@@ -197,17 +207,33 @@ export class UsersPage implements OnInit {
     void userId;
   }
 
+  onEditRoles(userId: string): void {
+    void userId;
+  }
+
+  onEditGroups(userId: string): void {
+    void userId;
+  }
+
   onDeleteUser(userId: string): void {
     void userId;
   }
 
-  onToggleLockUser(userId: string, isLocked: boolean): void {
-    void userId;
-    void isLocked;
-  }
-
-  onChangePassword(userId: string): void {
-    void userId;
+  onActionSelected(action: CxsActionMenuItem, userId: string): void {
+    switch (action.value) {
+      case 'edit-user':
+        this.onEditUser(userId);
+        break;
+      case 'edit-roles':
+        this.onEditRoles(userId);
+        break;
+      case 'edit-groups':
+        this.onEditGroups(userId);
+        break;
+      case 'delete-user':
+        this.onDeleteUser(userId);
+        break;
+    }
   }
 
   onOpenAddUser(): void {
