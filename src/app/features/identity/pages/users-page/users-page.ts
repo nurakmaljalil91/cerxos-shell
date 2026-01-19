@@ -78,7 +78,10 @@ export class UsersPage implements OnInit {
   readonly columns: CxsDataTableColumn[] = [
     { key: 'username', label: 'Username', filterable: true, sortable: true },
     { key: 'email', label: 'Email', sortable: true, filterable: true },
+    { key: 'emailConfirm', label: 'Email Confirm' },
     { key: 'phoneNumber', label: 'Phone' },
+    { key: 'phoneNumberConfirm', label: 'Phone Confirm' },
+    { key: 'twoFactorEnabled', label: '2-FA' },
     { key: 'roles', label: 'Roles', filterable: true, sortable: true },
     {
       key: 'locked',
@@ -98,6 +101,28 @@ export class UsersPage implements OnInit {
         },
       ],
     },
+    {
+      key: 'isDeleted',
+      label: 'Deleted',
+      align: 'right',
+      filterable: true,
+      sortable: true,
+      filterType: 'select',
+      filterOptions: [
+        {
+          label: 'Yes',
+          value: 'Yes',
+        },
+        {
+          label: 'No',
+          value: 'No',
+        },
+      ],
+    },
+    {
+      key: 'accessFailedCount',
+      label: 'Access Failed Count',
+    },
     { key: 'actions', label: 'Actions', align: 'right' },
   ];
 
@@ -107,8 +132,13 @@ export class UsersPage implements OnInit {
       username: user.username ?? '',
       email: user.email ?? '',
       phoneNumber: user.phoneNumber ?? '',
+      phoneNumberConfirm: user.phoneNumberConfirm ? 'Yes' : 'No',
+      emailConfirm: user.emailConfirm ? 'Yes' : 'No',
+      twoFactorEnabled: user.twoFactorEnabled ? 'Yes' : 'No',
       roles: user.roles?.length ? user.roles.join(', ') : undefined,
       locked: user.isLocked ? 'Yes' : 'No',
+      isDeleted: user.isDeleted ? 'Yes' : 'No',
+      accessFailedCount: user.accessFailedCount ?? 0,
       isLocked: user.isLocked ?? false,
     })),
   );
@@ -136,9 +166,18 @@ export class UsersPage implements OnInit {
   }
 
   onFilterChange(filters: { global: string; columns: Record<string, string> }): void {
+    const global = filters.global?.trim();
     const username = filters.columns['username']?.trim();
     const email = filters.columns['email']?.trim();
     const parts: string[] = [];
+
+    if (global) {
+      parts.push(
+        `username contains '${this.escapeFilterValue(global)}' or email contains '${this.escapeFilterValue(
+          global,
+        )}'`,
+      );
+    }
 
     if (username) {
       parts.push(`username contains '${this.escapeFilterValue(username)}'`);

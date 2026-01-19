@@ -13,6 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import {
   CxsButtonComponent,
+  CxsCardComponent,
   CxsDataTableCellDirective,
   CxsDataTableColumn,
   CxsDataTableComponent,
@@ -37,6 +38,7 @@ import { GroupsService } from '../../services/groups.service';
     CxsDialogComponent,
     CxsInputComponent,
     CxsToastComponent,
+    CxsCardComponent
   ],
   templateUrl: './groups-page.html',
   styleUrl: './groups-page.css',
