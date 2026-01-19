@@ -5,6 +5,8 @@ import { heroIconHelper } from '../../functions/hero-icon-helper.fx';
 import { LayoutNotifications } from '../layout-notifications/layout-notifications';
 import { LayoutProfileMenu } from '../layout-profile-menu/layout-profile-menu';
 import { UserSessionService } from '../../../core/services/user-session.service';
+import { NgOptimizedImage } from '@angular/common';
+import { CxsBadgeComponent } from 'cerxos-ui';
 
 type NavigationItem = {
   label: string;
@@ -16,17 +18,20 @@ type NavigationItem = {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,selector: 'app-application-layout',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-application-layout',
   imports: [
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
     HeroIconHelperPipe,
     LayoutNotifications,
-    LayoutProfileMenu
+    LayoutProfileMenu,
+    NgOptimizedImage,
+    CxsBadgeComponent
   ],
   templateUrl: './application-layout.html',
-  styleUrl: './application-layout.css'
+  styleUrl: './application-layout.css',
 })
 export class ApplicationLayout {
   readonly collapsed = signal<boolean>(false);
@@ -45,7 +50,11 @@ export class ApplicationLayout {
         { label: 'Users', route: '/identity/users', icon: heroIconHelper('user-group') },
         { label: 'Groups', route: '/identity/groups', icon: heroIconHelper('user-group') },
         { label: 'Roles', route: '/identity/roles', icon: heroIconHelper('user') },
-        { label: 'Permissions', route: '/identity/permissions', icon: heroIconHelper('cog-6-tooth') },
+        {
+          label: 'Permissions',
+          route: '/identity/permissions',
+          icon: heroIconHelper('cog-6-tooth'),
+        },
       ],
     },
     { label: 'Profile', route: '/profile', icon: heroIconHelper('user') },
@@ -70,7 +79,6 @@ export class ApplicationLayout {
   private saveCollapsedStateEffect = effect(() => {
     localStorage.setItem('sidebar:collapsed', this.collapsed() ? '1' : '0');
   });
-  
 
   constructor() {
     const saveDrawerState = localStorage.getItem('sidebar:collapsed');
@@ -99,7 +107,7 @@ export class ApplicationLayout {
       ...state,
       [label]: !this.isGroupExpanded(label),
     }));
-    if (this.collapsed()){
+    if (this.collapsed()) {
       this.toggleSidebar();
     }
   }
@@ -125,7 +133,9 @@ export class ApplicationLayout {
     if (item.requiredRoles?.length && !this.userSessionService.hasAnyRole(item.requiredRoles)) {
       return false;
     }
-    return !(item.requiredPermissions?.length &&
-      !this.userSessionService.hasAnyPermission(item.requiredPermissions));
+    return !(
+      item.requiredPermissions?.length &&
+      !this.userSessionService.hasAnyPermission(item.requiredPermissions)
+    );
   }
 }
