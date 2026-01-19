@@ -43,8 +43,9 @@
       <ng-template cxsDataTableCell="actions" let-row>
         <div class="flex items-center justify-end">
           <cxs-action-menu
-            [items]="actionMenuItems"
+            align="end"
             [floating]="true"
+            [items]="actionMenuItems"
             (itemSelected)="onActionSelected($event, $any(row).id)"
           />
         </div>
