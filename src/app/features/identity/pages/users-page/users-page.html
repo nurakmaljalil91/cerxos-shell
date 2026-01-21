@@ -43,18 +43,18 @@
       <ng-template cxsDataTableCell="actions" let-row>
         <div class="relative flex justify-end">
           <button
-            type="button"
-            class="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
-            [attr.aria-expanded]="openMenuId() === $any(row).id"
             aria-haspopup="true"
             aria-label="Open actions menu"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+            type="button"
+            [attr.aria-expanded]="openMenuId() === $any(row).id"
             (click)="onToggleActionMenu($any(row).id, $event)"
           >
             <svg
-              class="h-4 w-4"
-              viewBox="0 0 16 16"
-              fill="currentColor"
               aria-hidden="true"
+              class="h-4 w-4"
+              fill="currentColor"
+              viewBox="0 0 16 16"
             >
               <circle cx="8" cy="3.5" r="1.5" />
               <circle cx="8" cy="8" r="1.5" />
@@ -64,34 +64,34 @@
           @if (openMenuId() === $any(row).id && menuPosition()) {
             <div
               class="fixed z-50 w-44 rounded-md border border-gray-200 bg-white py-1 text-sm shadow-lg"
-              [style.top.px]="menuPosition()!.top"
               [style.left.px]="menuPosition()!.left"
+              [style.top.px]="menuPosition()!.top"
               (click)="$event.stopPropagation()"
             >
               <button
-                type="button"
                 class="flex w-full items-center px-3 py-2 text-left text-gray-700 hover:bg-gray-50"
+                type="button"
                 (click)="onEditUser($any(row).id); onCloseActionMenu()"
               >
                 Edit user
               </button>
               <button
-                type="button"
                 class="flex w-full items-center px-3 py-2 text-left text-gray-700 hover:bg-gray-50"
+                type="button"
                 (click)="onEditRoles($any(row).id); onCloseActionMenu()"
               >
                 Edit roles
               </button>
               <button
-                type="button"
                 class="flex w-full items-center px-3 py-2 text-left text-gray-700 hover:bg-gray-50"
+                type="button"
                 (click)="onEditGroups($any(row).id); onCloseActionMenu()"
               >
                 Edit groups
               </button>
               <button
-                type="button"
                 class="flex w-full items-center px-3 py-2 text-left text-red-600 hover:bg-red-50"
+                type="button"
                 (click)="onDeleteUser($any(row).id); onCloseActionMenu()"
               >
                 Delete user

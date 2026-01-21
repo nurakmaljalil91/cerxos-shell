@@ -58,6 +58,7 @@ export class ApplicationLayout {
       ],
     },
     { label: 'Profile', route: '/profile', icon: heroIconHelper('user') },
+    { label: 'Planning', route: '/planning', icon: heroIconHelper('calendar') },
     { label: 'Settings', route: '/settings', icon: heroIconHelper('cog-6-tooth') },
   ];
 

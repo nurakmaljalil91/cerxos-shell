@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authenticationGuard } from './core/guards/authentication.guard';
 import { ApplicationLayout } from './shared/layouts/application-layout/application-layout';
 import { loadRemoteModule } from '@angular-architects/native-federation';
+import { loadRemoteStyles } from './shared/utils/remote-style-loader';
 
 export const routes: Routes = [
   {
@@ -75,7 +76,9 @@ export const routes: Routes = [
       {
         path: 'planning',
         loadChildren: () =>
-          loadRemoteModule('planning-mfe', './Routes').then((m) => m.PLANNING_ROUTES),
+          loadRemoteStyles('planning-mfe').then(() =>
+            loadRemoteModule('planning-mfe', './Routes').then((m) => m.PLANNING_ROUTES)
+          ),
       },
     ],
   },
