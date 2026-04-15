@@ -117,6 +117,7 @@
           },
           "defaultConfiguration": "development",
           "options": {
+            "host": "0.0.0.0",
             "port": 4200
           }
         },
@@ -135,6 +136,7 @@
   "cli": {
     "schematicCollections": [
       "angular-eslint"
-    ]
+    ],
+    "analytics": "c96c8715-f01b-4796-8a49-120bee374ea0"
   }
 }
