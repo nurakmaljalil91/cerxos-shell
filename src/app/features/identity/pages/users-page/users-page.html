@@ -70,14 +70,14 @@
               <button
                 class="flex w-full items-center px-3 py-2 text-left text-gray-700 hover:bg-gray-50"
                 type="button"
-                (click)="onEditRoles($any(row).id); onCloseActionMenu()"
+                (click)="onEditRoles($any(row).id, $any(row)); onCloseActionMenu()"
               >
                 Edit roles
               </button>
               <button
                 class="flex w-full items-center px-3 py-2 text-left text-gray-700 hover:bg-gray-50"
                 type="button"
-                (click)="onEditGroups($any(row).id); onCloseActionMenu()"
+                (click)="onEditGroups($any(row).id, $any(row)); onCloseActionMenu()"
               >
                 Edit groups
               </button>
@@ -197,6 +197,20 @@
       </cxs-button>
     </div>
   </cxs-dialog>
+
+  <app-user-roles-dialog
+    [open]="rolesDialogOpen()"
+    [user]="rolesDialogUser()"
+    (closed)="rolesDialogOpen.set(false); rolesDialogUser.set(null)"
+    (roleAssigned)="onAssignmentSaved('Role assigned', $event)"
+  />
+
+  <app-user-groups-dialog
+    [open]="!!groupDialogUser()"
+    [user]="groupDialogUser()"
+    (closed)="groupDialogUser.set(null)"
+    (groupAssigned)="onAssignmentSaved('Group assigned', $event)"
+  />
 
   <cxs-toast
     [duration]="3500"

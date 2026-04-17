@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import {
+  AssignUserToGroupCommand,
   BaseResponseOfGroupDto,
   BaseResponseOfPaginatedEnumerableOfGroupDto,
   CreateGroupCommand,
@@ -46,5 +47,19 @@ export class GroupsService {
     }
 
     return this.http.post<BaseResponseOfGroupDto>(this.groupsEndpoint, command);
+  }
+
+  assignUserToGroup(
+    groupId: string,
+    command: AssignUserToGroupCommand,
+  ): Observable<BaseResponseOfGroupDto> {
+    if (environment.testMode) {
+      return this.mock.assignUserToGroup(groupId, command);
+    }
+
+    return this.http.post<BaseResponseOfGroupDto>(
+      `${this.groupsEndpoint}/${groupId}/assign-user`,
+      command,
+    );
   }
 }

@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import {
+  AssignRoleToUserCommand,
   BaseResponseOfPaginatedEnumerableOfUserDto,
   BaseResponseOfUserDto,
   CreateUserCommand,
@@ -53,5 +54,19 @@ export class UsersService {
     }
 
     return this.http.patch<BaseResponseOfUserDto>(`${this.usersEndpoint}/${userId}`, command);
+  }
+
+  assignRoleToUser(
+    userId: string,
+    command: AssignRoleToUserCommand,
+  ): Observable<BaseResponseOfUserDto> {
+    if (environment.testMode) {
+      return this.mock.assignRoleToUser(userId, command);
+    }
+
+    return this.http.post<BaseResponseOfUserDto>(
+      `${this.usersEndpoint}/${userId}/assign-role`,
+      command,
+    );
   }
 }

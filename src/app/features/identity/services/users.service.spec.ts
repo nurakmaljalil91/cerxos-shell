@@ -5,6 +5,7 @@ import { of } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { QueryRequest } from '../../../shared/models/query-request';
 import {
+  AssignRoleToUserCommand,
   BaseResponseOfPaginatedEnumerableOfUserDto,
   BaseResponseOfUserDto,
   CreateUserCommand,
@@ -16,13 +17,20 @@ import { UsersService } from './users.service';
 describe('UsersService', () => {
   let service: UsersService;
   let httpClientSpy: jasmine.SpyObj<HttpClient>;
-  let usersMockSpy: jasmine.SpyObj<Pick<UsersMock, 'getUsers' | 'createUser' | 'updateUser'>>;
+  let usersMockSpy: jasmine.SpyObj<
+    Pick<UsersMock, 'getUsers' | 'createUser' | 'updateUser' | 'assignRoleToUser'>
+  >;
   let originalTestMode: boolean;
 
   beforeEach(() => {
     originalTestMode = environment.testMode;
     httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'patch']);
-    usersMockSpy = jasmine.createSpyObj('UsersMock', ['getUsers', 'createUser', 'updateUser']);
+    usersMockSpy = jasmine.createSpyObj('UsersMock', [
+      'getUsers',
+      'createUser',
+      'updateUser',
+      'assignRoleToUser',
+    ]);
 
     TestBed.configureTestingModule({
       providers: [
@@ -229,6 +237,58 @@ describe('UsersService', () => {
     service.updateUser('1', command).subscribe((result) => {
       expect(httpClientSpy.patch).toHaveBeenCalledWith(
         `${environment.apiBaseUrl}/api/users/1`,
+        command,
+      );
+      expect(result).toEqual(response);
+      done();
+    });
+  });
+
+  it('should use UsersMock to assign a role when testMode is enabled', (done) => {
+    environment.testMode = true;
+
+    const command: AssignRoleToUserCommand = {
+      userId: '1',
+      roleId: '2',
+    };
+    const response: BaseResponseOfUserDto = {
+      success: true,
+      data: {
+        id: '1',
+        roles: ['Manager'],
+      },
+    };
+
+    usersMockSpy.assignRoleToUser.and.returnValue(of(response));
+
+    service.assignRoleToUser('1', command).subscribe((result) => {
+      expect(usersMockSpy.assignRoleToUser).toHaveBeenCalledWith('1', command);
+      expect(httpClientSpy.post).not.toHaveBeenCalled();
+      expect(result).toEqual(response);
+      done();
+    });
+  });
+
+  it('should call HttpClient to assign a role when testMode is disabled', (done) => {
+    environment.testMode = false;
+
+    const command: AssignRoleToUserCommand = {
+      userId: '1',
+      roleId: '2',
+    };
+    const response: BaseResponseOfUserDto = {
+      success: true,
+      data: {
+        id: '1',
+        roles: ['Manager'],
+      },
+    };
+
+    httpClientSpy.post.and.returnValue(of(response));
+
+    service.assignRoleToUser('1', command).subscribe((result) => {
+      expect(httpClientSpy.post).toHaveBeenCalledWith(
+        `${environment.apiBaseUrl}/api/users/1/assign-role`,
         command,
       );
       expect(result).toEqual(response);

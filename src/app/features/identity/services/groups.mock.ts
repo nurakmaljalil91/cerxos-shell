@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
+  AssignUserToGroupCommand,
   BaseResponseOfGroupDto,
   BaseResponseOfPaginatedEnumerableOfGroupDto,
   CreateGroupCommand,
@@ -82,6 +83,35 @@ export class GroupsMock {
       data: newGroup,
     };
 
+    return new Observable<BaseResponseOfGroupDto>((observer) => {
+      setTimeout(() => {
+        observer.next(response);
+        observer.complete();
+      }, 300);
+    });
+  }
+
+  assignUserToGroup(
+    groupId: string,
+    command: AssignUserToGroupCommand,
+  ): Observable<BaseResponseOfGroupDto> {
+    const group = this.groups.find((item) => item.id === groupId);
+
+    if (!group || !command.userId) {
+      return this.createResponse({
+        success: false,
+        message: 'Mock group or user not found.',
+      });
+    }
+
+    return this.createResponse({
+      success: true,
+      message: 'Mock user assigned to group.',
+      data: group,
+    });
+  }
+
+  private createResponse(response: BaseResponseOfGroupDto): Observable<BaseResponseOfGroupDto> {
     return new Observable<BaseResponseOfGroupDto>((observer) => {
       setTimeout(() => {
         observer.next(response);

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
+  AssignRoleToUserCommand,
   BaseResponseOfPaginatedEnumerableOfUserDto,
   BaseResponseOfUserDto,
   CreateUserCommand,
@@ -14,6 +15,12 @@ import { QueryRequest } from '../../../shared/models/query-request';
   providedIn: 'root',
 })
 export class UsersMock {
+  private readonly roleNamesById = new Map([
+    ['1', 'Admin'],
+    ['2', 'Manager'],
+    ['3', 'Auditor'],
+  ]);
+
   private readonly users: UserDto[] = [
     {
       id: '1',
@@ -166,6 +173,52 @@ export class UsersMock {
       data: updatedUser,
     };
 
+    return new Observable<BaseResponseOfUserDto>((observer) => {
+      setTimeout(() => {
+        observer.next(response);
+        observer.complete();
+      }, 300);
+    });
+  }
+
+  assignRoleToUser(
+    userId: string,
+    command: AssignRoleToUserCommand,
+  ): Observable<BaseResponseOfUserDto> {
+    const userIndex = this.users.findIndex((user) => user.id === userId);
+
+    if (userIndex < 0) {
+      return this.createResponse({
+        success: false,
+        message: 'Mock user not found.',
+      });
+    }
+
+    const roleName = this.roleNamesById.get(command.roleId ?? '') ?? command.roleId ?? '';
+    const user = this.users[userIndex];
+
+    if (user.roles?.includes(roleName)) {
+      return this.createResponse({
+        success: false,
+        message: 'Role already assigned.',
+      });
+    }
+
+    const updatedUser: UserDto = {
+      ...user,
+      roles: [...(user.roles ?? []), roleName],
+    };
+
+    this.users[userIndex] = updatedUser;
+
+    return this.createResponse({
+      success: true,
+      message: 'Mock role assigned to user.',
+      data: updatedUser,
+    });
+  }
+
+  private createResponse(response: BaseResponseOfUserDto): Observable<BaseResponseOfUserDto> {
     return new Observable<BaseResponseOfUserDto>((observer) => {
       setTimeout(() => {
         observer.next(response);

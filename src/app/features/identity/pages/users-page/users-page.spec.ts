@@ -4,6 +4,8 @@ import { of } from 'rxjs';
 
 import { UsersPage } from './users-page';
 import { UsersService } from '../../services/users.service';
+import { RolesService } from '../../services/roles.service';
+import { GroupsService } from '../../services/groups.service';
 import {
   BaseResponseOfPaginatedEnumerableOfUserDto,
   BaseResponseOfUserDto,
@@ -13,15 +15,21 @@ describe('UsersPage', () => {
   let component: UsersPage;
   let fixture: ComponentFixture<UsersPage>;
   let usersServiceSpy: jasmine.SpyObj<Pick<UsersService, 'getUsers' | 'updateUser'>>;
+  let rolesServiceSpy: jasmine.SpyObj<Pick<RolesService, 'getRoles'>>;
+  let groupsServiceSpy: jasmine.SpyObj<Pick<GroupsService, 'getGroups' | 'assignUserToGroup'>>;
 
   beforeEach(async () => {
     usersServiceSpy = jasmine.createSpyObj('UsersService', ['getUsers', 'updateUser']);
+    rolesServiceSpy = jasmine.createSpyObj('RolesService', ['getRoles']);
+    groupsServiceSpy = jasmine.createSpyObj('GroupsService', ['getGroups', 'assignUserToGroup']);
 
     await TestBed.configureTestingModule({
       imports: [UsersPage],
       providers: [
         provideZonelessChangeDetection(),
         { provide: UsersService, useValue: usersServiceSpy },
+        { provide: RolesService, useValue: rolesServiceSpy },
+        { provide: GroupsService, useValue: groupsServiceSpy },
       ],
     }).compileComponents();
 

@@ -27,6 +27,8 @@ import {
 } from 'cerxos-ui';
 import { CreateUserCommand, UpdateUserCommand, UserDto } from '../../../../shared/models/model';
 import { UsersService } from '../../services/users.service';
+import { UserGroupsDialog } from './user-groups-dialog';
+import { UserRolesDialog } from './user-roles-dialog';
 import { buildUsersFilter, UsersTableFilters } from './users-page.filters';
 import { toUserTableRow, USER_COLUMNS } from './users-page.table';
 
@@ -45,6 +47,8 @@ import { toUserTableRow, USER_COLUMNS } from './users-page.table';
     CxsToggleComponent,
     CxsToastComponent,
     CxsCardComponent,
+    UserGroupsDialog,
+    UserRolesDialog,
   ],
   templateUrl: './users-page.html',
   styleUrl: './users-page.css',
@@ -63,6 +67,9 @@ export class UsersPage implements OnInit {
   readonly editUserLoading = signal(false);
   readonly editUserError = signal<string | null>(null);
   readonly editingUserId = signal<string | null>(null);
+  readonly groupDialogUser = signal<UserDto | null>(null);
+  readonly rolesDialogOpen = signal(false);
+  readonly rolesDialogUser = signal<UserDto | null>(null);
   readonly toastOpen = signal(false);
   readonly toastTitle = signal('');
   readonly toastMessage = signal('');
@@ -93,43 +100,35 @@ export class UsersPage implements OnInit {
 
   readonly columns = USER_COLUMNS;
   readonly rows = computed(() => this.users().map(toUserTableRow));
-
   ngOnInit(): void {
     this.loadUsers();
   }
-
   onPageChange(page: number): void {
     this.pageIndex.set(page);
     this.loadUsers();
   }
-
   onPageSizeChange(size: number): void {
     this.pageSize.set(size);
     this.pageIndex.set(1);
     this.loadUsers();
   }
-
   onSortChange(sort: CxsDataTableSort): void {
     this.sortKey.set(sort.key);
     this.sortDirection.set(sort.direction);
     this.pageIndex.set(1);
     this.loadUsers();
   }
-
   onFilterChange(filters: UsersTableFilters): void {
     this.filter.set(buildUsersFilter(filters));
     this.pageIndex.set(1);
     this.loadUsers();
   }
-
   onEditUser(userId: string, row?: Partial<UserDto>): void {
     const user = this.users().find((item) => item.id === userId) ?? row;
-
     if (!user) {
       this.showToast('User not found', 'Refresh the users list and try again.', 'danger');
       return;
     }
-
     this.editingUserId.set(userId);
     this.editUserError.set(null);
     this.editUserForm.reset({
@@ -140,19 +139,33 @@ export class UsersPage implements OnInit {
     });
     this.editUserOpen.set(true);
   }
-
-  onEditRoles(userId: string): void {
-    void userId;
+  onEditRoles(userId: string, row?: Partial<UserDto>): void {
+    const user = this.users().find((item) => item.id === userId) ?? row;
+    if (!user?.id) {
+      this.showToast('User not found', 'Refresh the users list and try again.', 'danger');
+      return;
+    }
+    this.rolesDialogUser.set(user as UserDto);
+    this.rolesDialogOpen.set(true);
   }
-
-  onEditGroups(userId: string): void {
-    void userId;
+  onAssignmentSaved(title: string, message: string): void {
+    this.rolesDialogOpen.set(false);
+    this.rolesDialogUser.set(null);
+    this.groupDialogUser.set(null);
+    this.showToast(title, message, 'info');
+    this.loadUsers();
   }
-
+  onEditGroups(userId: string, row?: Partial<UserDto>): void {
+    const user = this.users().find((item) => item.id === userId) ?? row;
+    if (!user?.id) {
+      this.showToast('User not found', 'Refresh the users list and try again.', 'danger');
+      return;
+    }
+    this.groupDialogUser.set(user as UserDto);
+  }
   onDeleteUser(userId: string): void {
     void userId;
   }
-
   onToggleActionMenu(userId: string, event: MouseEvent): void {
     event.stopPropagation();
     if (this.openMenuId() === userId) {
@@ -160,45 +173,37 @@ export class UsersPage implements OnInit {
       this.menuPosition.set(null);
       return;
     }
-
     const button = event.currentTarget as HTMLElement | null;
     if (!button) {
       this.openMenuId.set(userId);
       this.menuPosition.set(null);
       return;
     }
-
     const rect = button.getBoundingClientRect();
     const menuWidth = 176;
     const top = rect.bottom + 8;
     const left = Math.max(8, rect.right - menuWidth);
-
     this.openMenuId.set(userId);
     this.menuPosition.set({ top, left });
   }
-
   onCloseActionMenu(): void {
     this.openMenuId.set(null);
     this.menuPosition.set(null);
   }
-
   @HostListener('document:click')
   onDocumentClick(): void {
     this.openMenuId.set(null);
     this.menuPosition.set(null);
   }
-
   @HostListener('window:scroll')
   onWindowScroll(): void {
     this.openMenuId.set(null);
     this.menuPosition.set(null);
   }
-
   onOpenAddUser(): void {
     this.addUserError.set(null);
     this.addUserOpen.set(true);
   }
-
   onCloseAddUser(): void {
     this.addUserOpen.set(false);
     this.addUserLoading.set(false);

@@ -1,0 +1,57 @@
+<cxs-dialog
+  description="Assign an existing role to this user."
+  title="Edit roles"
+  [open]="open()"
+  (openChange)="onClose()"
+>
+  <form class="grid gap-4" [formGroup]="roleForm" (ngSubmit)="onSubmit()">
+    <div>
+      <p class="text-sm font-medium text-gray-900">Current roles</p>
+      @if (currentRoles().length) {
+        <div class="mt-2 flex flex-wrap gap-2">
+          @for (role of currentRoles(); track role) {
+            <span class="rounded-md bg-gray-100 px-2 py-1 text-xs text-gray-700">
+              {{ role }}
+            </span>
+          }
+        </div>
+      } @else {
+        <p class="mt-1 text-sm text-gray-500">No roles assigned.</p>
+      }
+    </div>
+
+    <cxs-select
+      formControlName="roleId"
+      label="Role"
+      placeholder="Select role"
+      [disabled]="loadingRoles() || !availableRoles().length"
+      [value]="roleForm.controls.roleId.value ?? ''"
+    >
+      @for (role of availableRoles(); track role.id) {
+        <option [value]="role.id">{{ role.name }}</option>
+      }
+    </cxs-select>
+
+    @if (!loadingRoles() && !availableRoles().length) {
+      <p class="text-sm text-gray-500">All available roles are already assigned.</p>
+    }
+  </form>
+
+  @if (error()) {
+    <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+      {{ error() }}
+    </div>
+  }
+
+  <div cxsDialogActions>
+    <cxs-button variant="secondary" (click)="onClose()">Cancel</cxs-button>
+    <cxs-button
+      type="submit"
+      [disabled]="assigningRole() || loadingRoles() || !availableRoles().length"
+      [loading]="assigningRole()"
+      (click)="onSubmit()"
+    >
+      Assign role
+    </cxs-button>
+  </div>
+</cxs-dialog>

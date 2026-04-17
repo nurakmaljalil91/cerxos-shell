@@ -1,0 +1,57 @@
+<cxs-dialog
+  description="Assign an existing group to this user."
+  title="Edit groups"
+  [open]="open()"
+  (openChange)="onClose()"
+>
+  <form class="grid gap-4" [formGroup]="groupForm" (ngSubmit)="onSubmit()">
+    <div>
+      <p class="text-sm font-medium text-gray-900">Current groups</p>
+      @if (currentGroups().length) {
+        <div class="mt-2 flex flex-wrap gap-2">
+          @for (group of currentGroups(); track group) {
+            <span class="rounded-md bg-gray-100 px-2 py-1 text-xs text-gray-700">
+              {{ group }}
+            </span>
+          }
+        </div>
+      } @else {
+        <p class="mt-1 text-sm text-gray-500">No groups assigned.</p>
+      }
+    </div>
+
+    <cxs-select
+      formControlName="groupId"
+      label="Group"
+      placeholder="Select group"
+      [disabled]="loadingGroups() || !availableGroups().length"
+      [value]="groupForm.controls.groupId.value ?? ''"
+    >
+      @for (group of availableGroups(); track group.id) {
+        <option [value]="group.id">{{ group.name }}</option>
+      }
+    </cxs-select>
+
+    @if (!loadingGroups() && !availableGroups().length) {
+      <p class="text-sm text-gray-500">All available groups are already assigned.</p>
+    }
+  </form>
+
+  @if (error()) {
+    <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+      {{ error() }}
+    </div>
+  }
+
+  <div cxsDialogActions>
+    <cxs-button variant="secondary" (click)="onClose()">Cancel</cxs-button>
+    <cxs-button
+      type="submit"
+      [disabled]="assigningGroup() || loadingGroups() || !availableGroups().length"
+      [loading]="assigningGroup()"
+      (click)="onSubmit()"
+    >
+      Assign group
+    </cxs-button>
+  </div>
+</cxs-dialog>
