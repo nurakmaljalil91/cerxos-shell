@@ -52,9 +52,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ]
+            "styles": ["src/styles.css"]
           }
         },
         "esbuild": {
@@ -68,12 +66,8 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ],
-            "polyfills": [
-              "es-module-shims"
-            ]
+            "styles": ["src/styles.css"],
+            "polyfills": ["src/polyfills.ts", "es-module-shims"]
           },
           "configurations": {
             "production": {
@@ -124,19 +118,14 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html"
-            ]
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
           }
         }
       }
     }
   },
   "cli": {
-    "schematicCollections": [
-      "angular-eslint"
-    ],
+    "schematicCollections": ["angular-eslint"],
     "analytics": "c96c8715-f01b-4796-8a49-120bee374ea0"
   }
 }

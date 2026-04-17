@@ -3,27 +3,33 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { of } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { BaseResponseOfPaginatedEnumerableOfUserDto, BaseResponseOfUserDto, CreateUserCommand } from '../../../shared/models/model';
+import { QueryRequest } from '../../../shared/models/query-request';
+import {
+  BaseResponseOfPaginatedEnumerableOfUserDto,
+  BaseResponseOfUserDto,
+  CreateUserCommand,
+  UpdateUserCommand,
+} from '../../../shared/models/model';
 import { UsersMock } from './users.mock';
-import { UsersQuery, UsersService } from './users.service';
+import { UsersService } from './users.service';
 
 describe('UsersService', () => {
   let service: UsersService;
   let httpClientSpy: jasmine.SpyObj<HttpClient>;
-  let usersMockSpy: jasmine.SpyObj<Pick<UsersMock, 'getUsers' | 'createUser'>>;
+  let usersMockSpy: jasmine.SpyObj<Pick<UsersMock, 'getUsers' | 'createUser' | 'updateUser'>>;
   let originalTestMode: boolean;
 
   beforeEach(() => {
     originalTestMode = environment.testMode;
-    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post']);
-    usersMockSpy = jasmine.createSpyObj('UsersMock', ['getUsers', 'createUser']);
+    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'patch']);
+    usersMockSpy = jasmine.createSpyObj('UsersMock', ['getUsers', 'createUser', 'updateUser']);
 
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
         { provide: HttpClient, useValue: httpClientSpy },
-        { provide: UsersMock, useValue: usersMockSpy }
-      ]
+        { provide: UsersMock, useValue: usersMockSpy },
+      ],
     });
 
     service = TestBed.inject(UsersService);
@@ -40,19 +46,19 @@ describe('UsersService', () => {
   it('should use UsersMock when testMode is enabled', (done) => {
     environment.testMode = true;
 
-    const query: UsersQuery = {
+    const query: QueryRequest = {
       page: 1,
       total: 10,
       sortBy: 'username',
-      descending: false
+      descending: false,
     };
 
     const response: BaseResponseOfPaginatedEnumerableOfUserDto = {
       success: true,
       data: {
         items: [],
-        totalCount: 0
-      }
+        totalCount: 0,
+      },
     };
 
     usersMockSpy.getUsers.and.returnValue(of(response));
@@ -68,19 +74,19 @@ describe('UsersService', () => {
   it('should call HttpClient with expected params when testMode is disabled', (done) => {
     environment.testMode = false;
 
-    const query: UsersQuery = {
+    const query: QueryRequest = {
       page: 2,
       total: 5,
       sortBy: 'email',
-      descending: true
+      descending: true,
     };
 
     const response: BaseResponseOfPaginatedEnumerableOfUserDto = {
       success: true,
       data: {
         items: [],
-        totalCount: 0
-      }
+        totalCount: 0,
+      },
     };
 
     httpClientSpy.get.and.returnValue(of(response));
@@ -91,7 +97,7 @@ describe('UsersService', () => {
 
       const [url, options] = httpClientSpy.get.calls.mostRecent().args as [
         string,
-        { params: HttpParams }
+        { params: HttpParams },
       ];
 
       const expectedParams = new HttpParams()
@@ -112,7 +118,7 @@ describe('UsersService', () => {
     const command: CreateUserCommand = {
       username: 'new-user',
       email: 'new-user@example.com',
-      password: 'Password123!'
+      password: 'Password123!',
     };
 
     const response: BaseResponseOfUserDto = {
@@ -120,8 +126,8 @@ describe('UsersService', () => {
       data: {
         id: '1',
         username: 'new-user',
-        email: 'new-user@example.com'
-      }
+        email: 'new-user@example.com',
+      },
     };
 
     usersMockSpy.createUser.and.returnValue(of(response));
@@ -140,7 +146,7 @@ describe('UsersService', () => {
     const command: CreateUserCommand = {
       username: 'new-user',
       email: 'new-user@example.com',
-      password: 'Password123!'
+      password: 'Password123!',
     };
 
     const response: BaseResponseOfUserDto = {
@@ -148,8 +154,8 @@ describe('UsersService', () => {
       data: {
         id: '1',
         username: 'new-user',
-        email: 'new-user@example.com'
-      }
+        email: 'new-user@example.com',
+      },
     };
 
     httpClientSpy.post.and.returnValue(of(response));
@@ -157,7 +163,73 @@ describe('UsersService', () => {
     service.createUser(command).subscribe((result) => {
       expect(httpClientSpy.post).toHaveBeenCalledWith(
         `${environment.apiBaseUrl}/api/users`,
-        command
+        command,
+      );
+      expect(result).toEqual(response);
+      done();
+    });
+  });
+
+  it('should use UsersMock to update a user when testMode is enabled', (done) => {
+    environment.testMode = true;
+
+    const command: UpdateUserCommand = {
+      id: '1',
+      username: 'updated-user',
+      email: 'updated-user@example.com',
+      phoneNumber: '+1 555 0199',
+      isLocked: true,
+    };
+
+    const response: BaseResponseOfUserDto = {
+      success: true,
+      data: {
+        id: '1',
+        username: 'updated-user',
+        email: 'updated-user@example.com',
+        phoneNumber: '+1 555 0199',
+        isLocked: true,
+      },
+    };
+
+    usersMockSpy.updateUser.and.returnValue(of(response));
+
+    service.updateUser('1', command).subscribe((result) => {
+      expect(usersMockSpy.updateUser).toHaveBeenCalledWith('1', command);
+      expect(httpClientSpy.patch).not.toHaveBeenCalled();
+      expect(result).toEqual(response);
+      done();
+    });
+  });
+
+  it('should call HttpClient to update a user when testMode is disabled', (done) => {
+    environment.testMode = false;
+
+    const command: UpdateUserCommand = {
+      id: '1',
+      username: 'updated-user',
+      email: 'updated-user@example.com',
+      phoneNumber: '+1 555 0199',
+      isLocked: false,
+    };
+
+    const response: BaseResponseOfUserDto = {
+      success: true,
+      data: {
+        id: '1',
+        username: 'updated-user',
+        email: 'updated-user@example.com',
+        phoneNumber: '+1 555 0199',
+        isLocked: false,
+      },
+    };
+
+    httpClientSpy.patch.and.returnValue(of(response));
+
+    service.updateUser('1', command).subscribe((result) => {
+      expect(httpClientSpy.patch).toHaveBeenCalledWith(
+        `${environment.apiBaseUrl}/api/users/1`,
+        command,
       );
       expect(result).toEqual(response);
       done();

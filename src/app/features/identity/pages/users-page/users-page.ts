@@ -16,7 +16,6 @@ import {
   CxsButtonComponent,
   CxsCardComponent,
   CxsDataTableCellDirective,
-  CxsDataTableColumn,
   CxsDataTableComponent,
   CxsDataTableSort,
   CxsDataTableSortDirection,
@@ -24,9 +23,12 @@ import {
   CxsInputComponent,
   CxsToastComponent,
   CxsToastVariant,
+  CxsToggleComponent,
 } from 'cerxos-ui';
-import { CreateUserCommand, UserDto } from '../../../../shared/models/model';
+import { CreateUserCommand, UpdateUserCommand, UserDto } from '../../../../shared/models/model';
 import { UsersService } from '../../services/users.service';
+import { buildUsersFilter, UsersTableFilters } from './users-page.filters';
+import { toUserTableRow, USER_COLUMNS } from './users-page.table';
 
 @Component({
   selector: 'app-users-page',
@@ -40,6 +42,7 @@ import { UsersService } from '../../services/users.service';
     CxsDataTableCellDirective,
     CxsDialogComponent,
     CxsInputComponent,
+    CxsToggleComponent,
     CxsToastComponent,
     CxsCardComponent,
   ],
@@ -56,6 +59,10 @@ export class UsersPage implements OnInit {
   readonly addUserOpen = signal(false);
   readonly addUserLoading = signal(false);
   readonly addUserError = signal<string | null>(null);
+  readonly editUserOpen = signal(false);
+  readonly editUserLoading = signal(false);
+  readonly editUserError = signal<string | null>(null);
+  readonly editingUserId = signal<string | null>(null);
   readonly toastOpen = signal(false);
   readonly toastTitle = signal('');
   readonly toastMessage = signal('');
@@ -77,74 +84,15 @@ export class UsersPage implements OnInit {
     phoneNumber: [''],
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
+  readonly editUserForm = this.formBuilder.group({
+    username: ['', [Validators.required]],
+    email: ['', [Validators.required, Validators.email]],
+    phoneNumber: [''],
+    isLocked: [false],
+  });
 
-  readonly columns: CxsDataTableColumn[] = [
-    { key: 'username', label: 'Username', filterable: true, sortable: true },
-    { key: 'email', label: 'Email', sortable: true, filterable: true },
-    { key: 'emailConfirm', label: 'Email Confirm' },
-    { key: 'phoneNumber', label: 'Phone' },
-    { key: 'phoneNumberConfirm', label: 'Phone Confirm' },
-    { key: 'twoFactorEnabled', label: '2-FA' },
-    { key: 'roles', label: 'Roles', filterable: true, sortable: true },
-    {
-      key: 'locked',
-      label: 'Locked',
-      align: 'right',
-      filterable: true,
-      sortable: true,
-      filterType: 'select',
-      filterOptions: [
-        {
-          label: 'Yes',
-          value: 'Yes',
-        },
-        {
-          label: 'No',
-          value: 'No',
-        },
-      ],
-    },
-    {
-      key: 'isDeleted',
-      label: 'Deleted',
-      align: 'right',
-      filterable: true,
-      sortable: true,
-      filterType: 'select',
-      filterOptions: [
-        {
-          label: 'Yes',
-          value: 'Yes',
-        },
-        {
-          label: 'No',
-          value: 'No',
-        },
-      ],
-    },
-    {
-      key: 'accessFailedCount',
-      label: 'Access Failed Count',
-    },
-    { key: 'actions', label: 'Actions', align: 'right' },
-  ];
-
-  readonly rows = computed(() =>
-    this.users().map((user) => ({
-      id: user.id ?? '',
-      username: user.username ?? '',
-      email: user.email ?? '',
-      phoneNumber: user.phoneNumber ?? '',
-      phoneNumberConfirm: user.phoneNumberConfirm ? 'Yes' : 'No',
-      emailConfirm: user.emailConfirm ? 'Yes' : 'No',
-      twoFactorEnabled: user.twoFactorEnabled ? 'Yes' : 'No',
-      roles: user.roles?.length ? user.roles.join(', ') : undefined,
-      locked: user.isLocked ? 'Yes' : 'No',
-      isDeleted: user.isDeleted ? 'Yes' : 'No',
-      accessFailedCount: user.accessFailedCount ?? 0,
-      isLocked: user.isLocked ?? false,
-    })),
-  );
+  readonly columns = USER_COLUMNS;
+  readonly rows = computed(() => this.users().map(toUserTableRow));
 
   ngOnInit(): void {
     this.loadUsers();
@@ -168,36 +116,29 @@ export class UsersPage implements OnInit {
     this.loadUsers();
   }
 
-  onFilterChange(filters: { global: string; columns: Record<string, string> }): void {
-    const global = filters.global?.trim();
-    const username = filters.columns['username']?.trim();
-    const email = filters.columns['email']?.trim();
-    const parts: string[] = [];
-
-    if (global) {
-      parts.push(
-        `username contains '${this.escapeFilterValue(global)}' or email contains '${this.escapeFilterValue(
-          global,
-        )}'`,
-      );
-    }
-
-    if (username) {
-      parts.push(`username contains '${this.escapeFilterValue(username)}'`);
-    }
-
-    if (email) {
-      parts.push(`email contains '${this.escapeFilterValue(email)}'`);
-    }
-
-    const filter = parts.length ? parts.join(' and ') : undefined;
-    this.filter.set(filter);
+  onFilterChange(filters: UsersTableFilters): void {
+    this.filter.set(buildUsersFilter(filters));
     this.pageIndex.set(1);
     this.loadUsers();
   }
 
-  onEditUser(userId: string): void {
-    void userId;
+  onEditUser(userId: string, row?: Partial<UserDto>): void {
+    const user = this.users().find((item) => item.id === userId) ?? row;
+
+    if (!user) {
+      this.showToast('User not found', 'Refresh the users list and try again.', 'danger');
+      return;
+    }
+
+    this.editingUserId.set(userId);
+    this.editUserError.set(null);
+    this.editUserForm.reset({
+      username: user.username ?? '',
+      email: user.email ?? '',
+      phoneNumber: user.phoneNumber ?? '',
+      isLocked: user.isLocked ?? false,
+    });
+    this.editUserOpen.set(true);
   }
 
   onEditRoles(userId: string): void {
@@ -324,6 +265,80 @@ export class UsersPage implements OnInit {
       });
   }
 
+  onCloseEditUser(): void {
+    this.editUserOpen.set(false);
+    this.editUserLoading.set(false);
+    this.editUserError.set(null);
+    this.editingUserId.set(null);
+    this.editUserForm.reset({
+      username: '',
+      email: '',
+      phoneNumber: '',
+      isLocked: false,
+    });
+  }
+
+  onEditUserLockedChange(locked: boolean): void {
+    this.editUserForm.patchValue({ isLocked: locked });
+    this.editUserForm.markAsDirty();
+  }
+
+  onSubmitEditUser(): void {
+    if (this.editUserLoading()) {
+      return;
+    }
+
+    const userId = this.editingUserId();
+    if (!userId) {
+      this.editUserError.set('Select a user to edit.');
+      return;
+    }
+
+    if (this.editUserForm.invalid) {
+      this.editUserForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.editUserForm.getRawValue();
+    const command: UpdateUserCommand = {
+      id: userId,
+      username: formValue.username ?? '',
+      email: formValue.email ?? '',
+      phoneNumber: formValue.phoneNumber ?? '',
+      isLocked: formValue.isLocked ?? false,
+    };
+
+    this.editUserLoading.set(true);
+    this.editUserError.set(null);
+
+    this.usersService
+      .updateUser(userId, command)
+      .pipe(
+        finalize(() => this.editUserLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response?.success) {
+            const message = response?.message ?? 'Failed to update user.';
+            this.editUserError.set(message);
+            this.showToast('User not updated', message, 'danger');
+            return;
+          }
+
+          this.editUserOpen.set(false);
+          this.editingUserId.set(null);
+          this.showToast('User updated', response?.message ?? 'User updated successfully.', 'info');
+          this.loadUsers();
+        },
+        error: (err) => {
+          const message = err?.error?.message ?? 'Failed to update user.';
+          this.editUserError.set(message);
+          this.showToast('User not updated', message, 'danger');
+        },
+      });
+  }
+
   onToastOpenChange(open: boolean): void {
     this.toastOpen.set(open);
   }
@@ -370,9 +385,5 @@ export class UsersPage implements OnInit {
     this.toastMessage.set(message);
     this.toastVariant.set(variant);
     this.toastOpen.set(true);
-  }
-
-  private escapeFilterValue(value: string): string {
-    return value.replace(/'/g, "''");
   }
 }

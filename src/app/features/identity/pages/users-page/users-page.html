@@ -8,9 +8,7 @@
   </div>
 
   @if (error()) {
-    <div
-      class="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700"
-    >
+    <div class="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
       {{ error() }}
     </div>
   }
@@ -50,12 +48,7 @@
             [attr.aria-expanded]="openMenuId() === $any(row).id"
             (click)="onToggleActionMenu($any(row).id, $event)"
           >
-            <svg
-              aria-hidden="true"
-              class="h-4 w-4"
-              fill="currentColor"
-              viewBox="0 0 16 16"
-            >
+            <svg aria-hidden="true" class="h-4 w-4" fill="currentColor" viewBox="0 0 16 16">
               <circle cx="8" cy="3.5" r="1.5" />
               <circle cx="8" cy="8" r="1.5" />
               <circle cx="8" cy="12.5" r="1.5" />
@@ -66,12 +59,11 @@
               class="fixed z-50 w-44 rounded-md border border-gray-200 bg-white py-1 text-sm shadow-lg"
               [style.left.px]="menuPosition()!.left"
               [style.top.px]="menuPosition()!.top"
-              (click)="$event.stopPropagation()"
             >
               <button
                 class="flex w-full items-center px-3 py-2 text-left text-gray-700 hover:bg-gray-50"
                 type="button"
-                (click)="onEditUser($any(row).id); onCloseActionMenu()"
+                (click)="onEditUser($any(row).id, $any(row)); onCloseActionMenu()"
               >
                 Edit user
               </button>
@@ -101,7 +93,6 @@
         </div>
       </ng-template>
     </cxs-data-table>
-
   </cxs-card>
 
   <cxs-dialog
@@ -111,9 +102,7 @@
     (openChange)="onCloseAddUser()"
   >
     <form class="grid gap-4" [formGroup]="addUserForm" (ngSubmit)="onSubmitAddUser()">
-
       <cxs-input formControlName="username" label="Username" placeholder="Username" />
-
 
       <cxs-input formControlName="email" label="Email" placeholder="user@example.com" type="email">
         @if (addUserForm.get('email')?.touched && addUserForm.get('email')?.invalid) {
@@ -121,13 +110,16 @@
         }
       </cxs-input>
       <cxs-input formControlName="phoneNumber" label="Phone" placeholder="+1 555 0100" type="tel" />
-      <cxs-input formControlName="password" label="Password" placeholder="Password" type="password" />
+      <cxs-input
+        formControlName="password"
+        label="Password"
+        placeholder="Password"
+        type="password"
+      />
     </form>
 
     @if (addUserError()) {
-      <div
-        class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700"
-      >
+      <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
         {{ addUserError() }}
       </div>
     }
@@ -141,6 +133,67 @@
         (click)="onSubmitAddUser()"
       >
         Create user
+      </cxs-button>
+    </div>
+  </cxs-dialog>
+
+  <cxs-dialog
+    description="Update user account details."
+    title="Edit user"
+    [open]="editUserOpen()"
+    (openChange)="onCloseEditUser()"
+  >
+    <form class="grid gap-4" [formGroup]="editUserForm" (ngSubmit)="onSubmitEditUser()">
+      <cxs-input
+        formControlName="username"
+        label="Username"
+        placeholder="Username"
+        [value]="editUserForm.controls.username.value ?? ''"
+      />
+
+      <cxs-input
+        formControlName="email"
+        label="Email"
+        placeholder="user@example.com"
+        type="email"
+        [value]="editUserForm.controls.email.value ?? ''"
+      >
+        @if (editUserForm.get('email')?.touched && editUserForm.get('email')?.invalid) {
+          <span cxsInputError>Enter a valid email address.</span>
+        }
+      </cxs-input>
+
+      <cxs-input
+        formControlName="phoneNumber"
+        label="Phone"
+        placeholder="+1 555 0100"
+        type="tel"
+        [value]="editUserForm.controls.phoneNumber.value ?? ''"
+      />
+
+      <cxs-toggle
+        ariaLabel="Lock user"
+        label="Locked"
+        [checked]="editUserForm.controls.isLocked.value ?? false"
+        (checkedChange)="onEditUserLockedChange($event)"
+      />
+    </form>
+
+    @if (editUserError()) {
+      <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+        {{ editUserError() }}
+      </div>
+    }
+
+    <div cxsDialogActions>
+      <cxs-button variant="secondary" (click)="onCloseEditUser()">Cancel</cxs-button>
+      <cxs-button
+        type="submit"
+        [disabled]="editUserLoading()"
+        [loading]="editUserLoading()"
+        (click)="onSubmitEditUser()"
+      >
+        Save changes
       </cxs-button>
     </div>
   </cxs-dialog>

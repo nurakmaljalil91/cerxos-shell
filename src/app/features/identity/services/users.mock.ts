@@ -5,12 +5,13 @@ import {
   BaseResponseOfUserDto,
   CreateUserCommand,
   PaginatedEnumerableOfUserDto,
-  UserDto
+  UpdateUserCommand,
+  UserDto,
 } from '../../../shared/models/model';
 import { QueryRequest } from '../../../shared/models/query-request';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UsersMock {
   private readonly users: UserDto[] = [
@@ -20,7 +21,7 @@ export class UsersMock {
       email: 'admin@cerxos.dev',
       phoneNumber: '+1 555 0100',
       roles: ['Admin'],
-      isLocked: false
+      isLocked: false,
     },
     {
       id: '2',
@@ -28,7 +29,7 @@ export class UsersMock {
       email: 'manager@cerxos.dev',
       phoneNumber: '+1 555 0101',
       roles: ['Manager'],
-      isLocked: false
+      isLocked: false,
     },
     {
       id: '3',
@@ -36,7 +37,7 @@ export class UsersMock {
       email: 'auditor@cerxos.dev',
       phoneNumber: '+1 555 0102',
       roles: ['Auditor'],
-      isLocked: true
+      isLocked: true,
     },
     {
       id: '4',
@@ -44,7 +45,7 @@ export class UsersMock {
       email: 'support@cerxos.dev',
       phoneNumber: '+1 555 0103',
       roles: ['Support'],
-      isLocked: false
+      isLocked: false,
     },
     {
       id: '5',
@@ -52,8 +53,8 @@ export class UsersMock {
       email: 'analyst@cerxos.dev',
       phoneNumber: '+1 555 0104',
       roles: ['Analyst'],
-      isLocked: false
-    }
+      isLocked: false,
+    },
   ];
 
   getUsers(query: QueryRequest): Observable<BaseResponseOfPaginatedEnumerableOfUserDto> {
@@ -89,13 +90,13 @@ export class UsersMock {
       totalPages,
       totalCount: items.length,
       hasPreviousPage: page > 1,
-      hasNextPage: page < totalPages
+      hasNextPage: page < totalPages,
     };
 
     const response: BaseResponseOfPaginatedEnumerableOfUserDto = {
       success: true,
       message: 'Mock users loaded.',
-      data
+      data,
     };
 
     return new Observable<BaseResponseOfPaginatedEnumerableOfUserDto>((observer) => {
@@ -113,7 +114,7 @@ export class UsersMock {
       email: command.email ?? '',
       phoneNumber: command.phoneNumber ?? '',
       roles: [],
-      isLocked: false
+      isLocked: false,
     };
 
     this.users.unshift(newUser);
@@ -121,7 +122,48 @@ export class UsersMock {
     const response: BaseResponseOfUserDto = {
       success: true,
       message: 'Mock user created.',
-      data: newUser
+      data: newUser,
+    };
+
+    return new Observable<BaseResponseOfUserDto>((observer) => {
+      setTimeout(() => {
+        observer.next(response);
+        observer.complete();
+      }, 300);
+    });
+  }
+
+  updateUser(userId: string, command: UpdateUserCommand): Observable<BaseResponseOfUserDto> {
+    const userIndex = this.users.findIndex((user) => user.id === userId);
+
+    if (userIndex < 0) {
+      const response: BaseResponseOfUserDto = {
+        success: false,
+        message: 'Mock user not found.',
+      };
+
+      return new Observable<BaseResponseOfUserDto>((observer) => {
+        setTimeout(() => {
+          observer.next(response);
+          observer.complete();
+        }, 300);
+      });
+    }
+
+    const updatedUser: UserDto = {
+      ...this.users[userIndex],
+      username: command.username ?? '',
+      email: command.email ?? '',
+      phoneNumber: command.phoneNumber ?? '',
+      isLocked: command.isLocked ?? false,
+    };
+
+    this.users[userIndex] = updatedUser;
+
+    const response: BaseResponseOfUserDto = {
+      success: true,
+      message: 'Mock user updated.',
+      data: updatedUser,
     };
 
     return new Observable<BaseResponseOfUserDto>((observer) => {

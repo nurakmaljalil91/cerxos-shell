@@ -6,6 +6,7 @@ import {
   BaseResponseOfPaginatedEnumerableOfUserDto,
   BaseResponseOfUserDto,
   CreateUserCommand,
+  UpdateUserCommand,
 } from '../../../shared/models/model';
 import { UsersMock } from './users.mock';
 import { QueryRequest } from '../../../shared/models/query-request';
@@ -44,5 +45,13 @@ export class UsersService {
     }
 
     return this.http.post<BaseResponseOfUserDto>(this.usersEndpoint, command);
+  }
+
+  updateUser(userId: string, command: UpdateUserCommand): Observable<BaseResponseOfUserDto> {
+    if (environment.testMode) {
+      return this.mock.updateUser(userId, command);
+    }
+
+    return this.http.patch<BaseResponseOfUserDto>(`${this.usersEndpoint}/${userId}`, command);
   }
 }

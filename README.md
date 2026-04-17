@@ -7,10 +7,41 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 To start a local development server, run:
 
 ```bash
-ng serve
+npm run start
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+
+### Permission errors when starting
+
+If `npm run start` fails with an error like this:
+
+```text
+An unhandled exception occurred: EACCES, Permission denied: dist/cerxos-shell/browser 'dist/cerxos-shell/browser'
+```
+
+or this:
+
+```text
+An unhandled exception occurred: EACCES: permission denied, unlink '.angular/cache/.../vite/deps/@angular-architects_native-federation.js'
+```
+
+check the ownership of the generated build output and Angular cache:
+
+```bash
+ls -ld dist dist/cerxos-shell dist/cerxos-shell/browser
+ls -ld .angular .angular/cache .angular/cache/*/cerxos-shell/vite/deps*
+```
+
+This can happen when generated directories were created by another user or by a container, for example as `nobody:nogroup`. Angular Native Federation and Vite remove and recreate files in these directories during startup, so the current user must own them.
+
+Fix the ownership, then start the app again:
+
+```bash
+sudo chown -R "$USER:$USER" dist/cerxos-shell
+sudo chown -R "$USER:$USER" .angular/cache
+npm run start
+```
 
 ## Code scaffolding
 
