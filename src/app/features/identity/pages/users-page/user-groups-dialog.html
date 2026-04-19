@@ -7,14 +7,28 @@
   <form class="grid gap-4" [formGroup]="groupForm" (ngSubmit)="onSubmit()">
     <div>
       <p class="text-sm font-medium text-gray-900">Current groups</p>
-      @if (currentGroups().length) {
-        <div class="mt-2 flex flex-wrap gap-2">
-          @for (group of currentGroups(); track group) {
-            <span class="rounded-md bg-gray-100 px-2 py-1 text-xs text-gray-700">
-              {{ group }}
-            </span>
+      @if (assignedGroups().length) {
+        <div class="mt-2 grid gap-2">
+          @for (group of assignedGroups(); track group.id) {
+            <div
+              class="flex items-center justify-between gap-3 rounded-md border border-gray-200 px-3 py-2"
+            >
+              <span class="text-sm text-gray-700">{{ group.name }}</span>
+              <cxs-button
+                size="sm"
+                type="button"
+                variant="ghost"
+                [disabled]="!!unassigningGroupId()"
+                [loading]="unassigningGroupId() === group.id"
+                (click)="onUnassignGroup(group)"
+              >
+                Remove
+              </cxs-button>
+            </div>
           }
         </div>
+      } @else if (currentGroups().length && loadingGroups()) {
+        <p class="mt-1 text-sm text-gray-500">Loading assigned groups.</p>
       } @else {
         <p class="mt-1 text-sm text-gray-500">No groups assigned.</p>
       }
@@ -23,14 +37,19 @@
     <cxs-select
       formControlName="groupId"
       label="Group"
-      placeholder="Select group"
       [disabled]="loadingGroups() || !availableGroups().length"
       [value]="groupForm.controls.groupId.value ?? ''"
+      (valueChange)="onGroupSelected($event)"
     >
+      <option value="">Select group</option>
       @for (group of availableGroups(); track group.id) {
         <option [value]="group.id">{{ group.name }}</option>
       }
     </cxs-select>
+
+    @if (groupForm.controls.groupId.touched && groupForm.controls.groupId.invalid) {
+      <p class="text-sm text-red-600">Select a group to assign.</p>
+    }
 
     @if (!loadingGroups() && !availableGroups().length) {
       <p class="text-sm text-gray-500">All available groups are already assigned.</p>
@@ -47,7 +66,13 @@
     <cxs-button variant="secondary" (click)="onClose()">Cancel</cxs-button>
     <cxs-button
       type="submit"
-      [disabled]="assigningGroup() || loadingGroups() || !availableGroups().length"
+      [disabled]="
+        assigningGroup() ||
+        !!unassigningGroupId() ||
+        loadingGroups() ||
+        !availableGroups().length ||
+        !selectedGroupId()
+      "
       [loading]="assigningGroup()"
       (click)="onSubmit()"
     >

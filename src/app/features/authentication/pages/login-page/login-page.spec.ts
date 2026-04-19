@@ -14,7 +14,6 @@ describe('LoginPage', () => {
   let navigateSpy: jasmine.Spy;
 
   beforeEach(async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     authenticationService = jasmine.createSpyObj('AuthenticationService', ['login']);
 
     await TestBed.configureTestingModule({
@@ -55,7 +54,6 @@ describe('LoginPage', () => {
 
     component.onSubmit();
 
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(authenticationService.login).not.toHaveBeenCalled();
   });
 
@@ -80,7 +78,6 @@ describe('LoginPage', () => {
 
     component.onSubmit();
 
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(authenticationService.login).toHaveBeenCalledWith({
       username: 'admin',
       password: 'Admin123#',
@@ -109,6 +106,32 @@ describe('LoginPage', () => {
     component.onSubmit();
 
     expect(navigateSpy).toHaveBeenCalledWith(['/']);
+  });
+
+  it('should reset loading when navigation is rejected after successful login', async () => {
+    navigateSpy.and.returnValue(Promise.resolve(false));
+    authenticationService.login.and.returnValue(
+      of({
+        success: true,
+        message: 'Login successful.',
+        data: {
+          token: 'abc',
+          expiresAt: new Date(),
+          refreshToken: 'refresh-abc',
+          refreshTokenExpiresAt: new Date(),
+        },
+      }),
+    );
+
+    component.form.patchValue({
+      username: 'admin',
+      password: 'Admin123#',
+    });
+
+    component.onSubmit();
+    await Promise.resolve();
+
+    expect(component.loading()).toBeFalse();
   });
 
   it('should show error message on login failure', () => {

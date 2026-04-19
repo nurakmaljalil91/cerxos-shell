@@ -1,7 +1,17 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TokenService } from './token.service';
-import { Observable, catchError, finalize, map, of, shareReplay, switchMap, tap, throwError } from 'rxjs';
+import {
+  catchError,
+  finalize,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  switchMap,
+  tap,
+  throwError,
+} from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   BaseResponseOfLoginResponse,
@@ -24,7 +34,7 @@ export class AuthenticationService {
 
   private readonly _user = signal<BaseResponseOfLoginResponse | null>(null);
   user = this._user.asReadonly();
-  readonly authenticating = computed(() => !!this.tokenService.get());
+  readonly authenticating = computed(() => !!this.tokenService.token());
   private refreshInFlight: Observable<BaseResponseOfLoginResponse> | null = null;
 
   isAuthenticated(): boolean {
@@ -62,11 +72,12 @@ export class AuthenticationService {
       return this.refreshInFlight;
     }
 
-    const request$ = (environment.testMode
-      ? this.mock.refresh(refreshToken)
-      : this.http.post<BaseResponseOfLoginResponse>(`${this.authenticationEndpoint}/refresh`, {
-          refreshToken,
-        })
+    const request$ = (
+      environment.testMode
+        ? this.mock.refresh(refreshToken)
+        : this.http.post<BaseResponseOfLoginResponse>(`${this.authenticationEndpoint}/refresh`, {
+            refreshToken,
+          })
     ).pipe(
       tap((response) => {
         this.storeTokens(response);

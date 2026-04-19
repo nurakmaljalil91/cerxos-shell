@@ -69,4 +69,14 @@ export class UsersService {
       command,
     );
   }
+
+  unassignRoleFromUser(userId: string, roleId: string): Observable<BaseResponseOfUserDto> {
+    if (environment.testMode) {
+      return this.mock.unassignRoleFromUser(userId, roleId);
+    }
+
+    return this.http.delete<BaseResponseOfUserDto>(
+      `${this.usersEndpoint}/${userId}/roles/${roleId}`,
+    );
+  }
 }

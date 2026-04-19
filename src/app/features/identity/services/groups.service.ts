@@ -62,4 +62,14 @@ export class GroupsService {
       command,
     );
   }
+
+  unassignUserFromGroup(groupId: string, userId: string): Observable<BaseResponseOfGroupDto> {
+    if (environment.testMode) {
+      return this.mock.unassignUserFromGroup(groupId, userId);
+    }
+
+    return this.http.delete<BaseResponseOfGroupDto>(
+      `${this.groupsEndpoint}/${groupId}/users/${userId}`,
+    );
+  }
 }

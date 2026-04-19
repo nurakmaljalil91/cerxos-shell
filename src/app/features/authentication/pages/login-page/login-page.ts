@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -10,10 +17,10 @@ import {
   CxsCheckboxComponent,
   CxsInputComponent,
 } from 'cerxos-ui';
-import { BaseResponseOfLoginResponse, LoginResponse } from '../../../../shared/models/model';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,selector: 'app-login-page',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-login-page',
   standalone: true,
   imports: [
     CommonModule,
@@ -24,7 +31,7 @@ import { BaseResponseOfLoginResponse, LoginResponse } from '../../../../shared/m
     CxsButtonComponent,
     CxsCardComponent,
     CxsCheckboxComponent,
-    CxsInputComponent
+    CxsInputComponent,
   ],
   templateUrl: './login-page.html',
   styleUrl: './login-page.css',
@@ -38,10 +45,8 @@ export class LoginPage implements OnInit {
   readonly loading = signal<boolean>(false);
   readonly error = signal<string | null>(null);
 
-  form = this.formBuilder.group({
-
+  readonly form = this.formBuilder.group({
     username: ['', [Validators.required]],
-
     password: ['', [Validators.required]],
     remember: [true],
   });
@@ -56,7 +61,9 @@ export class LoginPage implements OnInit {
   }
 
   onSubmit(): void {
-    if (!this.form.valid) {return;}
+    if (!this.form.valid) {
+      return;
+    }
     this.loading.set(true);
     this.error.set(null);
 
@@ -67,12 +74,19 @@ export class LoginPage implements OnInit {
       return;
     }
     this.authenticationService.login({ username, password }).subscribe({
-      next: (response: BaseResponseOfLoginResponse) => {
-        console.log(response);
-        void this.router.navigate(['/']);
+      next: () => {
+        void this.router
+          .navigate(['/'])
+          .then((navigated) => {
+            if (!navigated) {
+              this.loading.set(false);
+            }
+          })
+          .catch(() => {
+            this.loading.set(false);
+          });
       },
       error: (err) => {
-
         this.error.set(err.error?.message ?? 'Login failed. Please try again.');
         this.loading.set(false);
       },

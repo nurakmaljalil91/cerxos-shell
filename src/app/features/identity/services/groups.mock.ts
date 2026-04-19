@@ -111,6 +111,23 @@ export class GroupsMock {
     });
   }
 
+  unassignUserFromGroup(groupId: string, userId: string): Observable<BaseResponseOfGroupDto> {
+    const group = this.groups.find((item) => item.id === groupId);
+
+    if (!group || !userId) {
+      return this.createResponse({
+        success: false,
+        message: 'Mock group or user not found.',
+      });
+    }
+
+    return this.createResponse({
+      success: true,
+      message: 'Mock user unassigned from group.',
+      data: group,
+    });
+  }
+
   private createResponse(response: BaseResponseOfGroupDto): Observable<BaseResponseOfGroupDto> {
     return new Observable<BaseResponseOfGroupDto>((observer) => {
       setTimeout(() => {

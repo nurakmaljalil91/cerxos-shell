@@ -40,17 +40,27 @@ export class UserGroupsDialog {
   readonly user = input<UserDto | null>(null);
   readonly closed = output<void>();
   readonly groupAssigned = output<string>();
+  readonly groupUnassigned = output<string>();
 
   readonly loadingGroups = signal(false);
   readonly assigningGroup = signal(false);
+  readonly unassigningGroupId = signal<string | null>(null);
   readonly error = signal<string | null>(null);
   private readonly groups = signal<GroupDto[]>([]);
 
   readonly groupForm = this.formBuilder.group({
     groupId: ['', [Validators.required]],
   });
+  readonly selectedGroupId = signal('');
 
   readonly currentGroups = computed(() => this.user()?.groups ?? []);
+  readonly assignedGroups = computed(() => {
+    const assigned = new Set(this.currentGroups().map((group) => group.toLowerCase()));
+    return this.groups().filter((group) => {
+      const name = group.name?.toLowerCase();
+      return !!group.id && !!name && assigned.has(name);
+    });
+  });
   readonly availableGroups = computed(() => {
     const assigned = new Set(this.currentGroups().map((group) => group.toLowerCase()));
     return this.groups().filter((group) => {
@@ -85,6 +95,7 @@ export class UserGroupsDialog {
 
     if (this.groupForm.invalid) {
       this.groupForm.markAllAsTouched();
+      this.error.set('Select a group to assign.');
       return;
     }
 
@@ -116,6 +127,49 @@ export class UserGroupsDialog {
       });
   }
 
+  onGroupSelected(groupId: string): void {
+    this.groupForm.controls.groupId.setValue(groupId);
+    this.groupForm.controls.groupId.markAsTouched();
+    this.selectedGroupId.set(groupId);
+    this.error.set(null);
+  }
+
+  onUnassignGroup(group: GroupDto): void {
+    if (this.unassigningGroupId()) {
+      return;
+    }
+
+    const user = this.user();
+    if (!user?.id || !group.id) {
+      this.error.set('Select a user and group before removing.');
+      return;
+    }
+
+    this.unassigningGroupId.set(group.id);
+    this.error.set(null);
+
+    this.groupsService
+      .unassignUserFromGroup(group.id, user.id)
+      .pipe(
+        finalize(() => this.unassigningGroupId.set(null)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response?.success) {
+            this.error.set(response?.message ?? 'Failed to remove group.');
+            return;
+          }
+
+          this.groupUnassigned.emit(response?.message ?? 'Group removed from user.');
+          this.reset();
+        },
+        error: (err) => {
+          this.error.set(err?.error?.message ?? 'Failed to remove group.');
+        },
+      });
+  }
+
   private prepare(): void {
     this.error.set(null);
     this.groupForm.reset({ groupId: '' });
@@ -125,6 +179,8 @@ export class UserGroupsDialog {
   private reset(): void {
     this.error.set(null);
     this.assigningGroup.set(false);
+    this.unassigningGroupId.set(null);
+    this.selectedGroupId.set('');
     this.groupForm.reset({ groupId: '' });
   }
 

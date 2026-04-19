@@ -7,14 +7,28 @@
   <form class="grid gap-4" [formGroup]="roleForm" (ngSubmit)="onSubmit()">
     <div>
       <p class="text-sm font-medium text-gray-900">Current roles</p>
-      @if (currentRoles().length) {
-        <div class="mt-2 flex flex-wrap gap-2">
-          @for (role of currentRoles(); track role) {
-            <span class="rounded-md bg-gray-100 px-2 py-1 text-xs text-gray-700">
-              {{ role }}
-            </span>
+      @if (assignedRoles().length) {
+        <div class="mt-2 grid gap-2">
+          @for (role of assignedRoles(); track role.id) {
+            <div
+              class="flex items-center justify-between gap-3 rounded-md border border-gray-200 px-3 py-2"
+            >
+              <span class="text-sm text-gray-700">{{ role.name }}</span>
+              <cxs-button
+                size="sm"
+                type="button"
+                variant="ghost"
+                [disabled]="!!unassigningRoleId()"
+                [loading]="unassigningRoleId() === role.id"
+                (click)="onUnassignRole(role)"
+              >
+                Remove
+              </cxs-button>
+            </div>
           }
         </div>
+      } @else if (currentRoles().length && loadingRoles()) {
+        <p class="mt-1 text-sm text-gray-500">Loading assigned roles.</p>
       } @else {
         <p class="mt-1 text-sm text-gray-500">No roles assigned.</p>
       }
@@ -23,14 +37,19 @@
     <cxs-select
       formControlName="roleId"
       label="Role"
-      placeholder="Select role"
       [disabled]="loadingRoles() || !availableRoles().length"
       [value]="roleForm.controls.roleId.value ?? ''"
+      (valueChange)="onRoleSelected($event)"
     >
+      <option value="">Select role</option>
       @for (role of availableRoles(); track role.id) {
         <option [value]="role.id">{{ role.name }}</option>
       }
     </cxs-select>
+
+    @if (roleForm.controls.roleId.touched && roleForm.controls.roleId.invalid) {
+      <p class="text-sm text-red-600">Select a role to assign.</p>
+    }
 
     @if (!loadingRoles() && !availableRoles().length) {
       <p class="text-sm text-gray-500">All available roles are already assigned.</p>
@@ -47,7 +66,13 @@
     <cxs-button variant="secondary" (click)="onClose()">Cancel</cxs-button>
     <cxs-button
       type="submit"
-      [disabled]="assigningRole() || loadingRoles() || !availableRoles().length"
+      [disabled]="
+        assigningRole() ||
+        !!unassigningRoleId() ||
+        loadingRoles() ||
+        !availableRoles().length ||
+        !selectedRoleId()
+      "
       [loading]="assigningRole()"
       (click)="onSubmit()"
     >

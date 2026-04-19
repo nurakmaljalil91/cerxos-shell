@@ -43,17 +43,27 @@ export class UserRolesDialog {
 
   readonly closed = output<void>();
   readonly roleAssigned = output<string>();
+  readonly roleUnassigned = output<string>();
 
   readonly loadingRoles = signal(false);
   readonly assigningRole = signal(false);
+  readonly unassigningRoleId = signal<string | null>(null);
   readonly error = signal<string | null>(null);
   private readonly roles = signal<RoleDto[]>([]);
 
   readonly roleForm = this.formBuilder.group({
     roleId: ['', [Validators.required]],
   });
+  readonly selectedRoleId = signal('');
 
   readonly currentRoles = computed(() => this.user()?.roles ?? []);
+  readonly assignedRoles = computed(() => {
+    const assigned = new Set(this.currentRoles().map((role) => role.toLowerCase()));
+    return this.roles().filter((role) => {
+      const name = role.name?.toLowerCase();
+      return !!role.id && !!name && assigned.has(name);
+    });
+  });
   readonly availableRoles = computed(() => {
     const assigned = new Set(this.currentRoles().map((role) => role.toLowerCase()));
     return this.roles().filter((role) => {
@@ -88,6 +98,7 @@ export class UserRolesDialog {
 
     if (this.roleForm.invalid) {
       this.roleForm.markAllAsTouched();
+      this.error.set('Select a role to assign.');
       return;
     }
 
@@ -122,6 +133,49 @@ export class UserRolesDialog {
       });
   }
 
+  onRoleSelected(roleId: string): void {
+    this.roleForm.controls.roleId.setValue(roleId);
+    this.roleForm.controls.roleId.markAsTouched();
+    this.selectedRoleId.set(roleId);
+    this.error.set(null);
+  }
+
+  onUnassignRole(role: RoleDto): void {
+    if (this.unassigningRoleId()) {
+      return;
+    }
+
+    const user = this.user();
+    if (!user?.id || !role.id) {
+      this.error.set('Select a user and role before unassigning.');
+      return;
+    }
+
+    this.unassigningRoleId.set(role.id);
+    this.error.set(null);
+
+    this.usersService
+      .unassignRoleFromUser(user.id, role.id)
+      .pipe(
+        finalize(() => this.unassigningRoleId.set(null)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response?.success) {
+            this.error.set(response?.message ?? 'Failed to unassign role.');
+            return;
+          }
+
+          this.roleUnassigned.emit(response?.message ?? 'Role unassigned from user.');
+          this.reset();
+        },
+        error: (err) => {
+          this.error.set(err?.error?.message ?? 'Failed to unassign role.');
+        },
+      });
+  }
+
   private prepare(): void {
     this.error.set(null);
     this.roleForm.reset({ roleId: '' });
@@ -131,6 +185,8 @@ export class UserRolesDialog {
   private reset(): void {
     this.error.set(null);
     this.assigningRole.set(false);
+    this.unassigningRoleId.set(null);
+    this.selectedRoleId.set('');
     this.roleForm.reset({ roleId: '' });
   }
 

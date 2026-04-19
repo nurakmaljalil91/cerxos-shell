@@ -218,6 +218,40 @@ export class UsersMock {
     });
   }
 
+  unassignRoleFromUser(userId: string, roleId: string): Observable<BaseResponseOfUserDto> {
+    const userIndex = this.users.findIndex((user) => user.id === userId);
+
+    if (userIndex < 0) {
+      return this.createResponse({
+        success: false,
+        message: 'Mock user not found.',
+      });
+    }
+
+    const roleName = this.roleNamesById.get(roleId) ?? roleId;
+    const user = this.users[userIndex];
+
+    if (!user.roles?.includes(roleName)) {
+      return this.createResponse({
+        success: false,
+        message: 'Role is not assigned to user.',
+      });
+    }
+
+    const updatedUser: UserDto = {
+      ...user,
+      roles: user.roles.filter((role) => role !== roleName),
+    };
+
+    this.users[userIndex] = updatedUser;
+
+    return this.createResponse({
+      success: true,
+      message: 'Mock role unassigned from user.',
+      data: updatedUser,
+    });
+  }
+
   private createResponse(response: BaseResponseOfUserDto): Observable<BaseResponseOfUserDto> {
     return new Observable<BaseResponseOfUserDto>((observer) => {
       setTimeout(() => {

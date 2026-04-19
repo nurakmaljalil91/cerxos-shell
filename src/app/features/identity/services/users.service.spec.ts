@@ -18,18 +18,22 @@ describe('UsersService', () => {
   let service: UsersService;
   let httpClientSpy: jasmine.SpyObj<HttpClient>;
   let usersMockSpy: jasmine.SpyObj<
-    Pick<UsersMock, 'getUsers' | 'createUser' | 'updateUser' | 'assignRoleToUser'>
+    Pick<
+      UsersMock,
+      'getUsers' | 'createUser' | 'updateUser' | 'assignRoleToUser' | 'unassignRoleFromUser'
+    >
   >;
   let originalTestMode: boolean;
 
   beforeEach(() => {
     originalTestMode = environment.testMode;
-    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'patch']);
+    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'patch', 'delete']);
     usersMockSpy = jasmine.createSpyObj('UsersMock', [
       'getUsers',
       'createUser',
       'updateUser',
       'assignRoleToUser',
+      'unassignRoleFromUser',
     ]);
 
     TestBed.configureTestingModule({
@@ -290,6 +294,49 @@ describe('UsersService', () => {
       expect(httpClientSpy.post).toHaveBeenCalledWith(
         `${environment.apiBaseUrl}/api/users/1/assign-role`,
         command,
+      );
+      expect(result).toEqual(response);
+      done();
+    });
+  });
+
+  it('should use UsersMock to unassign a role when testMode is enabled', (done) => {
+    environment.testMode = true;
+
+    const response: BaseResponseOfUserDto = {
+      success: true,
+      data: {
+        id: '1',
+        roles: [],
+      },
+    };
+
+    usersMockSpy.unassignRoleFromUser.and.returnValue(of(response));
+
+    service.unassignRoleFromUser('1', '2').subscribe((result) => {
+      expect(usersMockSpy.unassignRoleFromUser).toHaveBeenCalledWith('1', '2');
+      expect(httpClientSpy.delete).not.toHaveBeenCalled();
+      expect(result).toEqual(response);
+      done();
+    });
+  });
+
+  it('should call HttpClient to unassign a role when testMode is disabled', (done) => {
+    environment.testMode = false;
+
+    const response: BaseResponseOfUserDto = {
+      success: true,
+      data: {
+        id: '1',
+        roles: [],
+      },
+    };
+
+    httpClientSpy.delete.and.returnValue(of(response));
+
+    service.unassignRoleFromUser('1', '2').subscribe((result) => {
+      expect(httpClientSpy.delete).toHaveBeenCalledWith(
+        `${environment.apiBaseUrl}/api/users/1/roles/2`,
       );
       expect(result).toEqual(response);
       done();
