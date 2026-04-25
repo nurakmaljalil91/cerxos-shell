@@ -31,7 +31,7 @@ describe('ApplicationLayout', () => {
   it('should define navigation items for dashboard, profile, and settings', () => {
     expect(component.navigations.length).toBe(4);
     expect(component.navigations[0].label).toBe('Dashboard');
-    expect(component.navigations[1].label).toBe('Identity Management');
+    expect(component.navigations[1].label).toBe('Manage Identity');
     expect(component.navigations[2].label).toBe('Profile');
     expect(component.navigations[3].label).toBe('Settings');
     expect(component.navigations[1].children?.map((item) => item.route)).toEqual([

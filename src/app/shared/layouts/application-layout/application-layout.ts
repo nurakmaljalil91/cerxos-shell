@@ -38,13 +38,13 @@ export class ApplicationLayout {
   readonly drawerOpened = signal<boolean>(false);
   private userSessionService = inject(UserSessionService);
   readonly expandedGroups = signal<Record<string, boolean>>({
-    'Identity Management': false,
+    'Manage Identity': false,
   });
 
   navigations: NavigationItem[] = [
     { label: 'Dashboard', route: '/', icon: heroIconHelper('home') },
     {
-      label: 'Identity Management',
+      label: 'Manage Identity',
       icon: heroIconHelper('user-group'),
       children: [
         { label: 'Users', route: '/identity/users', icon: heroIconHelper('user-group') },
