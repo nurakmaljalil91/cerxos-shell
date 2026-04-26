@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -30,7 +29,6 @@ import { GroupsService } from '../../services/groups.service';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     CxsButtonComponent,
     CxsDataTableComponent,
@@ -38,7 +36,7 @@ import { GroupsService } from '../../services/groups.service';
     CxsDialogComponent,
     CxsInputComponent,
     CxsToastComponent,
-    CxsCardComponent
+    CxsCardComponent,
   ],
   templateUrl: './groups-page.html',
   styleUrl: './groups-page.css',

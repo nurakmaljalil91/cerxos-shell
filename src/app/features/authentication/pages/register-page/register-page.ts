@@ -1,23 +1,27 @@
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../../../core/services/authentication.service';
-import { CxsAlertComponent, CxsButtonComponent, CxsCardComponent, CxsInputComponent } from 'cerxos-ui';
+import {
+  CxsAlertComponent,
+  CxsButtonComponent,
+  CxsCardComponent,
+  CxsInputComponent,
+} from 'cerxos-ui';
 
 @Component({
   selector: 'app-register-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     NgOptimizedImage,
     ReactiveFormsModule,
     RouterLink,
     CxsAlertComponent,
     CxsButtonComponent,
     CxsCardComponent,
-    CxsInputComponent
+    CxsInputComponent,
   ],
   templateUrl: './register-page.html',
   styleUrl: './register-page.css',
@@ -34,7 +38,7 @@ export class RegisterPage {
     username: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
-    confirmPassword: ['', [Validators.required]]
+    confirmPassword: ['', [Validators.required]],
   });
 
   readonly disabled = computed(() => this.loading());
@@ -74,8 +78,7 @@ export class RegisterPage {
       },
       complete: () => {
         this.loading.set(false);
-      }
+      },
     });
   }
-
 }

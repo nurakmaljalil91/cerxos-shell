@@ -6,7 +6,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../../../core/services/authentication.service';
@@ -23,7 +23,6 @@ import {
   selector: 'app-login-page',
   standalone: true,
   imports: [
-    CommonModule,
     NgOptimizedImage,
     ReactiveFormsModule,
     RouterLink,

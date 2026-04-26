@@ -80,6 +80,13 @@ export const routes: Routes = [
             loadRemoteModule('planning-mfe', './Routes').then((m) => m.PLANNING_ROUTES)
           ),
       },
+      {
+        path: 'financial',
+        loadChildren: () =>
+          loadRemoteStyles('financial-mfe').then(() =>
+            loadRemoteModule('financial-mfe', './Routes').then((m) => m.FINANCIAL_ROUTES)
+          ),
+      }
     ],
   },
   {

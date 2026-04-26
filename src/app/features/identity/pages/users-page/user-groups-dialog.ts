@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -21,13 +20,7 @@ import { GroupsService } from '../../services/groups.service';
 @Component({
   selector: 'app-user-groups-dialog',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    CxsButtonComponent,
-    CxsDialogComponent,
-    CxsSelectComponent,
-  ],
+  imports: [ReactiveFormsModule, CxsButtonComponent, CxsDialogComponent, CxsSelectComponent],
   templateUrl: './user-groups-dialog.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
