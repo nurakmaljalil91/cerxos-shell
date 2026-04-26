@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authenticationGuard } from './core/guards/authentication.guard';
+import { authorizationChildGuard, authorizationGuard } from './core/guards/authorization.guard';
 import { ApplicationLayout } from './shared/layouts/application-layout/application-layout';
 import { loadRemoteModule } from '@angular-architects/native-federation';
 import { loadRemoteStyles } from './shared/utils/remote-style-loader';
@@ -29,6 +30,12 @@ export const routes: Routes = [
       },
       {
         path: 'identity',
+        canActivate: [authorizationGuard],
+        canActivateChild: [authorizationChildGuard],
+        data: {
+          forbiddenMessage: 'You do not have access to Manage Identity.',
+          requiredRoles: ['Admin'],
+        },
         children: [
           {
             path: '',
@@ -75,6 +82,7 @@ export const routes: Routes = [
       },
       {
         path: 'planning',
+        canActivateChild: [authorizationChildGuard],
         loadChildren: () =>
           loadRemoteStyles('planning-mfe').then(() =>
             loadRemoteModule('planning-mfe', './Routes').then((m) => m.PLANNING_ROUTES)

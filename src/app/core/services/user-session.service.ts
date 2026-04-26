@@ -66,8 +66,8 @@ export class UserSessionService {
   }
 
   hasRole(role: string): boolean {
-    const roles = this.session()?.roles ?? [];
-    return roles.includes(role);
+    const normalizedRole = this.normalizeAccessValue(role);
+    return this.getRoles().some((assignedRole) => assignedRole === normalizedRole);
   }
 
   hasAnyRole(roles: string[]): boolean {
@@ -75,8 +75,8 @@ export class UserSessionService {
   }
 
   hasPermission(permission: string): boolean {
-    const permissions = this.session()?.permissions ?? [];
-    return permissions.includes(permission);
+    const normalizedPermission = this.normalizeAccessValue(permission);
+    return this.getPermissions().some((assignedPermission) => assignedPermission === normalizedPermission);
   }
 
   hasAnyPermission(permissions: string[]): boolean {
@@ -106,6 +106,40 @@ export class UserSessionService {
     const cleaned = this.cleanPreferences(data);
     this._session.set(cleaned);
     localStorage.setItem(USER_SESSION_KEY, JSON.stringify(cleaned));
+  }
+
+  private getRoles(): string[] {
+    const session = this.session();
+    if (!session) {
+      return [];
+    }
+
+    return this.normalizeAccessValues([
+      ...(session.roles ?? []),
+      ...(session.user?.roles ?? []),
+      ...Object.values(session.groupRoles ?? {}).flat(),
+      ...Object.values(session.user?.groupRoles ?? {}).flat(),
+    ]);
+  }
+
+  private getPermissions(): string[] {
+    const session = this.session();
+    if (!session) {
+      return [];
+    }
+
+    return this.normalizeAccessValues([
+      ...(session.permissions ?? []),
+      ...(session.user?.permissions ?? []),
+    ]);
+  }
+
+  private normalizeAccessValues(values: string[]): string[] {
+    return values.map((value) => this.normalizeAccessValue(value)).filter(Boolean);
+  }
+
+  private normalizeAccessValue(value: string): string {
+    return value.trim().toLowerCase();
   }
 
   private cleanPreferences(data: UserSessionDto): UserSessionDto {

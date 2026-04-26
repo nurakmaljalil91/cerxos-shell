@@ -39,6 +39,7 @@ export class ApplicationLayout {
   private userSessionService = inject(UserSessionService);
   readonly expandedGroups = signal<Record<string, boolean>>({
     'Manage Identity': false,
+    Planning: false,
   });
 
   navigations: NavigationItem[] = [
@@ -46,6 +47,7 @@ export class ApplicationLayout {
     {
       label: 'Manage Identity',
       icon: heroIconHelper('user-group'),
+      requiredRoles: ['Admin'],
       children: [
         { label: 'Users', route: '/identity/users', icon: heroIconHelper('user-group') },
         { label: 'Groups', route: '/identity/groups', icon: heroIconHelper('user-group') },
@@ -58,15 +60,31 @@ export class ApplicationLayout {
       ],
     },
     { label: 'Profile', route: '/profile', icon: heroIconHelper('user') },
-    { label: 'Planning', route: '/planning', icon: heroIconHelper('calendar') },
+    {
+      label: 'Planning',
+      icon: heroIconHelper('calendar'),
+      children: [
+        { label: 'Calendar', route: '/planning', icon: heroIconHelper('calendar') },
+        {
+          label: 'Manage Calendar',
+          route: '/planning/manage-calendar',
+          icon: heroIconHelper('cog-6-tooth'),
+          requiredRoles: ['Admin'],
+        },
+      ],
+    },
+    { label: 'Financial', route: '/financial', icon: heroIconHelper('banknotes') },
     { label: 'Settings', route: '/settings', icon: heroIconHelper('cog-6-tooth') },
   ];
 
   readonly filteredNavigations = computed(() =>
     this.navigations
       .map((item) => {
+        if (!this.canAccess(item)) {
+          return null;
+        }
         if (!item.children?.length) {
-          return this.canAccess(item) ? item : null;
+          return item;
         }
         const children = item.children.filter((child) => this.canAccess(child));
         if (!children.length) {

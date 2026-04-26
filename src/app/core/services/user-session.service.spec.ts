@@ -4,7 +4,7 @@ import { of } from 'rxjs';
 import { UserSessionService } from './user-session.service';
 import { UserSessionMock } from './user-session.mock';
 import { environment } from '../../../environments/environment';
-import { BaseResponseOfUserSessionDto } from '../../shared/models/model';
+import { BaseResponseOfUserSessionDto, UserSessionDto } from '../../shared/models/model';
 
 describe('UserSessionService', () => {
   let service: UserSessionService;
@@ -36,7 +36,7 @@ describe('UserSessionService', () => {
   });
 
   it('should hydrate session from localStorage', () => {
-    const stored = {
+    const stored: UserSessionDto = {
       user: { username: 'cached' },
       roles: ['Admin'],
     };
@@ -51,7 +51,7 @@ describe('UserSessionService', () => {
     });
     service = TestBed.inject(UserSessionService);
 
-    expect(service.session()).toEqual(stored as any);
+    expect(service.session()).toEqual(stored);
   });
 
   it('should refresh session using mock in test mode', (done) => {
@@ -94,5 +94,35 @@ describe('UserSessionService', () => {
       expect(service.session()?.user?.username).toBe('user');
       done();
     });
+  });
+
+  it('should read roles and permissions from nested user session data', () => {
+    const stored = {
+      user: {
+        username: 'admin',
+        roles: [' admin '],
+        permissions: ['planning.manage-calendar'],
+      },
+    };
+    localStorage.setItem('user_session', JSON.stringify(stored));
+
+    service.initialize();
+
+    expect(service.hasRole('Admin')).toBeTrue();
+    expect(service.hasPermission('planning.manage-calendar')).toBeTrue();
+  });
+
+  it('should read roles from session group roles', () => {
+    const stored = {
+      user: { username: 'admin' },
+      groupRoles: {
+        Administrators: ['Admin'],
+      },
+    };
+    localStorage.setItem('user_session', JSON.stringify(stored));
+
+    service.initialize();
+
+    expect(service.hasAnyRole(['Admin'])).toBeTrue();
   });
 });
