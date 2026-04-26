@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -22,13 +21,7 @@ import { UsersService } from '../../services/users.service';
 @Component({
   selector: 'app-user-roles-dialog',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    CxsButtonComponent,
-    CxsDialogComponent,
-    CxsSelectComponent,
-  ],
+  imports: [ReactiveFormsModule, CxsButtonComponent, CxsDialogComponent, CxsSelectComponent],
   templateUrl: './user-roles-dialog.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

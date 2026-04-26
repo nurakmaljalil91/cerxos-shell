@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -37,7 +36,6 @@ import { toUserTableRow, USER_COLUMNS } from './users-page.table';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     CxsButtonComponent,
     CxsDataTableComponent,

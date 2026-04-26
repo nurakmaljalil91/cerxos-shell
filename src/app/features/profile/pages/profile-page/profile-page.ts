@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -23,13 +22,7 @@ import { UserProfilesService } from '../../services/user-profiles.service';
   selector: 'app-profile-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    CommonModule,
-    CxsAvatarComponent,
-    CxsBadgeComponent,
-    CxsButtonComponent,
-    CxsCardComponent,
-  ],
+  imports: [CxsAvatarComponent, CxsBadgeComponent, CxsButtonComponent, CxsCardComponent],
   templateUrl: './profile-page.html',
   styleUrl: './profile-page.css',
 })
