@@ -114,6 +114,14 @@ export class UsersMock {
     });
   }
 
+  getMyUser(): Observable<BaseResponseOfUserDto> {
+    return this.createResponse({
+      success: true,
+      message: 'Mock current user loaded.',
+      data: this.users[0],
+    });
+  }
+
   createUser(command: CreateUserCommand): Observable<BaseResponseOfUserDto> {
     const newUser: UserDto = {
       id: crypto.randomUUID(),

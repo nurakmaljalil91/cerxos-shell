@@ -1,23 +1,29 @@
 <!-- Notifications -->
 <div class="relative">
   <button
-    class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 relative"
+    aria-haspopup="menu"
+    aria-label="Open notifications"
+    class="relative rounded-lg p-2 hover:bg-[var(--cxs-color-surface-hover)]"
+    type="button"
+    [attr.aria-expanded]="notificationOpen()"
     (click)="toggleNotification()"
     (keydown.enter)="toggleNotification()"
     (keydown.space)="toggleNotification()"
-    aria-label="Open notifications"
-    aria-haspopup="menu"
-    [attr.aria-expanded]="notificationOpen()"
-    type="button"
   >
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path [attr.d]="'bell' | heroIconHelper" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+    <svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="1.5"
+        [attr.d]="'bell' | heroIconHelper"
+      />
     </svg>
     <!-- unread dot -->
     @if (unreadCount() > 0) {
       <span
-        class="absolute -top-0.5 -right-0.5 inline-flex h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-900"
-        aria-hidden="true"></span>
+        aria-hidden="true"
+        class="absolute -right-0.5 -top-0.5 inline-flex h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-(--cxs-color-surface)"
+      ></span>
       <span class="sr-only">{{ unreadCount() }} unread notifications</span>
     }
   </button>
@@ -25,14 +31,18 @@
   <!-- Notifications menu -->
   @if (notificationOpen()) {
     <!-- overlay to close on outside click -->
-    <div class="fixed inset-0 z-30" (click)="closeMenus()" aria-hidden="true"></div>
+    <div aria-hidden="true" class="fixed inset-0 z-30" (click)="closeMenus()"></div>
 
     <div
-      class="absolute right-0 z-40 mt-2 w-80 max-w-[90vw] rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg">
-      <div class="px-3 py-2 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+      class="absolute right-0 z-40 mt-2 w-80 max-w-[90vw] rounded-xl border border-(--cxs-color-border) bg-(--cxs-color-surface) text-(--cxs-color-on-surface) shadow-lg"
+    >
+      <div class="flex items-center justify-between border-b border-(--cxs-color-border) px-3 py-2">
         <span class="text-sm font-semibold">Notifications</span>
-        <button class="text-xs px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-                (click)="markAllRead()" type="button">
+        <button
+          class="rounded px-2 py-1 text-xs hover:bg-[var(--cxs-color-surface-hover)]"
+          type="button"
+          (click)="markAllRead()"
+        >
           Mark all read
         </button>
       </div>
@@ -41,24 +51,25 @@
         @for (n of notifications; track n.id) {
           <li>
             <button
-              class="w-full text-left px-3 py-2 flex items-start gap-3 hover:bg-gray-50 dark:hover:bg-gray-800"
-              (click)="openNotification(n)"
+              class="flex w-full items-start gap-3 px-3 py-2 text-left hover:bg-[var(--cxs-color-surface-hover)]"
               type="button"
+              (click)="openNotification(n)"
             >
-                <span class="mt-1 h-2 w-2 rounded-full"
-                      [class.bg-blue-500]="!n.read"
-                      [class.bg-transparent]="n.read"
-                      aria-hidden="true"></span>
+              <span
+                aria-hidden="true"
+                class="mt-1 h-2 w-2 rounded-full"
+                [class.bg-blue-500]="!n.read"
+                [class.bg-transparent]="n.read"
+              ></span>
               <div class="min-w-0">
                 <p class="text-sm font-medium truncate">{{ n.title }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ n.body }}</p>
-                <p class="text-[11px] text-gray-400 mt-0.5">{{ n.when }}</p>
+                <p class="truncate text-xs text-(--cxs-color-on-surface-muted)">{{ n.body }}</p>
+                <p class="mt-0.5 text-[11px] text-(--cxs-color-on-surface-muted)">{{ n.when }}</p>
               </div>
             </button>
           </li>
-        }
-        @empty {
-          <li class="px-3 py-4 text-sm text-gray-500">No notifications</li>
+        } @empty {
+          <li class="px-3 py-4 text-sm text-(--cxs-color-on-surface-muted)">No notifications</li>
         }
       </ul>
     </div>

@@ -40,6 +40,14 @@ export class UsersService {
     });
   }
 
+  getMyUser(): Observable<BaseResponseOfUserDto> {
+    if (environment.testMode) {
+      return this.mock.getMyUser();
+    }
+
+    return this.http.get<BaseResponseOfUserDto>(`${this.usersEndpoint}/me`);
+  }
+
   createUser(command: CreateUserCommand): Observable<BaseResponseOfUserDto> {
     if (environment.testMode) {
       return this.mock.createUser(command);

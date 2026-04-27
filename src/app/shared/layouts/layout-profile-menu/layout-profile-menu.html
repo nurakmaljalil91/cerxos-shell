@@ -1,42 +1,73 @@
 <div class="relative">
   <button
-    class="flex items-center gap-2 pl-2 pr-2 sm:pl-3 sm:pr-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+    aria-haspopup="menu"
+    aria-label="Open profile menu"
+    class="flex items-center gap-2 rounded-lg py-1.5 pl-2 pr-2 hover:bg-[var(--cxs-color-surface-hover)] sm:pl-3 sm:pr-3"
+    type="button"
+    [attr.aria-expanded]="profileOpen()"
     (click)="toggleProfile()"
     (keydown.enter)="toggleProfile()"
     (keydown.space)="toggleProfile()"
-    aria-label="Open profile menu"
-    aria-haspopup="menu"
-    [attr.aria-expanded]="profileOpen()"
-    type="button"
   >
-    <cxs-avatar [src]="avatarSrc()" [name]="displayName()" size="sm"></cxs-avatar>
+    <cxs-avatar size="sm" [name]="displayName()" [src]="avatarSrc()" />
     <span class="hidden sm:block text-sm font-medium">{{ displayName() }}</span>
-    <svg class="hidden sm:block w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path [attr.d]="'chevron-down' | heroIconHelper" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+    <svg
+      aria-hidden="true"
+      class="hidden sm:block w-4 h-4 opacity-70"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="1.5"
+        [attr.d]="'chevron-down' | heroIconHelper"
+      />
     </svg>
   </button>
 
   <!-- Profile menu -->
   @if (profileOpen()) {
     <!-- overlay to close on outside click -->
-    <div class="fixed inset-0 z-30" (click)="closeMenus()" aria-hidden="true"></div>
+    <div aria-hidden="true" class="fixed inset-0 z-30" (click)="closeMenus()"></div>
 
     <div
-      class="absolute right-0 z-40 mt-2 w-56 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-lg py-2"
+      class="absolute right-0 z-40 mt-2 w-56 rounded-xl border border-(--cxs-color-border) bg-(--cxs-color-surface) py-2 text-(--cxs-color-on-surface) shadow-lg"
       role="menu"
     >
-      <div class="px-3 pb-2 border-b border-gray-100 dark:border-gray-800">
+      <div class="border-b border-(--cxs-color-border) px-3 pb-2">
         <p class="text-sm font-semibold truncate">{{ displayName() }}</p>
-        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ email() }}</p>
+        <p class="truncate text-xs text-(--cxs-color-on-surface-muted)">{{ email() }}</p>
       </div>
 
-      <a routerLink="/profile" class="block px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800" role="menuitem">Profile</a>
-      <a routerLink="/settings" class="block px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800" role="menuitem">Settings</a>
-      <a routerLink="/billing" class="block px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800" role="menuitem">Billing</a>
+      <a
+        class="block px-3 py-2 text-sm hover:bg-[var(--cxs-color-surface-hover)]"
+        role="menuitem"
+        routerLink="/profile"
+        >Profile</a
+      >
+      <a
+        class="block px-3 py-2 text-sm hover:bg-[var(--cxs-color-surface-hover)]"
+        role="menuitem"
+        routerLink="/settings"
+        >Settings</a
+      >
+      <a
+        class="block px-3 py-2 text-sm hover:bg-[var(--cxs-color-surface-hover)]"
+        role="menuitem"
+        routerLink="/billing"
+        >Billing</a
+      >
 
-      <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+      <div class="my-1 border-t border-(--cxs-color-border)"></div>
 
-      <button (click)="signOut()" class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800" type="button" role="menuitem">
+      <button
+        class="w-full px-3 py-2 text-left text-sm hover:bg-[var(--cxs-color-surface-hover)]"
+        role="menuitem"
+        type="button"
+        (click)="signOut()"
+      >
         Sign out
       </button>
     </div>

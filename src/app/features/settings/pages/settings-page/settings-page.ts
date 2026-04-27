@@ -18,61 +18,27 @@ import {
   CxsToggleComponent,
 } from 'cerxos-ui';
 import { UserSessionService } from '../../../../core/services/user-session.service';
-import { UserPreferenceDto } from '../../../../shared/models/model';
+import { UserDto, UserPreferenceDto } from '../../../../shared/models/model';
+import { UsersService } from '../../../identity/services/users.service';
 import { UserPreferencesService } from '../../services/user-preferences.service';
+import {
+  DEFAULT_PREFERENCES,
+  PREFERENCE_KEY_ALIASES,
+  PREFERENCE_KEYS,
+  PreferenceControlName,
+  PreferenceFormValue,
+} from './settings-page.preferences';
 
-type PreferenceControlName =
-  | 'language'
-  | 'defaultLanding'
-  | 'dateFormat'
-  | 'currencyFormat'
-  | 'theme'
-  | 'density'
-  | 'compactNavigation'
-  | 'analyticsHints';
-
-type PreferenceFormValue = {
-  language: string;
-  defaultLanding: string;
-  dateFormat: string;
-  currencyFormat: string;
-  theme: string;
-  density: string;
-  compactNavigation: boolean;
-  analyticsHints: boolean;
+type AccountFormValue = {
+  username: string;
+  email: string;
+  phoneNumber: string;
 };
 
-const PREFERENCE_KEYS: Record<PreferenceControlName, string> = {
-  language: 'ui.language',
-  defaultLanding: 'ui.defaultLanding',
-  dateFormat: 'ui.dateFormat',
-  currencyFormat: 'ui.currencyFormat',
-  theme: 'theme',
-  density: 'ui.density',
-  compactNavigation: 'ui.compactNavigation',
-  analyticsHints: 'ui.analyticsHints',
-};
-
-const PREFERENCE_KEY_ALIASES: Record<PreferenceControlName, string[]> = {
-  language: ['language'],
-  defaultLanding: ['defaultLanding', 'default_landing'],
-  dateFormat: ['dateFormat', 'date_format'],
-  currencyFormat: ['currencyFormat', 'currency_format', 'currency'],
-  theme: ['ui.theme'],
-  density: ['density'],
-  compactNavigation: ['compactNavigation', 'compact_navigation'],
-  analyticsHints: ['analyticsHints', 'analytics_hints'],
-};
-
-const DEFAULT_PREFERENCES: PreferenceFormValue = {
-  language: 'en',
-  defaultLanding: 'dashboard',
-  dateFormat: 'mdy',
-  currencyFormat: 'usd',
-  theme: 'light',
-  density: 'comfortable',
-  compactNavigation: true,
-  analyticsHints: false,
+const DEFAULT_ACCOUNT: AccountFormValue = {
+  username: '',
+  email: '',
+  phoneNumber: '',
 };
 
 @Component({
@@ -95,12 +61,22 @@ export class SettingsPage implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly userPreferencesService = inject(UserPreferencesService);
   private readonly userSessionService = inject(UserSessionService);
+  private readonly usersService = inject(UsersService);
 
+  readonly loadingAccount = signal(false);
+  readonly accountError = signal<string | null>(null);
+  readonly accountValues = signal<AccountFormValue>(DEFAULT_ACCOUNT);
   readonly loadingPreferences = signal(false);
   readonly savingPreferenceKeys = signal<Set<string>>(new Set());
   readonly preferenceError = signal<string | null>(null);
   readonly preferenceSavedMessage = signal<string | null>(null);
   readonly preferenceValues = signal<PreferenceFormValue>(DEFAULT_PREFERENCES);
+
+  readonly accountForm = this.formBuilder.group({
+    username: [{ value: DEFAULT_ACCOUNT.username, disabled: true }],
+    email: [DEFAULT_ACCOUNT.email],
+    phoneNumber: [DEFAULT_ACCOUNT.phoneNumber],
+  });
 
   readonly preferencesForm = this.formBuilder.group({
     language: [DEFAULT_PREFERENCES.language],
@@ -118,6 +94,7 @@ export class SettingsPage implements OnInit {
 
   ngOnInit(): void {
     this.registerPreferenceAutosave();
+    this.loadCurrentUser();
     this.loadPreferences();
   }
 
@@ -142,6 +119,42 @@ export class SettingsPage implements OnInit {
 
   isPreferenceSaving(controlName: PreferenceControlName): boolean {
     return this.savingPreferenceKeys().has(PREFERENCE_KEYS[controlName]);
+  }
+
+  private loadCurrentUser(): void {
+    this.loadingAccount.set(true);
+    this.accountError.set(null);
+
+    this.usersService
+      .getMyUser()
+      .pipe(
+        finalize(() => this.loadingAccount.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response?.success || !response.data) {
+            this.accountError.set(response?.message ?? 'Failed to load account details.');
+            return;
+          }
+
+          this.patchAccountForm(response.data);
+        },
+        error: (err) => {
+          this.accountError.set(err?.error?.message ?? 'Failed to load account details.');
+        },
+      });
+  }
+
+  private patchAccountForm(user: UserDto): void {
+    const account: AccountFormValue = {
+      username: user.username ?? '',
+      email: user.email ?? '',
+      phoneNumber: user.phoneNumber ?? '',
+    };
+
+    this.accountValues.set(account);
+    this.accountForm.patchValue(account, { emitEvent: false });
   }
 
   private registerPreferenceAutosave(): void {

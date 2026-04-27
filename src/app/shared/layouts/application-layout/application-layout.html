@@ -1,45 +1,50 @@
 <!-- src/app/layout/app-layout.component.html -->
-<div class="h-full min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-
+<div class="h-full min-h-screen bg-(--cxs-color-surface-hover) text-(--cxs-color-on-surface)">
   <!-- Top bar -->
   <header
-    class="sticky top-0 z-20 flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur px-3 sm:px-4 h-14">
+    class="sticky top-0 z-20 flex h-14 items-center gap-2 border-b border-(--cxs-color-border) bg-(--cxs-color-surface) px-3 backdrop-blur sm:px-4"
+  >
     <!-- Mobile hamburger -->
-    <button aria-label="Open navigation"
-            class="p-2 sm:hidden rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" (click)="openDrawer()">
+    <button
+      aria-label="Open navigation"
+      class="rounded-lg p-2 hover:bg-[var(--cxs-color-surface-hover)] sm:hidden"
+      type="button"
+      (click)="openDrawer()"
+    >
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-              [attr.d]="'bars-3' | heroIconHelper" />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          [attr.d]="'bars-3' | heroIconHelper"
+        />
       </svg>
     </button>
 
     <!-- Desktop collapse -->
-    <button aria-label="Toggle sidebar"
-            class="hidden sm:inline-flex p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-            (click)="toggleSidebar()">
+    <button
+      aria-label="Toggle sidebar"
+      class="hidden rounded-lg p-2 hover:bg-[var(--cxs-color-surface-hover)] sm:inline-flex"
+      type="button"
+      (click)="toggleSidebar()"
+    >
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        @for (d of (collapsed() ? ('chevron-double-right' | heroIconHelper) : ('chevron-double-left' | heroIconHelper)); track $index) {
+        @for (
+          d of collapsed()
+            ? ('chevron-double-right' | heroIconHelper)
+            : ('chevron-double-left' | heroIconHelper);
+          track $index
+        ) {
           <ng-container>
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" [attr.d]="d" />
           </ng-container>
         }
-
       </svg>
     </button>
     <!-- Logo / Title -->
-    <img
-      alt="Cerxos"
-      height="30"
-      ngSrc="/branding/logo.png"
-      width="30"
-    />
+    <img alt="Cerxos" height="30" ngSrc="/branding/logo.png" width="30" />
     <div class="font-semibold tracking-tight">Cerxos</div>
-    <cxs-badge
-      class="ml-4"
-      size="sm"
-    >
-      v0.1.0
-    </cxs-badge>
+    <cxs-badge class="ml-4" size="sm"> v0.1.0 </cxs-badge>
     <div class="ml-auto flex items-center gap-3">
       <!-- put profile menu, notifications, etc. here -->
       <app-layout-notifications />
@@ -49,34 +54,47 @@
 
   <div class="relative">
     <!-- Desktop sidebar -->
-    <aside class="hidden sm:block fixed top-14 bottom-0 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950
-                   transition-all duration-200 ease-in-out"
-           [class.w-16]="collapsed()"
-           [class.w-64]="!collapsed()">
+    <aside
+      class="fixed bottom-0 top-14 hidden border-r border-(--cxs-color-border) bg-(--cxs-color-surface) sm:block transition-all duration-200 ease-in-out"
+      [class.w-16]="collapsed()"
+      [class.w-64]="!collapsed()"
+    >
       <nav class="h-full overflow-y-auto">
         <ul class="py-3">
           @for (navigationItem of filteredNavigations(); track navigationItem.label) {
             <li>
               @if (navigationItem.children?.length) {
                 <button
-                  class="mx-2 my-1 flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  class="mx-2 my-1 flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-left transition-colors hover:bg-[var(--cxs-color-surface-hover)]"
                   type="button"
                   [attr.aria-controls]="navigationItem.label + '-submenu'"
                   [attr.aria-expanded]="isGroupExpanded(navigationItem.label)"
                   (click)="toggleGroup(navigationItem.label)"
                 >
                   <span class="flex items-center gap-2">
-                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      class="w-5 h-5 shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       @for (d of navigationItem.icon; track d) {
                         <ng-container>
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" [attr.d]="d" />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="1.5"
+                            [attr.d]="d"
+                          />
                         </ng-container>
                       }
                     </svg>
-                    <span class="whitespace-nowrap overflow-hidden transition-all p-1"
-                          [class.opacity-0]="collapsed()"
-                          [class.w-0]="collapsed()"
-                          [class.w-40]="!collapsed()">
+                    <span
+                      class="whitespace-nowrap overflow-hidden transition-all p-1"
+                      [class.opacity-0]="collapsed()"
+                      [class.w-0]="collapsed()"
+                      [class.w-40]="!collapsed()"
+                    >
                       {{ navigationItem.label }}
                     </span>
                   </span>
@@ -87,8 +105,12 @@
                     viewBox="0 0 24 24"
                     [class.rotate-180]="!isGroupExpanded(navigationItem.label)"
                   >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                          [attr.d]="'chevron-down' | heroIconHelper" />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      [attr.d]="'chevron-down' | heroIconHelper"
+                    />
                   </svg>
                 </button>
                 @if (isGroupExpanded(navigationItem.label)) {
@@ -96,20 +118,33 @@
                     @for (childItem of navigationItem.children; track childItem.route) {
                       <li>
                         <a
-                          class="mx-2 flex items-center justify-between rounded-lg py-2 pl-11 pr-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                          routerLinkActive="bg-gray-100 dark:bg-gray-800"
+                          class="mx-2 flex items-center justify-between rounded-lg py-2 pl-11 pr-3 transition-colors hover:bg-[var(--cxs-color-surface-hover)]"
+                          routerLinkActive="bg-[var(--cxs-color-surface-hover)]"
                           [routerLink]="childItem.route"
-                          [routerLinkActiveOptions]="{ exact: childItem.route === '/' }">
-                          <span class="whitespace-nowrap overflow-hidden transition-all"
-                                [class.opacity-0]="collapsed()"
-                                [class.w-0]="collapsed()"
-                                [class.w-40]="!collapsed()">
+                          [routerLinkActiveOptions]="{ exact: childItem.route === '/' }"
+                        >
+                          <span
+                            class="whitespace-nowrap overflow-hidden transition-all"
+                            [class.opacity-0]="collapsed()"
+                            [class.w-0]="collapsed()"
+                            [class.w-40]="!collapsed()"
+                          >
                             {{ childItem.label }}
                           </span>
-                          <svg class="w-5 h-5 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg
+                            class="w-5 h-5 shrink-0 text-(--cxs-color-on-surface-muted)"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
                             @for (d of childItem.icon; track d) {
                               <ng-container>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" [attr.d]="d" />
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.5"
+                                  [attr.d]="d"
+                                />
                               </ng-container>
                             }
                           </svg>
@@ -120,21 +155,34 @@
                 }
               } @else {
                 <a
-                  class="mx-2 my-1 flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                  routerLinkActive="bg-gray-100 dark:bg-gray-800"
+                  class="mx-2 my-1 flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-[var(--cxs-color-surface-hover)]"
+                  routerLinkActive="bg-[var(--cxs-color-surface-hover)]"
                   [routerLink]="navigationItem.route"
-                  [routerLinkActiveOptions]="{ exact: navigationItem.route === '/' }">
-                  <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  [routerLinkActiveOptions]="{ exact: navigationItem.route === '/' }"
+                >
+                  <svg
+                    class="w-5 h-5 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     @for (d of navigationItem.icon; track d) {
                       <ng-container>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" [attr.d]="d" />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.5"
+                          [attr.d]="d"
+                        />
                       </ng-container>
                     }
                   </svg>
-                  <span class="whitespace-nowrap overflow-hidden transition-all"
-                        [class.opacity-0]="collapsed()"
-                        [class.w-0]="collapsed()"
-                        [class.w-40]="!collapsed()">
+                  <span
+                    class="whitespace-nowrap overflow-hidden transition-all"
+                    [class.opacity-0]="collapsed()"
+                    [class.w-0]="collapsed()"
+                    [class.w-40]="!collapsed()"
+                  >
                     {{ navigationItem.label }}
                   </span>
                 </a>
@@ -154,15 +202,24 @@
         (click)="closeDrawer()"
         (keydown.enter)="closeDrawer()"
         (keydown.space)="closeDrawer()"
-      >
-
-      </div>
+      ></div>
       <aside
-        class="sm:hidden fixed inset-y-0 left-0 z-40 w-72 bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 p-3">
-        <button aria-label="Close navigation" class="mb-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-                (click)="closeDrawer()">
-          <svg class="size-6" fill="none" stroke="currentColor" stroke-width="1.5"
-               viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        class="fixed inset-y-0 left-0 z-40 w-72 border-r border-(--cxs-color-border) bg-(--cxs-color-surface) p-3 sm:hidden"
+      >
+        <button
+          aria-label="Close navigation"
+          class="mb-2 rounded p-2 hover:bg-[var(--cxs-color-surface-hover)]"
+          type="button"
+          (click)="closeDrawer()"
+        >
+          <svg
+            class="size-6"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path d="M6 18 18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </button>
@@ -172,17 +229,27 @@
               <li>
                 @if (navigationItem.children?.length) {
                   <button
-                    class="my-1 flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    class="my-1 flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors hover:bg-[var(--cxs-color-surface-hover)]"
                     type="button"
                     [attr.aria-controls]="navigationItem.label + '-submenu-mobile'"
                     [attr.aria-expanded]="isGroupExpanded(navigationItem.label)"
                     (click)="toggleGroup(navigationItem.label)"
                   >
                     <span class="flex items-center gap-2">
-                      <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg
+                        class="w-5 h-5 shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
                         @for (d of navigationItem.icon; track d) {
                           <ng-container>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" [attr.d]="d" />
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.5"
+                              [attr.d]="d"
+                            />
                           </ng-container>
                         }
                       </svg>
@@ -195,8 +262,12 @@
                       viewBox="0 0 24 24"
                       [class.rotate-180]="!isGroupExpanded(navigationItem.label)"
                     >
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                            [attr.d]="'chevron-down' | heroIconHelper" />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        [attr.d]="'chevron-down' | heroIconHelper"
+                      />
                     </svg>
                   </button>
                   @if (isGroupExpanded(navigationItem.label)) {
@@ -204,17 +275,27 @@
                       @for (childItem of navigationItem.children; track childItem.route) {
                         <li>
                           <a
-                            class="my-1 flex items-center justify-between rounded-lg py-2 pl-11 pr-3 hover:bg-gray-100 dark:hover:bg-gray-800"
-                            routerLinkActive="bg-gray-100 dark:bg-gray-800"
+                            class="my-1 flex items-center justify-between rounded-lg py-2 pl-11 pr-3 hover:bg-[var(--cxs-color-surface-hover)]"
+                            routerLinkActive="bg-[var(--cxs-color-surface-hover)]"
                             [routerLink]="childItem.route"
                             [routerLinkActiveOptions]="{ exact: childItem.route === '/' }"
-                            (click)="closeDrawer()">
+                            (click)="closeDrawer()"
+                          >
                             <span>{{ childItem.label }}</span>
-                            <svg class="w-5 h-5 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg
+                              class="w-5 h-5 shrink-0 text-(--cxs-color-on-surface-muted)"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
                               @for (d of childItem.icon; track d) {
                                 <ng-container>
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                        [attr.d]="d" />
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    [attr.d]="d"
+                                  />
                                 </ng-container>
                               }
                             </svg>
@@ -224,15 +305,27 @@
                     </ul>
                   }
                 } @else {
-                  <a class="my-1 flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800"
-                     routerLinkActive="bg-gray-100 dark:bg-gray-800"
-                     [routerLink]="navigationItem.route"
-                     [routerLinkActiveOptions]="{ exact: navigationItem.route === '/' }"
-                     (click)="closeDrawer()">
-                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <a
+                    class="my-1 flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-[var(--cxs-color-surface-hover)]"
+                    routerLinkActive="bg-[var(--cxs-color-surface-hover)]"
+                    [routerLink]="navigationItem.route"
+                    [routerLinkActiveOptions]="{ exact: navigationItem.route === '/' }"
+                    (click)="closeDrawer()"
+                  >
+                    <svg
+                      class="w-5 h-5 shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       @for (d of navigationItem.icon; track d) {
                         <ng-container>
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" [attr.d]="d" />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="1.5"
+                            [attr.d]="d"
+                          />
                         </ng-container>
                       }
                     </svg>
@@ -247,9 +340,11 @@
     }
 
     <!-- Content area -->
-    <main class="transition-all duration-200 ease-in-out pt-4 px-3 sm:px-6"
-          [class.sm:ml-16]="collapsed()"
-          [class.sm:ml-64]="!collapsed()">
+    <main
+      class="transition-all duration-200 ease-in-out pt-4 px-3 sm:px-6"
+      [class.sm:ml-16]="collapsed()"
+      [class.sm:ml-64]="!collapsed()"
+    >
       <router-outlet />
     </main>
   </div>

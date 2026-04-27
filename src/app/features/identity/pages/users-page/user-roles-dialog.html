@@ -6,7 +6,7 @@
 >
   <form class="grid gap-4" [formGroup]="roleForm" (ngSubmit)="onSubmit()">
     <div>
-      <p class="text-sm font-medium text-gray-900">Current roles</p>
+      <p class="text-sm font-medium text-gray-900 dark:text-white">Current roles</p>
       @if (assignedRoles().length) {
         <div class="mt-2 grid gap-2">
           @for (role of assignedRoles(); track role.id) {

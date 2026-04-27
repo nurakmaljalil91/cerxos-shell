@@ -1,7 +1,7 @@
 <section class="space-y-4">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h1 class="text-lg font-semibold text-gray-900">Groups</h1>
+      <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Groups</h1>
       <p class="text-sm text-gray-500">Manage group membership and role assignments.</p>
     </div>
     <cxs-button size="sm" (click)="onOpenAddGroup()">Add group</cxs-button>
@@ -118,7 +118,7 @@
     <div class="space-y-3 text-sm text-gray-600">
       <p>
         Are you sure you want to delete
-        <span class="font-medium text-gray-900">{{ deletingGroup()?.name ?? 'this group' }}</span
+        <span class="font-medium text-gray-900 dark:text-white">{{ deletingGroup()?.name ?? 'this group' }}</span
         >?
       </p>
     </div>

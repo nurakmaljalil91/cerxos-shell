@@ -4,9 +4,11 @@ import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { of } from 'rxjs';
 import {
   BaseResponseOfPaginatedEnumerableOfUserPreferenceDto,
+  BaseResponseOfUserDto,
   BaseResponseOfUserPreferenceDto,
 } from '../../../../shared/models/model';
 import { UserSessionService } from '../../../../core/services/user-session.service';
+import { UsersService } from '../../../identity/services/users.service';
 import { UserPreferencesService } from '../../services/user-preferences.service';
 
 describe('SettingsPage', () => {
@@ -17,6 +19,7 @@ describe('SettingsPage', () => {
     session: sessionSignal,
     setPreference: jasmine.createSpy('setPreference'),
   };
+  let usersServiceSpy: jasmine.SpyObj<Pick<UsersService, 'getMyUser'>>;
   let userPreferencesServiceSpy: jasmine.SpyObj<
     Pick<
       UserPreferencesService,
@@ -25,6 +28,15 @@ describe('SettingsPage', () => {
   >;
 
   beforeEach(async () => {
+    const userResponse: BaseResponseOfUserDto = {
+      success: true,
+      data: {
+        id: 'user-1',
+        username: 'admin',
+        email: 'admin@cerxos.dev',
+        phoneNumber: '+1 555 0100',
+      },
+    };
     const preferencesResponse: BaseResponseOfPaginatedEnumerableOfUserPreferenceDto = {
       success: true,
       data: {
@@ -32,6 +44,9 @@ describe('SettingsPage', () => {
         totalCount: 0,
       },
     };
+
+    usersServiceSpy = jasmine.createSpyObj('UsersService', ['getMyUser']);
+    usersServiceSpy.getMyUser.and.returnValue(of(userResponse));
 
     userPreferencesServiceSpy = jasmine.createSpyObj('UserPreferencesService', [
       'getMyUserPreferences',
@@ -66,6 +81,7 @@ describe('SettingsPage', () => {
       imports: [SettingsPage],
       providers: [
         provideZonelessChangeDetection(),
+        { provide: UsersService, useValue: usersServiceSpy },
         { provide: UserPreferencesService, useValue: userPreferencesServiceSpy },
         { provide: UserSessionService, useValue: userSessionServiceStub },
       ],
@@ -90,6 +106,16 @@ describe('SettingsPage', () => {
       total: 100,
       sortBy: 'key',
       descending: false,
+    });
+  });
+
+  it('should load current user account details into the account form', () => {
+    expect(usersServiceSpy.getMyUser).toHaveBeenCalled();
+    expect(component.accountForm.controls.username.disabled).toBeTrue();
+    expect(component.accountValues()).toEqual({
+      username: 'admin',
+      email: 'admin@cerxos.dev',
+      phoneNumber: '+1 555 0100',
     });
   });
 

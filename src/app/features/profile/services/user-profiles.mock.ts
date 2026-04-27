@@ -4,6 +4,7 @@ import {
   BaseResponseOfPaginatedEnumerableOfUserProfileDto,
   BaseResponseOfUserProfileDto,
   PaginatedEnumerableOfUserProfileDto,
+  UpdateUserProfileCommand,
   UserProfileDto,
 } from '../../../shared/models/model';
 import type { UserProfilesQuery } from './user-profiles.service';
@@ -131,6 +132,32 @@ export class UserProfilesMock {
       message: 'Mock my user profile loaded.',
       data: profile,
     };
+
+    return new Observable<BaseResponseOfUserProfileDto>((observer) => {
+      setTimeout(() => {
+        observer.next(response);
+        observer.complete();
+      }, 300);
+    });
+  }
+
+  updateUserProfile(
+    id: string,
+    command: UpdateUserProfileCommand,
+  ): Observable<BaseResponseOfUserProfileDto> {
+    const index = this.profiles.findIndex((p) => p.id === id);
+    let response: BaseResponseOfUserProfileDto;
+
+    if (index === -1) {
+      response = { success: false, message: 'User profile not found.' };
+    } else {
+      this.profiles[index] = { ...this.profiles[index], ...command };
+      response = {
+        success: true,
+        message: 'Mock user profile updated.',
+        data: this.profiles[index],
+      };
+    }
 
     return new Observable<BaseResponseOfUserProfileDto>((observer) => {
       setTimeout(() => {

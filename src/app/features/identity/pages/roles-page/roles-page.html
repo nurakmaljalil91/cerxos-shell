@@ -1,7 +1,7 @@
 <section class="space-y-4">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h1 class="text-lg font-semibold text-gray-900">Roles</h1>
+      <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Roles</h1>
       <p class="text-sm text-gray-500">Manage role definitions and permissions.</p>
     </div>
     <cxs-button size="sm" (click)="onOpenAddRole()">Add role</cxs-button>
@@ -116,7 +116,7 @@
     <div class="space-y-3 text-sm text-gray-600">
       <p>
         Are you sure you want to delete
-        <span class="font-medium text-gray-900">{{ deletingRole()?.name ?? 'this role' }}</span
+        <span class="font-medium text-gray-900 dark:text-white">{{ deletingRole()?.name ?? 'this role' }}</span
         >?
       </p>
     </div>

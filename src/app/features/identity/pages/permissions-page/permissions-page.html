@@ -1,7 +1,7 @@
 <section class="space-y-4">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h1 class="text-lg font-semibold text-gray-900">Permissions</h1>
+      <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Permissions</h1>
       <p class="text-sm text-gray-500">Manage permission catalog and descriptions.</p>
     </div>
     <cxs-button size="sm" (click)="onOpenAddPermission()">Add permission</cxs-button>
@@ -116,7 +116,7 @@
     <div class="space-y-3 text-sm text-gray-600">
       <p>
         Are you sure you want to delete
-        <span class="font-medium text-gray-900">
+        <span class="font-medium text-gray-900 dark:text-white">
           {{ deletingPermission()?.name ?? 'this permission' }}</span
         >?
       </p>

@@ -5,6 +5,7 @@ import { environment } from '../../../../environments/environment';
 import {
   BaseResponseOfPaginatedEnumerableOfUserProfileDto,
   BaseResponseOfUserProfileDto,
+  UpdateUserProfileCommand,
 } from '../../../shared/models/model';
 import { UserProfilesMock } from './user-profiles.mock';
 
@@ -62,5 +63,19 @@ export class UserProfilesService {
     }
 
     return this.http.get<BaseResponseOfUserProfileDto>(`${this.userProfilesEndpoint}/me`);
+  }
+
+  updateUserProfile(
+    id: string,
+    command: UpdateUserProfileCommand,
+  ): Observable<BaseResponseOfUserProfileDto> {
+    if (environment.testMode) {
+      return this.mock.updateUserProfile(id, command);
+    }
+
+    return this.http.patch<BaseResponseOfUserProfileDto>(
+      `${this.userProfilesEndpoint}/${id}`,
+      command,
+    );
   }
 }

@@ -1,14 +1,16 @@
 <section class="space-y-6">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h1 class="text-lg font-semibold text-gray-900">Profile</h1>
+      <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Profile</h1>
       <p class="text-sm text-gray-500">Review your personal details and identifiers.</p>
     </div>
     <div class="flex flex-wrap items-center gap-2">
       <cxs-button size="sm" variant="secondary" [loading]="loading()" (click)="onRefresh()">
         Refresh
       </cxs-button>
-      <cxs-button size="sm" variant="primary" [disabled]="true">Edit profile</cxs-button>
+      <cxs-button size="sm" variant="primary" [disabled]="!profile()" (click)="onOpenEdit()">
+        Edit profile
+      </cxs-button>
     </div>
   </div>
 
@@ -34,7 +36,7 @@
         />
         <div class="min-w-0 space-y-1">
           <div class="flex flex-wrap items-center gap-2">
-            <h2 class="text-xl font-semibold text-gray-900">{{ displayName() }}</h2>
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ displayName() }}</h2>
             @if (profile()?.tag) {
               <cxs-badge variant="neutral">{{ profile()?.tag }}</cxs-badge>
             }
@@ -53,14 +55,14 @@
       <cxs-card>
         <div class="space-y-3">
           <div>
-            <h3 class="text-sm font-semibold text-gray-900">Personal</h3>
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Personal</h3>
             <p class="text-xs text-gray-500">The essentials we have on file.</p>
           </div>
           <dl class="grid gap-3 text-sm">
             @for (item of personalDetails(); track item.label) {
               <div class="flex items-start justify-between gap-4">
                 <dt class="text-gray-500">{{ item.label }}</dt>
-                <dd class="text-right text-gray-900">{{ item.value }}</dd>
+                <dd class="text-right text-gray-900 dark:text-white">{{ item.value }}</dd>
               </div>
             }
           </dl>
@@ -70,14 +72,14 @@
       <cxs-card>
         <div class="space-y-3">
           <div>
-            <h3 class="text-sm font-semibold text-gray-900">Identifiers</h3>
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Identifiers</h3>
             <p class="text-xs text-gray-500">Verification and account references.</p>
           </div>
           <dl class="grid gap-3 text-sm">
             @for (item of identityDetails(); track item.label) {
               <div class="flex items-start justify-between gap-4">
                 <dt class="text-gray-500">{{ item.label }}</dt>
-                <dd class="text-right text-gray-900">{{ item.value }}</dd>
+                <dd class="text-right text-gray-900 dark:text-white">{{ item.value }}</dd>
               </div>
             }
           </dl>
@@ -87,14 +89,14 @@
       <cxs-card>
         <div class="space-y-3">
           <div>
-            <h3 class="text-sm font-semibold text-gray-900">Sizing</h3>
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Sizing</h3>
             <p class="text-xs text-gray-500">Optional measurements for personalization.</p>
           </div>
           <dl class="grid gap-3 text-sm">
             @for (item of sizeDetails(); track item.label) {
               <div class="flex items-start justify-between gap-4">
                 <dt class="text-gray-500">{{ item.label }}</dt>
-                <dd class="text-right text-gray-900">{{ item.value }}</dd>
+                <dd class="text-right text-gray-900 dark:text-white">{{ item.value }}</dd>
               </div>
             }
           </dl>
@@ -104,7 +106,7 @@
       <cxs-card>
         <div class="space-y-3">
           <div>
-            <h3 class="text-sm font-semibold text-gray-900">Bio</h3>
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Bio</h3>
             <p class="text-xs text-gray-500">Share a quick overview about yourself.</p>
           </div>
           <p class="text-sm text-gray-700">{{ bio() }}</p>
@@ -120,3 +122,140 @@
     </cxs-card>
   }
 </section>
+
+<cxs-dialog
+  description="Update your personal details."
+  title="Edit profile"
+  [open]="editOpen()"
+  (openChange)="onCloseEdit()"
+>
+  <form class="grid gap-4" [formGroup]="editForm" (ngSubmit)="onSubmitEdit()">
+    <div class="grid gap-4 sm:grid-cols-2">
+      <cxs-input
+        formControlName="firstName"
+        label="First name"
+        placeholder="First name"
+        [value]="editForm.controls.firstName.value ?? ''"
+      />
+      <cxs-input
+        formControlName="lastName"
+        label="Last name"
+        placeholder="Last name"
+        [value]="editForm.controls.lastName.value ?? ''"
+      />
+    </div>
+
+    <cxs-input
+      formControlName="displayName"
+      label="Display name"
+      placeholder="Display name"
+      [value]="editForm.controls.displayName.value ?? ''"
+    />
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <cxs-input
+        formControlName="dateOfBirth"
+        label="Date of birth"
+        placeholder="yyyy-MM-dd"
+        [value]="editForm.controls.dateOfBirth.value ?? ''"
+      />
+      <cxs-input
+        formControlName="birthPlace"
+        label="Birth place"
+        placeholder="City, Country"
+        [value]="editForm.controls.birthPlace.value ?? ''"
+      />
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <cxs-input
+        formControlName="identityCardNumber"
+        label="Identity card"
+        placeholder="IC number"
+        [value]="editForm.controls.identityCardNumber.value ?? ''"
+      />
+      <cxs-input
+        formControlName="passportNumber"
+        label="Passport"
+        placeholder="Passport number"
+        [value]="editForm.controls.passportNumber.value ?? ''"
+      />
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-3">
+      <cxs-input
+        formControlName="shoeSize"
+        label="Shoe size"
+        placeholder="e.g. 42"
+        [value]="editForm.controls.shoeSize.value ?? ''"
+      />
+      <cxs-input
+        formControlName="clothingSize"
+        label="Clothing size"
+        placeholder="e.g. M"
+        [value]="editForm.controls.clothingSize.value ?? ''"
+      />
+      <cxs-input
+        formControlName="waistSize"
+        label="Waist size"
+        placeholder="e.g. 32"
+        [value]="editForm.controls.waistSize.value ?? ''"
+      />
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <cxs-input
+        formControlName="bloodType"
+        label="Blood type"
+        placeholder="e.g. O+"
+        [value]="editForm.controls.bloodType.value ?? ''"
+      />
+      <cxs-input
+        formControlName="tag"
+        label="Tag"
+        placeholder="e.g. Core"
+        [value]="editForm.controls.tag.value ?? ''"
+      />
+    </div>
+
+    <cxs-input
+      formControlName="imageUrl"
+      label="Image URL"
+      placeholder="https://..."
+      [value]="editForm.controls.imageUrl.value ?? ''"
+    />
+
+    <cxs-input
+      formControlName="bio"
+      label="Bio"
+      placeholder="Tell us about yourself"
+      [value]="editForm.controls.bio.value ?? ''"
+    />
+  </form>
+
+  @if (editError()) {
+    <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+      {{ editError() }}
+    </div>
+  }
+
+  <div cxsDialogActions>
+    <cxs-button variant="secondary" (click)="onCloseEdit()">Cancel</cxs-button>
+    <cxs-button
+      type="submit"
+      [disabled]="editLoading()"
+      [loading]="editLoading()"
+      (click)="onSubmitEdit()"
+    >
+      Save changes
+    </cxs-button>
+  </div>
+</cxs-dialog>
+
+<cxs-toast
+  [open]="toastOpen()"
+  [title]="toastTitle()"
+  [message]="toastMessage()"
+  [variant]="toastVariant()"
+  (openChange)="toastOpen.set($event)"
+/>

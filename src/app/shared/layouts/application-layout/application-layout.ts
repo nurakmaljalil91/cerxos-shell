@@ -63,16 +63,17 @@ export class ApplicationLayout {
     {
       label: 'Planning',
       icon: heroIconHelper('calendar'),
+      requiredRoles: ['Admin'],
       children: [
         { label: 'Calendar', route: '/planning', icon: heroIconHelper('calendar') },
         {
           label: 'Manage Calendar',
           route: '/planning/manage-calendar',
           icon: heroIconHelper('cog-6-tooth'),
-          requiredRoles: ['Admin'],
         },
       ],
     },
+    { label: 'Planning', route: '/planning', icon: heroIconHelper('calendar'), requiredRoles: ['User'] },
     { label: 'Financial', route: '/financial', icon: heroIconHelper('banknotes') },
     { label: 'Settings', route: '/settings', icon: heroIconHelper('cog-6-tooth') },
   ];
