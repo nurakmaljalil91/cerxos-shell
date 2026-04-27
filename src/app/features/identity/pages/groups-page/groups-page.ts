@@ -1,8 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   computed,
+  DestroyRef,
   inject,
   OnInit,
   signal,
@@ -21,7 +21,7 @@ import {
   CxsToastComponent,
   CxsToastVariant,
 } from 'cerxos-ui';
-import { CreateGroupCommand, GroupDto } from '../../../../shared/models/model';
+import { CreateGroupCommand, GroupDto, UpdateGroupCommand } from '../../../../shared/models/model';
 import { GroupsService } from '../../services/groups.service';
 
 @Component({
@@ -51,6 +51,14 @@ export class GroupsPage implements OnInit {
   readonly addGroupOpen = signal(false);
   readonly addGroupLoading = signal(false);
   readonly addGroupError = signal<string | null>(null);
+  readonly editGroupOpen = signal(false);
+  readonly editGroupLoading = signal(false);
+  readonly editGroupError = signal<string | null>(null);
+  readonly editingGroupId = signal<string | null>(null);
+  readonly deleteGroupOpen = signal(false);
+  readonly deleteGroupLoading = signal(false);
+  readonly deleteGroupError = signal<string | null>(null);
+  readonly deletingGroup = signal<GroupDto | null>(null);
   readonly toastOpen = signal(false);
   readonly toastTitle = signal('');
   readonly toastMessage = signal('');
@@ -59,6 +67,10 @@ export class GroupsPage implements OnInit {
   private readonly groups = signal<GroupDto[]>([]);
 
   readonly addGroupForm = this.formBuilder.group({
+    name: ['', [Validators.required]],
+    description: [''],
+  });
+  readonly editGroupForm = this.formBuilder.group({
     name: ['', [Validators.required]],
     description: [''],
   });
@@ -84,11 +96,33 @@ export class GroupsPage implements OnInit {
   }
 
   onEditGroup(groupId: string): void {
-    void groupId;
+    const group = this.groups().find((item) => item.id === groupId);
+
+    if (!group) {
+      this.showToast('Group not found', 'Refresh the groups list and try again.', 'danger');
+      return;
+    }
+
+    this.editingGroupId.set(groupId);
+    this.editGroupError.set(null);
+    this.editGroupForm.reset({
+      name: group.name ?? '',
+      description: group.description ?? '',
+    });
+    this.editGroupOpen.set(true);
   }
 
   onDeleteGroup(groupId: string): void {
-    void groupId;
+    const group = this.groups().find((item) => item.id === groupId);
+
+    if (!group) {
+      this.showToast('Group not found', 'Refresh the groups list and try again.', 'danger');
+      return;
+    }
+
+    this.deleteGroupError.set(null);
+    this.deletingGroup.set(group);
+    this.deleteGroupOpen.set(true);
   }
 
   onOpenAddGroup(): void {
@@ -152,6 +186,128 @@ export class GroupsPage implements OnInit {
           const message = err?.error?.message ?? 'Failed to create group.';
           this.addGroupError.set(message);
           this.showToast('Group not created', message, 'danger');
+        },
+      });
+  }
+
+  onCloseEditGroup(): void {
+    this.editGroupOpen.set(false);
+    this.editGroupLoading.set(false);
+    this.editGroupError.set(null);
+    this.editingGroupId.set(null);
+    this.editGroupForm.reset({
+      name: '',
+      description: '',
+    });
+  }
+
+  onSubmitEditGroup(): void {
+    if (this.editGroupLoading()) {
+      return;
+    }
+
+    const groupId = this.editingGroupId();
+    if (!groupId) {
+      this.editGroupError.set('Select a group to edit.');
+      return;
+    }
+
+    if (this.editGroupForm.invalid) {
+      this.editGroupForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.editGroupForm.getRawValue();
+    const command: UpdateGroupCommand = {
+      id: groupId,
+      name: formValue.name ?? '',
+      description: formValue.description ?? '',
+    };
+
+    this.editGroupLoading.set(true);
+    this.editGroupError.set(null);
+
+    this.groupsService
+      .updateGroup(groupId, command)
+      .pipe(
+        finalize(() => this.editGroupLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response?.success) {
+            const message = response?.message ?? 'Failed to update group.';
+            this.editGroupError.set(message);
+            this.showToast('Group not updated', message, 'danger');
+            return;
+          }
+
+          this.editGroupOpen.set(false);
+          this.editingGroupId.set(null);
+          this.showToast(
+            'Group updated',
+            response?.message ?? 'Group updated successfully.',
+            'info',
+          );
+          this.loadGroups();
+        },
+        error: (err) => {
+          const message = err?.error?.message ?? 'Failed to update group.';
+          this.editGroupError.set(message);
+          this.showToast('Group not updated', message, 'danger');
+        },
+      });
+  }
+
+  onCloseDeleteGroup(): void {
+    this.deleteGroupOpen.set(false);
+    this.deleteGroupLoading.set(false);
+    this.deleteGroupError.set(null);
+    this.deletingGroup.set(null);
+  }
+
+  onConfirmDeleteGroup(): void {
+    if (this.deleteGroupLoading()) {
+      return;
+    }
+
+    const group = this.deletingGroup();
+    if (!group?.id) {
+      this.deleteGroupError.set('Select a group to delete.');
+      return;
+    }
+
+    this.deleteGroupLoading.set(true);
+    this.deleteGroupError.set(null);
+
+    this.groupsService
+      .deleteGroup(group.id)
+      .pipe(
+        finalize(() => this.deleteGroupLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response?.success) {
+            const message = response?.message ?? 'Failed to delete group.';
+            this.deleteGroupError.set(message);
+            this.showToast('Group not deleted', message, 'danger');
+            return;
+          }
+
+          this.deleteGroupOpen.set(false);
+          this.deletingGroup.set(null);
+          this.showToast(
+            'Group deleted',
+            response?.message ?? 'Group deleted successfully.',
+            'info',
+          );
+          this.loadGroups();
+        },
+        error: (err) => {
+          const message = err?.error?.message ?? 'Failed to delete group.';
+          this.deleteGroupError.set(message);
+          this.showToast('Group not deleted', message, 'danger');
         },
       });
   }

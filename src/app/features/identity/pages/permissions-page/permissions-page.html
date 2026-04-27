@@ -52,19 +52,9 @@
     [open]="addPermissionOpen()"
     (openChange)="onCloseAddPermission()"
   >
-    <form
-      class="grid gap-4"
-      [formGroup]="addPermissionForm"
-      (ngSubmit)="onSubmitAddPermission()"
-    >
-      <label class="grid gap-1 text-sm">
-        <span class="text-gray-700">Permission name</span>
-        <cxs-input formControlName="name" placeholder="Permission name" />
-      </label>
-      <label class="grid gap-1 text-sm">
-        <span class="text-gray-700">Description</span>
-        <cxs-input formControlName="description" placeholder="Description" />
-      </label>
+    <form class="grid gap-4" [formGroup]="addPermissionForm" (ngSubmit)="onSubmitAddPermission()">
+      <cxs-input formControlName="name" label="Permission name" placeholder="Permission name" />
+      <cxs-input formControlName="description" label="Description" placeholder="Description" />
     </form>
 
     @if (addPermissionError()) {
@@ -82,6 +72,72 @@
         (click)="onSubmitAddPermission()"
       >
         Create permission
+      </cxs-button>
+    </div>
+  </cxs-dialog>
+
+  <cxs-dialog
+    description="Update permission details."
+    title="Edit permission"
+    [open]="editPermissionOpen()"
+    (openChange)="onCloseEditPermission()"
+  >
+    <form class="grid gap-4" [formGroup]="editPermissionForm" (ngSubmit)="onSubmitEditPermission()">
+      <cxs-input formControlName="name" label="Permission name" placeholder="Permission name" />
+
+      <cxs-input formControlName="description" label="Description" placeholder="Description" />
+    </form>
+
+    @if (editPermissionError()) {
+      <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+        {{ editPermissionError() }}
+      </div>
+    }
+
+    <div cxsDialogActions>
+      <cxs-button variant="secondary" (click)="onCloseEditPermission()">Cancel</cxs-button>
+      <cxs-button
+        type="submit"
+        [disabled]="editPermissionLoading()"
+        [loading]="editPermissionLoading()"
+        (click)="onSubmitEditPermission()"
+      >
+        Save changes
+      </cxs-button>
+    </div>
+  </cxs-dialog>
+
+  <cxs-dialog
+    description="This will remove the permission from the system."
+    title="Delete permission"
+    [open]="deletePermissionOpen()"
+    (openChange)="onCloseDeletePermission()"
+  >
+    <div class="space-y-3 text-sm text-gray-600">
+      <p>
+        Are you sure you want to delete
+        <span class="font-medium text-gray-900">
+          {{ deletingPermission()?.name ?? 'this permission' }}</span
+        >?
+      </p>
+    </div>
+
+    @if (deletePermissionError()) {
+      <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+        {{ deletePermissionError() }}
+      </div>
+    }
+
+    <div cxsDialogActions>
+      <cxs-button variant="secondary" (click)="onCloseDeletePermission()">No</cxs-button>
+      <cxs-button
+        class="text-red-600 hover:bg-red-50"
+        variant="ghost"
+        [disabled]="deletePermissionLoading()"
+        [loading]="deletePermissionLoading()"
+        (click)="onConfirmDeletePermission()"
+      >
+        Yes, delete permission
       </cxs-button>
     </div>
   </cxs-dialog>

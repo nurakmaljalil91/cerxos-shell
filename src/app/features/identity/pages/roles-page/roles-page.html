@@ -53,14 +53,8 @@
     (openChange)="onCloseAddRole()"
   >
     <form class="grid gap-4" [formGroup]="addRoleForm" (ngSubmit)="onSubmitAddRole()">
-      <label class="grid gap-1 text-sm">
-        <span class="text-gray-700">Role name</span>
-        <cxs-input formControlName="name" placeholder="Role name" />
-      </label>
-      <label class="grid gap-1 text-sm">
-        <span class="text-gray-700">Description</span>
-        <cxs-input formControlName="description" placeholder="Description" />
-      </label>
+      <cxs-input formControlName="name" label="Role name" placeholder="Role name" />
+      <cxs-input formControlName="description" label="Description" placeholder="Description" />
     </form>
 
     @if (addRoleError()) {
@@ -78,6 +72,71 @@
         (click)="onSubmitAddRole()"
       >
         Create role
+      </cxs-button>
+    </div>
+  </cxs-dialog>
+
+  <cxs-dialog
+    description="Update role details."
+    title="Edit role"
+    [open]="editRoleOpen()"
+    (openChange)="onCloseEditRole()"
+  >
+    <form class="grid gap-4" [formGroup]="editRoleForm" (ngSubmit)="onSubmitEditRole()">
+      <cxs-input formControlName="name" label="Role name" placeholder="Role name" />
+
+      <cxs-input formControlName="description" label="Description" placeholder="Description" />
+    </form>
+
+    @if (editRoleError()) {
+      <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+        {{ editRoleError() }}
+      </div>
+    }
+
+    <div cxsDialogActions>
+      <cxs-button variant="secondary" (click)="onCloseEditRole()">Cancel</cxs-button>
+      <cxs-button
+        type="submit"
+        [disabled]="editRoleLoading()"
+        [loading]="editRoleLoading()"
+        (click)="onSubmitEditRole()"
+      >
+        Save changes
+      </cxs-button>
+    </div>
+  </cxs-dialog>
+
+  <cxs-dialog
+    description="This will remove the role from the system."
+    title="Delete role"
+    [open]="deleteRoleOpen()"
+    (openChange)="onCloseDeleteRole()"
+  >
+    <div class="space-y-3 text-sm text-gray-600">
+      <p>
+        Are you sure you want to delete
+        <span class="font-medium text-gray-900">{{ deletingRole()?.name ?? 'this role' }}</span
+        >?
+      </p>
+    </div>
+
+    @if (deleteRoleError()) {
+      <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+        {{ deleteRoleError() }}
+      </div>
+    }
+
+    <div cxsDialogActions>
+      <cxs-button variant="secondary" (click)="onCloseDeleteRole()">No</cxs-button>
+      <cxs-button
+        class="text-red-600 hover:bg-red-50"
+        variant="ghost"
+        [disabled]="deleteRoleLoading()"
+        [loading]="deleteRoleLoading()"
+        (click)="onConfirmDeleteRole()"
+      >
+        Yes, delete role
       </cxs-button>
     </div>
   </cxs-dialog>

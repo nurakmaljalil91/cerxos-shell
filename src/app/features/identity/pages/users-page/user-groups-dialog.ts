@@ -61,12 +61,26 @@ export class UserGroupsDialog {
       return !!group.id && !!name && !assigned.has(name);
     });
   });
+  readonly groupSelectDisabled = computed(
+    () => this.loadingGroups() || !this.availableGroups().length,
+  );
 
   constructor() {
     effect(() => {
       if (this.open()) {
         untracked(() => this.prepare());
       }
+    });
+
+    effect(() => {
+      const control = this.groupForm.controls.groupId;
+
+      if (this.groupSelectDisabled()) {
+        control.disable({ emitEvent: false });
+        return;
+      }
+
+      control.enable({ emitEvent: false });
     });
   }
 

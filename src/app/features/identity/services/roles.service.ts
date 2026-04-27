@@ -5,7 +5,8 @@ import { environment } from '../../../../environments/environment';
 import {
   BaseResponseOfPaginatedEnumerableOfRoleDto,
   BaseResponseOfRoleDto,
-  CreateRoleCommand
+  CreateRoleCommand,
+  UpdateRoleCommand,
 } from '../../../shared/models/model';
 import { RolesMock } from './roles.mock';
 
@@ -17,7 +18,7 @@ export type RolesQuery = {
 };
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RolesService {
   private readonly http = inject(HttpClient);
@@ -29,17 +30,15 @@ export class RolesService {
       return this.mock.getRoles(query);
     }
 
-    let params = new HttpParams()
-      .set('page', String(query.page))
-      .set('total', String(query.total));
+    let params = new HttpParams().set('page', String(query.page)).set('total', String(query.total));
 
     if (query.sortBy) {
-      params = params
-        .set('sortBy', query.sortBy)
-        .set('descending', String(!!query.descending));
+      params = params.set('sortBy', query.sortBy).set('descending', String(!!query.descending));
     }
 
-    return this.http.get<BaseResponseOfPaginatedEnumerableOfRoleDto>(this.rolesEndpoint, { params });
+    return this.http.get<BaseResponseOfPaginatedEnumerableOfRoleDto>(this.rolesEndpoint, {
+      params,
+    });
   }
 
   createRole(command: CreateRoleCommand): Observable<BaseResponseOfRoleDto> {
@@ -48,5 +47,21 @@ export class RolesService {
     }
 
     return this.http.post<BaseResponseOfRoleDto>(this.rolesEndpoint, command);
+  }
+
+  updateRole(roleId: string, command: UpdateRoleCommand): Observable<BaseResponseOfRoleDto> {
+    if (environment.testMode) {
+      return this.mock.updateRole(roleId, command);
+    }
+
+    return this.http.patch<BaseResponseOfRoleDto>(`${this.rolesEndpoint}/${roleId}`, command);
+  }
+
+  deleteRole(roleId: string): Observable<BaseResponseOfRoleDto> {
+    if (environment.testMode) {
+      return this.mock.deleteRole(roleId);
+    }
+
+    return this.http.delete<BaseResponseOfRoleDto>(`${this.rolesEndpoint}/${roleId}`);
   }
 }

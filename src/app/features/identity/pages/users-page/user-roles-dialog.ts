@@ -64,12 +64,26 @@ export class UserRolesDialog {
       return !!role.id && !!name && !assigned.has(name);
     });
   });
+  readonly roleSelectDisabled = computed(
+    () => this.loadingRoles() || !this.availableRoles().length,
+  );
 
   constructor() {
     effect(() => {
       if (this.open()) {
         untracked(() => this.prepare());
       }
+    });
+
+    effect(() => {
+      const control = this.roleForm.controls.roleId;
+
+      if (this.roleSelectDisabled()) {
+        control.disable({ emitEvent: false });
+        return;
+      }
+
+      control.enable({ emitEvent: false });
     });
   }
 

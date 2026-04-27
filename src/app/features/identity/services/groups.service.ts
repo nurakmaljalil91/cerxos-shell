@@ -7,6 +7,7 @@ import {
   BaseResponseOfGroupDto,
   BaseResponseOfPaginatedEnumerableOfGroupDto,
   CreateGroupCommand,
+  UpdateGroupCommand,
 } from '../../../shared/models/model';
 import { GroupsMock } from './groups.mock';
 
@@ -47,6 +48,22 @@ export class GroupsService {
     }
 
     return this.http.post<BaseResponseOfGroupDto>(this.groupsEndpoint, command);
+  }
+
+  updateGroup(groupId: string, command: UpdateGroupCommand): Observable<BaseResponseOfGroupDto> {
+    if (environment.testMode) {
+      return this.mock.updateGroup(groupId, command);
+    }
+
+    return this.http.patch<BaseResponseOfGroupDto>(`${this.groupsEndpoint}/${groupId}`, command);
+  }
+
+  deleteGroup(groupId: string): Observable<BaseResponseOfGroupDto> {
+    if (environment.testMode) {
+      return this.mock.deleteGroup(groupId);
+    }
+
+    return this.http.delete<BaseResponseOfGroupDto>(`${this.groupsEndpoint}/${groupId}`);
   }
 
   assignUserToGroup(

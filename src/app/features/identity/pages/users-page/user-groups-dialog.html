@@ -37,7 +37,6 @@
     <cxs-select
       formControlName="groupId"
       label="Group"
-      [disabled]="loadingGroups() || !availableGroups().length"
       [value]="groupForm.controls.groupId.value ?? ''"
       (valueChange)="onGroupSelected($event)"
     >

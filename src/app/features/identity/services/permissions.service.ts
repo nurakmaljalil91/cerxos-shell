@@ -5,7 +5,8 @@ import { environment } from '../../../../environments/environment';
 import {
   BaseResponseOfPaginatedEnumerableOfPermissionDto,
   BaseResponseOfPermissionDto,
-  CreatePermissionCommand
+  CreatePermissionCommand,
+  UpdatePermissionCommand,
 } from '../../../shared/models/model';
 import { PermissionsMock } from './permissions.mock';
 
@@ -17,31 +18,29 @@ export type PermissionsQuery = {
 };
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PermissionsService {
   private readonly http = inject(HttpClient);
   private readonly mock = inject(PermissionsMock);
   private readonly permissionsEndpoint = `${environment.apiBaseUrl}/api/permissions`;
 
-  getPermissions(query: PermissionsQuery): Observable<BaseResponseOfPaginatedEnumerableOfPermissionDto> {
+  getPermissions(
+    query: PermissionsQuery,
+  ): Observable<BaseResponseOfPaginatedEnumerableOfPermissionDto> {
     if (environment.testMode) {
       return this.mock.getPermissions(query);
     }
 
-    let params = new HttpParams()
-      .set('page', String(query.page))
-      .set('total', String(query.total));
+    let params = new HttpParams().set('page', String(query.page)).set('total', String(query.total));
 
     if (query.sortBy) {
-      params = params
-        .set('sortBy', query.sortBy)
-        .set('descending', String(!!query.descending));
+      params = params.set('sortBy', query.sortBy).set('descending', String(!!query.descending));
     }
 
     return this.http.get<BaseResponseOfPaginatedEnumerableOfPermissionDto>(
       this.permissionsEndpoint,
-      { params }
+      { params },
     );
   }
 
@@ -51,5 +50,29 @@ export class PermissionsService {
     }
 
     return this.http.post<BaseResponseOfPermissionDto>(this.permissionsEndpoint, command);
+  }
+
+  updatePermission(
+    permissionId: string,
+    command: UpdatePermissionCommand,
+  ): Observable<BaseResponseOfPermissionDto> {
+    if (environment.testMode) {
+      return this.mock.updatePermission(permissionId, command);
+    }
+
+    return this.http.patch<BaseResponseOfPermissionDto>(
+      `${this.permissionsEndpoint}/${permissionId}`,
+      command,
+    );
+  }
+
+  deletePermission(permissionId: string): Observable<BaseResponseOfPermissionDto> {
+    if (environment.testMode) {
+      return this.mock.deletePermission(permissionId);
+    }
+
+    return this.http.delete<BaseResponseOfPermissionDto>(
+      `${this.permissionsEndpoint}/${permissionId}`,
+    );
   }
 }

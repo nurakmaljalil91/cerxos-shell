@@ -1,8 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   computed,
+  DestroyRef,
   inject,
   OnInit,
   signal,
@@ -20,7 +20,11 @@ import {
   CxsToastComponent,
   CxsToastVariant,
 } from 'cerxos-ui';
-import { CreatePermissionCommand, PermissionDto } from '../../../../shared/models/model';
+import {
+  CreatePermissionCommand,
+  PermissionDto,
+  UpdatePermissionCommand,
+} from '../../../../shared/models/model';
 import { PermissionsService } from '../../services/permissions.service';
 
 @Component({
@@ -49,6 +53,14 @@ export class PermissionsPage implements OnInit {
   readonly addPermissionOpen = signal(false);
   readonly addPermissionLoading = signal(false);
   readonly addPermissionError = signal<string | null>(null);
+  readonly editPermissionOpen = signal(false);
+  readonly editPermissionLoading = signal(false);
+  readonly editPermissionError = signal<string | null>(null);
+  readonly editingPermissionId = signal<string | null>(null);
+  readonly deletePermissionOpen = signal(false);
+  readonly deletePermissionLoading = signal(false);
+  readonly deletePermissionError = signal<string | null>(null);
+  readonly deletingPermission = signal<PermissionDto | null>(null);
   readonly toastOpen = signal(false);
   readonly toastTitle = signal('');
   readonly toastMessage = signal('');
@@ -57,6 +69,10 @@ export class PermissionsPage implements OnInit {
   private readonly permissions = signal<PermissionDto[]>([]);
 
   readonly addPermissionForm = this.formBuilder.group({
+    name: ['', [Validators.required]],
+    description: [''],
+  });
+  readonly editPermissionForm = this.formBuilder.group({
     name: ['', [Validators.required]],
     description: [''],
   });
@@ -80,11 +96,41 @@ export class PermissionsPage implements OnInit {
   }
 
   onEditPermission(permissionId: string): void {
-    void permissionId;
+    const permission = this.permissions().find((item) => item.id === permissionId);
+
+    if (!permission) {
+      this.showToast(
+        'Permission not found',
+        'Refresh the permissions list and try again.',
+        'danger',
+      );
+      return;
+    }
+
+    this.editingPermissionId.set(permissionId);
+    this.editPermissionError.set(null);
+    this.editPermissionForm.reset({
+      name: permission.name ?? '',
+      description: permission.description ?? '',
+    });
+    this.editPermissionOpen.set(true);
   }
 
   onDeletePermission(permissionId: string): void {
-    void permissionId;
+    const permission = this.permissions().find((item) => item.id === permissionId);
+
+    if (!permission) {
+      this.showToast(
+        'Permission not found',
+        'Refresh the permissions list and try again.',
+        'danger',
+      );
+      return;
+    }
+
+    this.deletePermissionError.set(null);
+    this.deletingPermission.set(permission);
+    this.deletePermissionOpen.set(true);
   }
 
   onOpenAddPermission(): void {
@@ -152,6 +198,128 @@ export class PermissionsPage implements OnInit {
           const message = err?.error?.message ?? 'Failed to create permission.';
           this.addPermissionError.set(message);
           this.showToast('Permission not created', message, 'danger');
+        },
+      });
+  }
+
+  onCloseEditPermission(): void {
+    this.editPermissionOpen.set(false);
+    this.editPermissionLoading.set(false);
+    this.editPermissionError.set(null);
+    this.editingPermissionId.set(null);
+    this.editPermissionForm.reset({
+      name: '',
+      description: '',
+    });
+  }
+
+  onSubmitEditPermission(): void {
+    if (this.editPermissionLoading()) {
+      return;
+    }
+
+    const permissionId = this.editingPermissionId();
+    if (!permissionId) {
+      this.editPermissionError.set('Select a permission to edit.');
+      return;
+    }
+
+    if (this.editPermissionForm.invalid) {
+      this.editPermissionForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.editPermissionForm.getRawValue();
+    const command: UpdatePermissionCommand = {
+      id: permissionId,
+      name: formValue.name ?? '',
+      description: formValue.description ?? '',
+    };
+
+    this.editPermissionLoading.set(true);
+    this.editPermissionError.set(null);
+
+    this.permissionsService
+      .updatePermission(permissionId, command)
+      .pipe(
+        finalize(() => this.editPermissionLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response?.success) {
+            const message = response?.message ?? 'Failed to update permission.';
+            this.editPermissionError.set(message);
+            this.showToast('Permission not updated', message, 'danger');
+            return;
+          }
+
+          this.editPermissionOpen.set(false);
+          this.editingPermissionId.set(null);
+          this.showToast(
+            'Permission updated',
+            response?.message ?? 'Permission updated successfully.',
+            'info',
+          );
+          this.loadPermissions();
+        },
+        error: (err) => {
+          const message = err?.error?.message ?? 'Failed to update permission.';
+          this.editPermissionError.set(message);
+          this.showToast('Permission not updated', message, 'danger');
+        },
+      });
+  }
+
+  onCloseDeletePermission(): void {
+    this.deletePermissionOpen.set(false);
+    this.deletePermissionLoading.set(false);
+    this.deletePermissionError.set(null);
+    this.deletingPermission.set(null);
+  }
+
+  onConfirmDeletePermission(): void {
+    if (this.deletePermissionLoading()) {
+      return;
+    }
+
+    const permission = this.deletingPermission();
+    if (!permission?.id) {
+      this.deletePermissionError.set('Select a permission to delete.');
+      return;
+    }
+
+    this.deletePermissionLoading.set(true);
+    this.deletePermissionError.set(null);
+
+    this.permissionsService
+      .deletePermission(permission.id)
+      .pipe(
+        finalize(() => this.deletePermissionLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response?.success) {
+            const message = response?.message ?? 'Failed to delete permission.';
+            this.deletePermissionError.set(message);
+            this.showToast('Permission not deleted', message, 'danger');
+            return;
+          }
+
+          this.deletePermissionOpen.set(false);
+          this.deletingPermission.set(null);
+          this.showToast(
+            'Permission deleted',
+            response?.message ?? 'Permission deleted successfully.',
+            'info',
+          );
+          this.loadPermissions();
+        },
+        error: (err) => {
+          const message = err?.error?.message ?? 'Failed to delete permission.';
+          this.deletePermissionError.set(message);
+          this.showToast('Permission not deleted', message, 'danger');
         },
       });
   }

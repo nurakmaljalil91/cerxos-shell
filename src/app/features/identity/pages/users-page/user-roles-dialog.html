@@ -37,7 +37,6 @@
     <cxs-select
       formControlName="roleId"
       label="Role"
-      [disabled]="loadingRoles() || !availableRoles().length"
       [value]="roleForm.controls.roleId.value ?? ''"
       (valueChange)="onRoleSelected($event)"
     >

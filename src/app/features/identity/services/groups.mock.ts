@@ -7,6 +7,7 @@ import {
   CreateGroupCommand,
   GroupDto,
   PaginatedEnumerableOfGroupDto,
+  UpdateGroupCommand,
 } from '../../../shared/models/model';
 import type { GroupsQuery } from './groups.service';
 
@@ -88,6 +89,45 @@ export class GroupsMock {
         observer.next(response);
         observer.complete();
       }, 300);
+    });
+  }
+
+  updateGroup(groupId: string, command: UpdateGroupCommand): Observable<BaseResponseOfGroupDto> {
+    const group = this.groups.find((item) => item.id === groupId);
+
+    if (!group) {
+      return this.createResponse({
+        success: false,
+        message: 'Mock group not found.',
+      });
+    }
+
+    group.name = command.name ?? '';
+    group.description = command.description ?? '';
+
+    return this.createResponse({
+      success: true,
+      message: 'Mock group updated.',
+      data: group,
+    });
+  }
+
+  deleteGroup(groupId: string): Observable<BaseResponseOfGroupDto> {
+    const index = this.groups.findIndex((group) => group.id === groupId);
+
+    if (index < 0) {
+      return this.createResponse({
+        success: false,
+        message: 'Mock group not found.',
+      });
+    }
+
+    const [deletedGroup] = this.groups.splice(index, 1);
+
+    return this.createResponse({
+      success: true,
+      message: 'Mock group deleted.',
+      data: deletedGroup,
     });
   }
 
