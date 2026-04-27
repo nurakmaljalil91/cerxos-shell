@@ -76,7 +76,9 @@ export class UserSessionService {
 
   hasPermission(permission: string): boolean {
     const normalizedPermission = this.normalizeAccessValue(permission);
-    return this.getPermissions().some((assignedPermission) => assignedPermission === normalizedPermission);
+    return this.getPermissions().some(
+      (assignedPermission) => assignedPermission === normalizedPermission,
+    );
   }
 
   hasAnyPermission(permissions: string[]): boolean {
@@ -87,6 +89,30 @@ export class UserSessionService {
     const preferences = this.session()?.preferences ?? [];
     const match = preferences.find((preference) => preference.key === key);
     return match?.value ?? null;
+  }
+
+  setPreference(key: string, value: string): void {
+    const session = this.session();
+    if (!session) {
+      return;
+    }
+
+    const preferences = [...(session.preferences ?? [])];
+    const index = preferences.findIndex((preference) => preference.key === key);
+
+    if (index >= 0) {
+      preferences[index] = {
+        ...preferences[index],
+        value,
+      };
+    } else {
+      preferences.push({ key, value });
+    }
+
+    this.setSession({
+      ...session,
+      preferences,
+    });
   }
 
   private hydrate(): void {

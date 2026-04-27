@@ -125,4 +125,21 @@ describe('UserSessionService', () => {
 
     expect(service.hasAnyRole(['Admin'])).toBeTrue();
   });
+
+  it('should update a session preference and recompute theme mode', () => {
+    const stored: UserSessionDto = {
+      user: { username: 'admin' },
+      preferences: [{ key: 'theme', value: 'light' }],
+    };
+    localStorage.setItem('user_session', JSON.stringify(stored));
+
+    service.initialize();
+    service.setPreference('theme', 'dark');
+
+    expect(service.themeMode()).toBe('dark');
+    expect(service.getPreference('theme')).toBe('dark');
+    expect(JSON.parse(localStorage.getItem('user_session') ?? '{}').preferences).toEqual([
+      { key: 'theme', value: 'dark' },
+    ]);
+  });
 });
