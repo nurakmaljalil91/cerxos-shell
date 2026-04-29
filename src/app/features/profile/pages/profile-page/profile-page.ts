@@ -15,13 +15,44 @@ import {
   CxsBadgeComponent,
   CxsButtonComponent,
   CxsCardComponent,
+  CxsDataTableCellDirective,
+  CxsDataTableComponent,
   CxsDialogComponent,
   CxsInputComponent,
   CxsToastComponent,
   CxsToastVariant,
 } from 'cerxos-ui';
+import type { CxsDataTableColumn } from 'cerxos-ui';
+import { AddressDto } from '../../../../shared/models/model';
 import { UserProfileDto } from '../../../../shared/models/model';
 import { UserProfilesService } from '../../services/user-profiles.service';
+import { AddressesService } from '../../services/addresses.service';
+
+interface SkillEntry {
+  id: string;
+  name: string;
+  level: string;
+  years: string;
+}
+
+interface EducationEntry {
+  id: string;
+  institution: string;
+  degree: string;
+  field: string;
+  startYear: string;
+  endYear: string;
+}
+
+interface WorkplaceEntry {
+  id: string;
+  company: string;
+  position: string;
+  department: string;
+  startDate: string;
+  endDate: string;
+  isCurrent: boolean;
+}
 
 @Component({
   selector: 'app-profile-page',
@@ -33,6 +64,8 @@ import { UserProfilesService } from '../../services/user-profiles.service';
     CxsBadgeComponent,
     CxsButtonComponent,
     CxsCardComponent,
+    CxsDataTableCellDirective,
+    CxsDataTableComponent,
     CxsDialogComponent,
     CxsInputComponent,
     CxsToastComponent,
@@ -42,9 +75,11 @@ import { UserProfilesService } from '../../services/user-profiles.service';
 })
 export class ProfilePage implements OnInit {
   private readonly userProfilesService = inject(UserProfilesService);
+  private readonly addressesService = inject(AddressesService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
 
+  // ---- Profile ----
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly profile = signal<UserProfileDto | null>(null);
@@ -117,9 +152,121 @@ export class ProfilePage implements OnInit {
   readonly bio = computed(() => this.formatValue(this.profile()?.bio));
   readonly empty = computed(() => !this.loading() && !this.error() && !this.profile());
 
+  // ---- Addresses ----
+  readonly addresses = signal<AddressDto[]>([]);
+  readonly addressesLoading = signal(false);
+  readonly addressModalItem = signal<AddressDto | null>(null);
+  readonly addressModalOpen = signal(false);
+  readonly addressModalLoading = signal(false);
+  readonly addressModalError = signal<string | null>(null);
+
+  readonly addressForm = this.formBuilder.group({
+    label: [''],
+    type: [''],
+    line1: [''],
+    line2: [''],
+    city: [''],
+    state: [''],
+    postalCode: [''],
+    country: [''],
+    isDefault: [false],
+  });
+
+  readonly addressColumns: CxsDataTableColumn[] = [
+    { key: 'label', label: 'Label' },
+    { key: 'type', label: 'Type' },
+    { key: 'line1', label: 'Address' },
+    { key: 'city', label: 'City' },
+    { key: 'country', label: 'Country' },
+    { key: 'isDefault', label: 'Default', formatter: (v) => (v ? 'Yes' : '') },
+    { key: 'actions', label: '', width: '72px' },
+  ];
+
+  readonly addressData = computed(
+    () => this.addresses() as unknown as Array<Record<string, unknown>>,
+  );
+
+  // ---- Skills (local) ----
+  readonly skills = signal<SkillEntry[]>([]);
+  readonly skillModalItem = signal<SkillEntry | null>(null);
+  readonly skillModalOpen = signal(false);
+
+  readonly skillForm = this.formBuilder.group({
+    name: [''],
+    level: [''],
+    years: [''],
+  });
+
+  readonly skillColumns: CxsDataTableColumn[] = [
+    { key: 'name', label: 'Skill' },
+    { key: 'level', label: 'Level' },
+    { key: 'years', label: 'Years' },
+    { key: 'actions', label: '', width: '72px' },
+  ];
+
+  readonly skillData = computed(
+    () => this.skills() as unknown as Array<Record<string, unknown>>,
+  );
+
+  // ---- Education (local) ----
+  readonly educations = signal<EducationEntry[]>([]);
+  readonly educationModalItem = signal<EducationEntry | null>(null);
+  readonly educationModalOpen = signal(false);
+
+  readonly educationForm = this.formBuilder.group({
+    institution: [''],
+    degree: [''],
+    field: [''],
+    startYear: [''],
+    endYear: [''],
+  });
+
+  readonly educationColumns: CxsDataTableColumn[] = [
+    { key: 'institution', label: 'Institution' },
+    { key: 'degree', label: 'Degree' },
+    { key: 'field', label: 'Field' },
+    { key: 'startYear', label: 'From' },
+    { key: 'endYear', label: 'To' },
+    { key: 'actions', label: '', width: '72px' },
+  ];
+
+  readonly educationData = computed(
+    () => this.educations() as unknown as Array<Record<string, unknown>>,
+  );
+
+  // ---- Workplace (local) ----
+  readonly workplaces = signal<WorkplaceEntry[]>([]);
+  readonly workplaceModalItem = signal<WorkplaceEntry | null>(null);
+  readonly workplaceModalOpen = signal(false);
+
+  readonly workplaceForm = this.formBuilder.group({
+    company: [''],
+    position: [''],
+    department: [''],
+    startDate: [''],
+    endDate: [''],
+    isCurrent: [false],
+  });
+
+  readonly workplaceColumns: CxsDataTableColumn[] = [
+    { key: 'company', label: 'Company' },
+    { key: 'position', label: 'Position' },
+    { key: 'department', label: 'Department' },
+    { key: 'startDate', label: 'From' },
+    { key: 'endDate', label: 'To' },
+    { key: 'isCurrent', label: 'Current', formatter: (v) => (v ? 'Yes' : '') },
+    { key: 'actions', label: '', width: '72px' },
+  ];
+
+  readonly workplaceData = computed(
+    () => this.workplaces() as unknown as Array<Record<string, unknown>>,
+  );
+
   ngOnInit(): void {
     this.loadProfile();
   }
+
+  // ---- Profile handlers ----
 
   onRefresh(): void {
     this.loadProfile();
@@ -197,11 +344,304 @@ export class ProfilePage implements OnInit {
           this.editOpen.set(false);
           this.showToast('info', 'Profile updated', 'Your profile has been saved.');
         },
-        error: (err) => {
+        error: (err: { error?: { message?: string } }) => {
           this.editError.set(err?.error?.message ?? 'Failed to update profile.');
         },
       });
   }
+
+  // ---- Address handlers ----
+
+  onOpenAddAddress(): void {
+    this.addressModalItem.set(null);
+    this.addressForm.reset({ label: '', type: '', line1: '', line2: '', city: '', state: '', postalCode: '', country: '', isDefault: false });
+    this.addressModalError.set(null);
+    this.addressModalOpen.set(true);
+  }
+
+  onOpenEditAddress(id: string): void {
+    const address = this.addresses().find((a) => a.id === id) ?? null;
+    if (!address) return;
+
+    this.addressModalItem.set(address);
+    this.addressForm.setValue({
+      label: address.label ?? '',
+      type: address.type ?? '',
+      line1: address.line1 ?? '',
+      line2: address.line2 ?? '',
+      city: address.city ?? '',
+      state: address.state ?? '',
+      postalCode: address.postalCode ?? '',
+      country: address.country ?? '',
+      isDefault: address.isDefault ?? false,
+    });
+    this.addressModalError.set(null);
+    this.addressModalOpen.set(true);
+  }
+
+  onCloseAddressModal(): void {
+    this.addressModalOpen.set(false);
+    this.addressModalError.set(null);
+  }
+
+  onSubmitAddress(): void {
+    const profile = this.profile();
+    const raw = this.addressForm.getRawValue();
+    const existing = this.addressModalItem();
+
+    this.addressModalLoading.set(true);
+    this.addressModalError.set(null);
+
+    if (existing?.id) {
+      const command = {
+        id: existing.id,
+        label: raw.label || undefined,
+        type: raw.type || undefined,
+        line1: raw.line1 || undefined,
+        line2: raw.line2 || undefined,
+        city: raw.city || undefined,
+        state: raw.state || undefined,
+        postalCode: raw.postalCode || undefined,
+        country: raw.country || undefined,
+        isDefault: raw.isDefault ?? undefined,
+      };
+
+      this.addressesService
+        .updateAddress(existing.id, command)
+        .pipe(
+          finalize(() => this.addressModalLoading.set(false)),
+          takeUntilDestroyed(this.destroyRef),
+        )
+        .subscribe({
+          next: (response) => {
+            if (!response?.success) {
+              this.addressModalError.set(response?.message ?? 'Failed to update address.');
+              return;
+            }
+            const updated = response.data;
+            if (updated) {
+              this.addresses.update((list) =>
+                list.map((a) => (a.id === updated.id ? updated : a)),
+              );
+            }
+            this.addressModalOpen.set(false);
+            this.showToast('info', 'Address updated', 'The address has been saved.');
+          },
+          error: (err: { error?: { message?: string } }) => {
+            this.addressModalError.set(err?.error?.message ?? 'Failed to update address.');
+          },
+        });
+    } else {
+      const command = {
+        userId: profile?.userId ?? undefined,
+        label: raw.label || undefined,
+        type: raw.type || undefined,
+        line1: raw.line1 || undefined,
+        line2: raw.line2 || undefined,
+        city: raw.city || undefined,
+        state: raw.state || undefined,
+        postalCode: raw.postalCode || undefined,
+        country: raw.country || undefined,
+        isDefault: raw.isDefault ?? false,
+      };
+
+      this.addressesService
+        .createAddress(command)
+        .pipe(
+          finalize(() => this.addressModalLoading.set(false)),
+          takeUntilDestroyed(this.destroyRef),
+        )
+        .subscribe({
+          next: (response) => {
+            if (!response?.success) {
+              this.addressModalError.set(response?.message ?? 'Failed to create address.');
+              return;
+            }
+            if (response.data) {
+              this.addresses.update((list) => [...list, response.data!]);
+            }
+            this.addressModalOpen.set(false);
+            this.showToast('info', 'Address added', 'The address has been created.');
+          },
+          error: (err: { error?: { message?: string } }) => {
+            this.addressModalError.set(err?.error?.message ?? 'Failed to create address.');
+          },
+        });
+    }
+  }
+
+  // ---- Skill handlers ----
+
+  onOpenAddSkill(): void {
+    this.skillModalItem.set(null);
+    this.skillForm.reset({ name: '', level: '', years: '' });
+    this.skillModalOpen.set(true);
+  }
+
+  onOpenEditSkill(id: string): void {
+    const skill = this.skills().find((s) => s.id === id) ?? null;
+    if (!skill) return;
+
+    this.skillModalItem.set(skill);
+    this.skillForm.setValue({ name: skill.name, level: skill.level, years: skill.years });
+    this.skillModalOpen.set(true);
+  }
+
+  onCloseSkillModal(): void {
+    this.skillModalOpen.set(false);
+  }
+
+  onSubmitSkill(): void {
+    const raw = this.skillForm.getRawValue();
+    const existing = this.skillModalItem();
+
+    if (existing) {
+      this.skills.update((list) =>
+        list.map((s) =>
+          s.id === existing.id
+            ? { ...s, name: raw.name ?? '', level: raw.level ?? '', years: raw.years ?? '' }
+            : s,
+        ),
+      );
+    } else {
+      const newSkill: SkillEntry = {
+        id: `skill-${Date.now()}`,
+        name: raw.name ?? '',
+        level: raw.level ?? '',
+        years: raw.years ?? '',
+      };
+      this.skills.update((list) => [...list, newSkill]);
+    }
+
+    this.skillModalOpen.set(false);
+  }
+
+  // ---- Education handlers ----
+
+  onOpenAddEducation(): void {
+    this.educationModalItem.set(null);
+    this.educationForm.reset({ institution: '', degree: '', field: '', startYear: '', endYear: '' });
+    this.educationModalOpen.set(true);
+  }
+
+  onOpenEditEducation(id: string): void {
+    const entry = this.educations().find((e) => e.id === id) ?? null;
+    if (!entry) return;
+
+    this.educationModalItem.set(entry);
+    this.educationForm.setValue({
+      institution: entry.institution,
+      degree: entry.degree,
+      field: entry.field,
+      startYear: entry.startYear,
+      endYear: entry.endYear,
+    });
+    this.educationModalOpen.set(true);
+  }
+
+  onCloseEducationModal(): void {
+    this.educationModalOpen.set(false);
+  }
+
+  onSubmitEducation(): void {
+    const raw = this.educationForm.getRawValue();
+    const existing = this.educationModalItem();
+
+    if (existing) {
+      this.educations.update((list) =>
+        list.map((e) =>
+          e.id === existing.id
+            ? {
+                ...e,
+                institution: raw.institution ?? '',
+                degree: raw.degree ?? '',
+                field: raw.field ?? '',
+                startYear: raw.startYear ?? '',
+                endYear: raw.endYear ?? '',
+              }
+            : e,
+        ),
+      );
+    } else {
+      const newEntry: EducationEntry = {
+        id: `edu-${Date.now()}`,
+        institution: raw.institution ?? '',
+        degree: raw.degree ?? '',
+        field: raw.field ?? '',
+        startYear: raw.startYear ?? '',
+        endYear: raw.endYear ?? '',
+      };
+      this.educations.update((list) => [...list, newEntry]);
+    }
+
+    this.educationModalOpen.set(false);
+  }
+
+  // ---- Workplace handlers ----
+
+  onOpenAddWorkplace(): void {
+    this.workplaceModalItem.set(null);
+    this.workplaceForm.reset({ company: '', position: '', department: '', startDate: '', endDate: '', isCurrent: false });
+    this.workplaceModalOpen.set(true);
+  }
+
+  onOpenEditWorkplace(id: string): void {
+    const entry = this.workplaces().find((w) => w.id === id) ?? null;
+    if (!entry) return;
+
+    this.workplaceModalItem.set(entry);
+    this.workplaceForm.setValue({
+      company: entry.company,
+      position: entry.position,
+      department: entry.department,
+      startDate: entry.startDate,
+      endDate: entry.endDate,
+      isCurrent: entry.isCurrent,
+    });
+    this.workplaceModalOpen.set(true);
+  }
+
+  onCloseWorkplaceModal(): void {
+    this.workplaceModalOpen.set(false);
+  }
+
+  onSubmitWorkplace(): void {
+    const raw = this.workplaceForm.getRawValue();
+    const existing = this.workplaceModalItem();
+
+    if (existing) {
+      this.workplaces.update((list) =>
+        list.map((w) =>
+          w.id === existing.id
+            ? {
+                ...w,
+                company: raw.company ?? '',
+                position: raw.position ?? '',
+                department: raw.department ?? '',
+                startDate: raw.startDate ?? '',
+                endDate: raw.endDate ?? '',
+                isCurrent: raw.isCurrent ?? false,
+              }
+            : w,
+        ),
+      );
+    } else {
+      const newEntry: WorkplaceEntry = {
+        id: `work-${Date.now()}`,
+        company: raw.company ?? '',
+        position: raw.position ?? '',
+        department: raw.department ?? '',
+        startDate: raw.startDate ?? '',
+        endDate: raw.endDate ?? '',
+        isCurrent: raw.isCurrent ?? false,
+      };
+      this.workplaces.update((list) => [...list, newEntry]);
+    }
+
+    this.workplaceModalOpen.set(false);
+  }
+
+  // ---- Private helpers ----
 
   private loadProfile(): void {
     this.loading.set(true);
@@ -221,10 +661,34 @@ export class ProfilePage implements OnInit {
             return;
           }
           this.profile.set(response.data ?? null);
+          if (response.data?.userId) {
+            this.loadAddresses(response.data.userId);
+          }
         },
-        error: (err) => {
+        error: (err: { error?: { message?: string } }) => {
           this.profile.set(null);
           this.error.set(err?.error?.message ?? 'Failed to load profile.');
+        },
+      });
+  }
+
+  private loadAddresses(userId: string): void {
+    this.addressesLoading.set(true);
+
+    this.addressesService
+      .getAddressesByUserId(userId)
+      .pipe(
+        finalize(() => this.addressesLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (response?.success) {
+            this.addresses.set(response.data?.items ?? []);
+          }
+        },
+        error: () => {
+          this.addresses.set([]);
         },
       });
   }
