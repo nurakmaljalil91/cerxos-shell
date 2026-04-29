@@ -27,6 +27,7 @@ import { AddressDto } from '../../../../shared/models/model';
 import { UserProfileDto } from '../../../../shared/models/model';
 import { UserProfilesService } from '../../services/user-profiles.service';
 import { AddressesService } from '../../services/addresses.service';
+import { FileService } from '../../services/file.service';
 
 interface SkillEntry {
   id: string;
@@ -76,6 +77,7 @@ interface WorkplaceEntry {
 export class ProfilePage implements OnInit {
   private readonly userProfilesService = inject(UserProfilesService);
   private readonly addressesService = inject(AddressesService);
+  private readonly fileService = inject(FileService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -87,6 +89,8 @@ export class ProfilePage implements OnInit {
   readonly editOpen = signal(false);
   readonly editLoading = signal(false);
   readonly editError = signal<string | null>(null);
+  readonly uploadLoading = signal(false);
+  readonly uploadError = signal<string | null>(null);
 
   readonly toastOpen = signal(false);
   readonly toastTitle = signal('');
@@ -300,6 +304,46 @@ export class ProfilePage implements OnInit {
   onCloseEdit(): void {
     this.editOpen.set(false);
     this.editError.set(null);
+  }
+
+  onAvatarFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const allowedTypes: readonly string[] = ['image/jpeg', 'image/png', 'image/webp'];
+    const maxSizeBytes = 5 * 1024 * 1024;
+
+    if (!allowedTypes.includes(file.type)) {
+      this.uploadError.set('Only JPG, PNG, or WebP images are allowed.');
+      return;
+    }
+    if (file.size > maxSizeBytes) {
+      this.uploadError.set('File exceeds the 5 MB size limit.');
+      return;
+    }
+
+    this.uploadLoading.set(true);
+    this.uploadError.set(null);
+
+    this.fileService
+      .uploadProfilePicture(file)
+      .pipe(
+        finalize(() => this.uploadLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (response?.data?.url) {
+            this.editForm.controls.imageUrl.setValue(response.data.url);
+          } else {
+            this.uploadError.set(response?.message ?? 'Upload failed: no URL returned.');
+          }
+        },
+        error: (err: { error?: { message?: string } }) => {
+          this.uploadError.set(err?.error?.message ?? 'Upload failed.');
+        },
+      });
   }
 
   onSubmitEdit(): void {

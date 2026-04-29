@@ -330,10 +330,44 @@
       />
     </div>
 
+    <!-- Hidden native file input -->
+    <input
+      #avatarInput
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      class="hidden"
+      (change)="onAvatarFileChange($event)"
+    />
+
+    <!-- Clickable avatar preview with upload button -->
+    <div class="flex items-center gap-4">
+      <cxs-avatar
+        size="lg"
+        [name]="displayName()"
+        [src]="editForm.controls.imageUrl.value || undefined"
+      />
+      <div class="space-y-1">
+        <cxs-button
+          type="button"
+          variant="secondary"
+          size="sm"
+          [loading]="uploadLoading()"
+          (click)="avatarInput.click()"
+        >
+          Change photo
+        </cxs-button>
+        <p class="text-xs text-gray-500 dark:text-gray-400">JPG, PNG or WebP — max 5 MB</p>
+        @if (uploadError()) {
+          <p class="text-xs text-red-600">{{ uploadError() }}</p>
+        }
+      </div>
+    </div>
+
+    <!-- Read-only URL field so user can see/clear the URL -->
     <cxs-input
       formControlName="imageUrl"
       label="Image URL"
-      placeholder="https://..."
+      placeholder="Uploaded automatically"
       [value]="editForm.controls.imageUrl.value ?? ''"
     />
 

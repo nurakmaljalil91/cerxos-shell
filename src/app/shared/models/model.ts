@@ -1113,3 +1113,17 @@ export interface UserSessionDto {
     /** Gets the roles grouped by group name. */
     groupRoles?: { [key: string]: string[]; };
 }
+
+export interface UploadedFileDto {
+    url?: string;
+    key?: string;
+    contentType?: string;
+    sizeBytes?: number;
+}
+
+export interface BaseResponseOfUploadedFileDto {
+    success?: boolean;
+    message?: string | undefined;
+    data?: UploadedFileDto | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}
