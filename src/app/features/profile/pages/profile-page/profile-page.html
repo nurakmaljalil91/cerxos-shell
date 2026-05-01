@@ -1,4 +1,5 @@
 <section class="space-y-6">
+  <!-- Page header -->
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
       <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Profile</h1>
@@ -20,217 +21,278 @@
     </div>
   }
 
-  @if (loading()) {
-    <div class="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm text-gray-500">
-      Loading profile details...
+  <!-- Two-column layout -->
+  <div class="grid gap-6 lg:grid-cols-[320px_1fr] items-start">
+
+    <!-- LEFT COLUMN -->
+    <div class="lg:sticky lg:top-6">
+      @if (loading()) {
+        <cxs-card ariaLabel="Loading profile">
+          <p class="text-sm text-gray-400">Loading profile details...</p>
+        </cxs-card>
+      } @else if (empty()) {
+        <cxs-card ariaLabel="Empty profile state">
+          <div class="space-y-2 text-sm text-gray-600">
+            <p>No profile data is available yet.</p>
+            <p>Once your profile is created, it will appear here automatically.</p>
+          </div>
+        </cxs-card>
+      } @else if (profile()) {
+        <cxs-card ariaLabel="Profile summary">
+          <div class="space-y-5">
+
+            <!-- Profile header -->
+            <div class="flex flex-col items-center gap-3 text-center">
+              <cxs-avatar
+                size="lg"
+                [name]="displayName()"
+                [src]="profile()?.imageUrl"
+              />
+              <div class="space-y-1">
+                <h2 class="text-base font-semibold text-gray-900 dark:text-white">{{ displayName() }}</h2>
+                <div class="flex flex-wrap items-center justify-center gap-1.5">
+                  @if (profile()?.tag) {
+                    <cxs-badge variant="neutral">{{ profile()?.tag }}</cxs-badge>
+                  }
+                  @if (profile()?.bloodType) {
+                    <cxs-badge variant="primary">Blood {{ profile()?.bloodType }}</cxs-badge>
+                  }
+                </div>
+                <p class="text-xs text-gray-400">{{ profile()?.userId ?? 'N/A' }}</p>
+              </div>
+            </div>
+
+            <div class="border-t pt-5 space-y-5">
+
+              <!-- Personal -->
+              <div class="space-y-2">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Personal</h3>
+                <dl class="space-y-2">
+                  @for (item of personalDetails(); track item.label) {
+                    <div class="flex items-start justify-between gap-3 text-sm">
+                      <dt class="text-gray-500 shrink-0">{{ item.label }}</dt>
+                      <dd class="text-right text-gray-900 dark:text-white">{{ item.value }}</dd>
+                    </div>
+                  }
+                </dl>
+              </div>
+
+              <!-- Identifiers -->
+              <div class="space-y-2">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Identifiers</h3>
+                <dl class="space-y-2">
+                  @for (item of identityDetails(); track item.label) {
+                    <div class="flex items-start justify-between gap-3 text-sm">
+                      <dt class="text-gray-500 shrink-0">{{ item.label }}</dt>
+                      <dd class="font-mono text-xs truncate max-w-[160px] text-right text-gray-900 dark:text-white">{{ item.value }}</dd>
+                    </div>
+                  }
+                </dl>
+              </div>
+
+              <!-- Sizing -->
+              <div class="space-y-2">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Sizing</h3>
+                <div class="grid grid-cols-3 gap-2">
+                  @for (item of sizeDetails(); track item.label) {
+                    <div class="rounded-lg bg-gray-50 dark:bg-gray-800 p-2 text-center flex flex-col items-center">
+                      <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ item.value }}</span>
+                      <span class="text-xs text-gray-400">{{ item.label }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Bio -->
+              <div class="space-y-2">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Bio</h3>
+                <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{{ bio() }}</p>
+              </div>
+
+
+            </div>
+          </div>
+        </cxs-card>
+      }
     </div>
-  }
 
-  @if (profile()) {
-    <cxs-card ariaLabel="Profile summary" size="lg">
-      <div class="flex flex-wrap items-center gap-4">
-        <cxs-avatar
-          size="lg"
-          [name]="displayName()"
-          [src]="profile()?.imageUrl"
-        />
-        <div class="min-w-0 space-y-1">
-          <div class="flex flex-wrap items-center gap-2">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ displayName() }}</h2>
-            @if (profile()?.tag) {
-              <cxs-badge variant="neutral">{{ profile()?.tag }}</cxs-badge>
-            }
-            @if (profile()?.bloodType) {
-              <cxs-badge variant="primary">Blood {{ profile()?.bloodType }}</cxs-badge>
-            }
-          </div>
-          <p class="text-sm text-gray-500">
-            User ID: {{ profile()?.userId ?? 'N/A' }}
-          </p>
-        </div>
-      </div>
-    </cxs-card>
+    <!-- RIGHT COLUMN -->
+    <cxs-card>
+      <cxs-tabs ariaLabel="Profile sections">
 
-    <div class="grid gap-4 md:grid-cols-2 mt-4">
-      <cxs-card>
-        <div class="space-y-3">
-          <div>
-            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Personal</h3>
-            <p class="text-xs text-gray-500">The essentials we have on file.</p>
-          </div>
-          <dl class="grid gap-3 text-sm">
-            @for (item of personalDetails(); track item.label) {
-              <div class="flex items-start justify-between gap-4">
-                <dt class="text-gray-500">{{ item.label }}</dt>
-                <dd class="text-right text-gray-900 dark:text-white">{{ item.value }}</dd>
+        <!-- Addresses -->
+        <cxs-tab-panel id="addresses" label="Addresses">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Addresses</h3>
+                <p class="text-xs text-gray-500">Saved locations and delivery addresses.</p>
               </div>
+              <cxs-button size="sm" variant="primary" (click)="onOpenAddAddress()">Add</cxs-button>
+            </div>
+            @if (addressesLoading()) {
+              <p class="text-sm text-gray-400">Loading...</p>
+            } @else {
+              <cxs-data-table
+                [columns]="addressColumns"
+                [data]="addressData()"
+                [bordered]="true"
+                [compact]="true"
+                [showGlobalSearch]="false"
+                [showFilters]="false"
+                [showColumnVisibility]="false"
+                [showPagination]="false"
+              >
+                <ng-template cxsDataTableCell="actions" let-row>
+                  <cxs-button size="sm" variant="ghost" (click)="onOpenEditAddress($any(row['id']))">Edit</cxs-button>
+                </ng-template>
+              </cxs-data-table>
             }
-          </dl>
-        </div>
-      </cxs-card>
-
-      <cxs-card>
-        <div class="space-y-3">
-          <div>
-            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Identifiers</h3>
-            <p class="text-xs text-gray-500">Verification and account references.</p>
           </div>
-          <dl class="grid gap-3 text-sm">
-            @for (item of identityDetails(); track item.label) {
-              <div class="flex items-start justify-between gap-4">
-                <dt class="text-gray-500">{{ item.label }}</dt>
-                <dd class="text-right text-gray-900 dark:text-white">{{ item.value }}</dd>
+        </cxs-tab-panel>
+
+        <!-- Languages -->
+        <cxs-tab-panel id="languages" label="Languages">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Languages</h3>
+                <p class="text-xs text-gray-500">Languages spoken and proficiency levels.</p>
               </div>
+              <cxs-button size="sm" variant="primary" (click)="onOpenAddLanguage()">Add</cxs-button>
+            </div>
+            @if (languagesLoading()) {
+              <p class="text-sm text-gray-400">Loading...</p>
+            } @else {
+              <cxs-data-table
+                [columns]="languageColumns"
+                [data]="languageData()"
+                [bordered]="true"
+                [compact]="true"
+                [showGlobalSearch]="false"
+                [showFilters]="false"
+                [showColumnVisibility]="false"
+                [showPagination]="false"
+              >
+                <ng-template cxsDataTableCell="actions" let-row>
+                  <cxs-button size="sm" variant="ghost" (click)="onOpenEditLanguage($any(row['id']))">Edit</cxs-button>
+                </ng-template>
+              </cxs-data-table>
             }
-          </dl>
-        </div>
-      </cxs-card>
-
-      <cxs-card>
-        <div class="space-y-3">
-          <div>
-            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Sizing</h3>
-            <p class="text-xs text-gray-500">Optional measurements for personalization.</p>
           </div>
-          <dl class="grid gap-3 text-sm">
-            @for (item of sizeDetails(); track item.label) {
-              <div class="flex items-start justify-between gap-4">
-                <dt class="text-gray-500">{{ item.label }}</dt>
-                <dd class="text-right text-gray-900 dark:text-white">{{ item.value }}</dd>
+        </cxs-tab-panel>
+
+        <!-- Skills -->
+        <cxs-tab-panel id="skills" label="Skills">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Skills</h3>
+                <p class="text-xs text-gray-500">Proficiencies and areas of expertise.</p>
               </div>
-            }
-          </dl>
-        </div>
-      </cxs-card>
-
-      <cxs-card>
-        <div class="space-y-3">
-          <div>
-            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Bio</h3>
-            <p class="text-xs text-gray-500">Share a quick overview about yourself.</p>
+              <cxs-button size="sm" variant="primary" (click)="onOpenAddSkill()">Add</cxs-button>
+            </div>
+            <cxs-data-table
+              [columns]="skillColumns"
+              [data]="skillData()"
+              [bordered]="true"
+              [compact]="true"
+              [showGlobalSearch]="false"
+              [showFilters]="false"
+              [showColumnVisibility]="false"
+              [showPagination]="false"
+            >
+              <ng-template cxsDataTableCell="actions" let-row>
+                <cxs-button size="sm" variant="ghost" (click)="onOpenEditSkill($any(row['id']))">Edit</cxs-button>
+              </ng-template>
+            </cxs-data-table>
           </div>
-          <p class="text-sm text-gray-700">{{ bio() }}</p>
-        </div>
-      </cxs-card>
-    </div>
-  } @else if (empty()) {
-    <cxs-card ariaLabel="Empty profile state">
-      <div class="space-y-2 text-sm text-gray-600">
-        <p>No profile data is available yet.</p>
-        <p>Once your profile is created, it will appear here automatically.</p>
-      </div>
-    </cxs-card>
-  }
+        </cxs-tab-panel>
 
-  <div class="flex flex-col gap-6">
-    <!-- Addresses -->
-    <cxs-card>
-      <div class="space-y-4">
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Address</h3>
-            <p class="text-xs text-gray-500">Home, work, and other saved locations.</p>
+        <!-- Education -->
+        <cxs-tab-panel id="education" label="Education">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Education</h3>
+                <p class="text-xs text-gray-500">Academic background and qualifications.</p>
+              </div>
+              <cxs-button size="sm" variant="primary" (click)="onOpenAddEducation()">Add</cxs-button>
+            </div>
+            <cxs-data-table
+              [columns]="educationColumns"
+              [data]="educationData()"
+              [bordered]="true"
+              [compact]="true"
+              [showGlobalSearch]="false"
+              [showFilters]="false"
+              [showColumnVisibility]="false"
+              [showPagination]="false"
+            >
+              <ng-template cxsDataTableCell="actions" let-row>
+                <cxs-button size="sm" variant="ghost" (click)="onOpenEditEducation($any(row['id']))">Edit</cxs-button>
+              </ng-template>
+            </cxs-data-table>
           </div>
-          <cxs-button size="sm" variant="primary" (click)="onOpenAddAddress()">Add</cxs-button>
-        </div>
-        <cxs-data-table
-          [columns]="addressColumns"
-          [data]="addressData()"
-          [loading]="addressesLoading()"
-          [bordered]="true"
-          [compact]="true"
-          [showGlobalSearch]="false"
-          [showFilters]="false"
-          [showColumnVisibility]="false"
-          [showPagination]="false"
-        >
-          <ng-template cxsDataTableCell="actions" let-row>
-            <cxs-button size="sm" variant="ghost" (click)="onOpenEditAddress($any(row['id']))">Edit</cxs-button>
-          </ng-template>
-        </cxs-data-table>
-      </div>
-    </cxs-card>
+        </cxs-tab-panel>
 
-    <!-- Skills -->
-    <cxs-card>
-      <div class="space-y-4">
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Skills</h3>
-            <p class="text-xs text-gray-500">Proficiencies and areas of expertise.</p>
+        <!-- Work Experience -->
+        <cxs-tab-panel id="experience" label="Work Experience">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Work Experience</h3>
+                <p class="text-xs text-gray-500">Employment history and current positions.</p>
+              </div>
+              <cxs-button size="sm" variant="primary" (click)="onOpenAddWorkplace()">Add</cxs-button>
+            </div>
+            <cxs-data-table
+              [columns]="workplaceColumns"
+              [data]="workplaceData()"
+              [bordered]="true"
+              [compact]="true"
+              [showGlobalSearch]="false"
+              [showFilters]="false"
+              [showColumnVisibility]="false"
+              [showPagination]="false"
+            >
+              <ng-template cxsDataTableCell="actions" let-row>
+                <cxs-button size="sm" variant="ghost" (click)="onOpenEditWorkplace($any(row['id']))">Edit</cxs-button>
+              </ng-template>
+            </cxs-data-table>
           </div>
-          <cxs-button size="sm" variant="primary" (click)="onOpenAddSkill()">Add</cxs-button>
-        </div>
-        <cxs-data-table
-          [columns]="skillColumns"
-          [data]="skillData()"
-          [bordered]="true"
-          [compact]="true"
-          [showGlobalSearch]="false"
-          [showFilters]="false"
-          [showColumnVisibility]="false"
-          [showPagination]="false"
-        >
-          <ng-template cxsDataTableCell="actions" let-row>
-            <cxs-button size="sm" variant="ghost" (click)="onOpenEditSkill($any(row['id']))">Edit</cxs-button>
-          </ng-template>
-        </cxs-data-table>
-      </div>
-    </cxs-card>
+        </cxs-tab-panel>
 
-    <!-- Education -->
-    <cxs-card>
-      <div class="space-y-4">
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Education</h3>
-            <p class="text-xs text-gray-500">Academic background and qualifications.</p>
+        <!-- Projects -->
+        <cxs-tab-panel id="projects" label="Projects">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Projects</h3>
+                <p class="text-xs text-gray-500">Personal and professional projects.</p>
+              </div>
+              <cxs-button size="sm" variant="primary" (click)="onOpenAddProject()">Add</cxs-button>
+            </div>
+            <cxs-data-table
+              [columns]="projectColumns"
+              [data]="projectData()"
+              [bordered]="true"
+              [compact]="true"
+              [showGlobalSearch]="false"
+              [showFilters]="false"
+              [showColumnVisibility]="false"
+              [showPagination]="false"
+            >
+              <ng-template cxsDataTableCell="actions" let-row>
+                <cxs-button size="sm" variant="ghost" (click)="onOpenEditProject($any(row['id']))">Edit</cxs-button>
+              </ng-template>
+            </cxs-data-table>
           </div>
-          <cxs-button size="sm" variant="primary" (click)="onOpenAddEducation()">Add</cxs-button>
-        </div>
-        <cxs-data-table
-          [columns]="educationColumns"
-          [data]="educationData()"
-          [bordered]="true"
-          [compact]="true"
-          [showGlobalSearch]="false"
-          [showFilters]="false"
-          [showColumnVisibility]="false"
-          [showPagination]="false"
-        >
-          <ng-template cxsDataTableCell="actions" let-row>
-            <cxs-button size="sm" variant="ghost" (click)="onOpenEditEducation($any(row['id']))">Edit</cxs-button>
-          </ng-template>
-        </cxs-data-table>
-      </div>
+        </cxs-tab-panel>
+
+      </cxs-tabs>
     </cxs-card>
 
-    <!-- Workplace -->
-    <cxs-card>
-      <div class="space-y-4">
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Workplace</h3>
-            <p class="text-xs text-gray-500">Employment history and current positions.</p>
-          </div>
-          <cxs-button size="sm" variant="primary" (click)="onOpenAddWorkplace()">Add</cxs-button>
-        </div>
-        <cxs-data-table
-          [columns]="workplaceColumns"
-          [data]="workplaceData()"
-          [bordered]="true"
-          [compact]="true"
-          [showGlobalSearch]="false"
-          [showFilters]="false"
-          [showColumnVisibility]="false"
-          [showPagination]="false"
-        >
-          <ng-template cxsDataTableCell="actions" let-row>
-            <cxs-button size="sm" variant="ghost" (click)="onOpenEditWorkplace($any(row['id']))">Edit</cxs-button>
-          </ng-template>
-        </cxs-data-table>
-      </div>
-    </cxs-card>
   </div>
 </section>
 
@@ -293,6 +355,13 @@
         [value]="editForm.controls.passportNumber.value ?? ''"
       />
     </div>
+
+    <cxs-input
+      formControlName="taxNumber"
+      label="Tax number"
+      placeholder="Tax identification number"
+      [value]="editForm.controls.taxNumber.value ?? ''"
+    />
 
     <div class="grid gap-4 sm:grid-cols-3">
       <cxs-input
@@ -626,6 +695,94 @@
   <div cxsDialogActions>
     <cxs-button variant="secondary" (click)="onCloseWorkplaceModal()">Cancel</cxs-button>
     <cxs-button (click)="onSubmitWorkplace()">Save</cxs-button>
+  </div>
+</cxs-dialog>
+
+<!-- Project dialog -->
+<cxs-dialog
+  [title]="projectModalItem() ? 'Edit Project' : 'Add Project'"
+  description="Enter the project details."
+  [open]="projectModalOpen()"
+  (openChange)="onCloseProjectModal()"
+>
+  <form class="grid gap-4" [formGroup]="projectForm" (ngSubmit)="onSubmitProject()">
+    <cxs-input
+      formControlName="name"
+      label="Project name"
+      placeholder="e.g. My Portfolio"
+      [value]="projectForm.controls.name.value ?? ''"
+    />
+    <cxs-input
+      formControlName="description"
+      label="Description"
+      placeholder="Short description of the project"
+      [value]="projectForm.controls.description.value ?? ''"
+    />
+    <cxs-input
+      formControlName="url"
+      label="URL"
+      placeholder="https://example.com"
+      [value]="projectForm.controls.url.value ?? ''"
+    />
+    <div class="grid gap-4 sm:grid-cols-2">
+      <cxs-input
+        formControlName="startDate"
+        label="Start date"
+        placeholder="yyyy-MM-dd"
+        [value]="projectForm.controls.startDate.value ?? ''"
+      />
+      <cxs-input
+        formControlName="endDate"
+        label="End date"
+        placeholder="yyyy-MM-dd"
+        [value]="projectForm.controls.endDate.value ?? ''"
+      />
+    </div>
+  </form>
+
+  <div cxsDialogActions>
+    <cxs-button variant="secondary" (click)="onCloseProjectModal()">Cancel</cxs-button>
+    <cxs-button (click)="onSubmitProject()">Save</cxs-button>
+  </div>
+</cxs-dialog>
+
+<!-- Language dialog -->
+<cxs-dialog
+  [title]="languageModalItem() ? 'Edit Language' : 'Add Language'"
+  description="Enter the language details."
+  [open]="languageModalOpen()"
+  (openChange)="onCloseLanguageModal()"
+>
+  <form class="grid gap-4" [formGroup]="languageForm" (ngSubmit)="onSubmitLanguage()">
+    <cxs-input
+      formControlName="name"
+      label="Language name"
+      placeholder="e.g. English"
+      [value]="languageForm.controls.name.value ?? ''"
+    />
+    <cxs-input
+      formControlName="level"
+      label="Proficiency level"
+      placeholder="e.g. Native, Fluent, Work Proficiency"
+      [value]="languageForm.controls.level.value ?? ''"
+    />
+  </form>
+
+  @if (languageModalError()) {
+    <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+      {{ languageModalError() }}
+    </div>
+  }
+
+  <div cxsDialogActions>
+    <cxs-button variant="secondary" (click)="onCloseLanguageModal()">Cancel</cxs-button>
+    <cxs-button
+      [disabled]="languageModalLoading()"
+      [loading]="languageModalLoading()"
+      (click)="onSubmitLanguage()"
+    >
+      Save
+    </cxs-button>
   </div>
 </cxs-dialog>
 

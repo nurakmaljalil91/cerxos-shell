@@ -919,6 +919,8 @@ export interface UserProfileDto {
     tag?: string | undefined;
     /** Gets the blood type recorded for the user. */
     bloodType?: string | undefined;
+    /** Gets the tax identification number. */
+    taxNumber?: string | undefined;
 }
 
 /** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
@@ -999,6 +1001,8 @@ export interface UpdateUserProfileCommand {
     tag?: string | undefined;
     /** Gets or sets the blood type recorded for the user. */
     bloodType?: string | undefined;
+    /** Gets or sets the tax identification number. */
+    taxNumber?: string | undefined;
 }
 
 /** Represents a standard response wrapper for service or API operations. Contains success status, message, data payload, and optional error details. */
@@ -1125,5 +1129,63 @@ export interface BaseResponseOfUploadedFileDto {
     success?: boolean;
     message?: string | undefined;
     data?: UploadedFileDto | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Represents a language record. */
+export interface LanguageDto {
+    /** Gets the language identifier. */
+    id?: string;
+    /** Gets the user identifier. */
+    userId?: string;
+    /** Gets the language name. */
+    name?: string | undefined;
+    /** Gets the proficiency level. */
+    level?: string | undefined;
+}
+
+/** Command to create a new language record. */
+export interface CreateLanguageCommand {
+    /** Gets or sets the user identifier. */
+    userId?: string;
+    /** Gets or sets the language name. */
+    name?: string | undefined;
+    /** Gets or sets the proficiency level. */
+    level?: string | undefined;
+}
+
+/** Command to update an existing language record. */
+export interface UpdateLanguageCommand {
+    /** Gets or sets the language identifier. */
+    id?: string;
+    /** Gets or sets the language name. */
+    name?: string | undefined;
+    /** Gets or sets the proficiency level. */
+    level?: string | undefined;
+}
+
+/** Standard response wrapping a LanguageDto. */
+export interface BaseResponseOfLanguageDto {
+    success?: boolean;
+    message?: string | undefined;
+    data?: LanguageDto | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Paginated collection of LanguageDto. */
+export interface PaginatedEnumerableOfLanguageDto {
+    items?: LanguageDto[] | undefined;
+    pageNumber?: number;
+    totalPages?: number;
+    totalCount?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+/** Standard response wrapping a paginated collection of LanguageDto. */
+export interface BaseResponseOfPaginatedEnumerableOfLanguageDto {
+    success?: boolean;
+    message?: string | undefined;
+    data?: PaginatedEnumerableOfLanguageDto | undefined;
     errors?: { [key: string]: string[]; } | undefined;
 }

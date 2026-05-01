@@ -1,7 +1,12 @@
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { HeroIconHelperPipe } from '../../pipes/hero-icon-helper.pipe';
+import {
+  LayoutNotificationItem,
+  NotificationService,
+} from '../../../core/services/notification.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-layout-notifications',
   standalone: true,
   imports: [HeroIconHelperPipe],
@@ -9,51 +14,34 @@ import { HeroIconHelperPipe } from '../../pipes/hero-icon-helper.pipe';
   styleUrl: './layout-notifications.css'
 })
 export class LayoutNotifications {
-  notificationOpen = signal<boolean>(false);
+  private readonly notificationService = inject(NotificationService);
 
-  notifications: { id: string; title: string; body: string; when: string; read: boolean }[] = [
-    {
-      id: 'n1',
-      title: 'Deployment complete',
-      body: 'Cerxos API v1.2.3 rolled out',
-      when: '2m ago',
-      read: false
-    },
-    {
-      id: 'n2',
-      title: 'New comment',
-      body: 'Johan mentioned you in PO-1042',
-      when: '1h ago',
-      read: false
-    },
-    {
-      id: 'n3',
-      title: 'Invoice paid',
-      body: 'RM 4,200 from Kyeob Consulting',
-      when: 'Yesterday',
-      read: true
+  readonly notificationOpen = signal<boolean>(false);
+  readonly notifications = this.notificationService.notifications;
+  readonly unreadCount = this.notificationService.unreadCount;
+  readonly loading = this.notificationService.loading;
+  readonly error = this.notificationService.error;
+  readonly panelStatus = computed((): string | null => {
+    if (this.loading()) {
+      return 'Loading notifications';
     }
-  ];
+    return this.error();
+  });
 
-  unreadCount = (): number =>
-    this.notifications.filter((notification) => !notification.read).length;
-
-  toggleNotification() {
+  toggleNotification(): void {
     this.notificationOpen.update((value) => !value);
   }
 
-  closeMenus() {
+  closeMenus(): void {
     this.notificationOpen.set(false);
   }
 
-  markAllRead() {
-    this.notifications = this.notifications.map(n => ({ ...n, read: true }));
+  markAllRead(): void {
+    this.notificationService.markAllRead();
   }
 
-  openNotification(n: { id: string }) {
-    // mark read and navigate / open a details drawer, etc.
-    this.notifications = this.notifications.map(x => (x.id === n.id ? { ...x, read: true } : x));
-    // Example: this.router.navigate(['/notifications', n.id]);
+  openNotification(n: LayoutNotificationItem): void {
+    this.notificationService.openNotification(n);
     this.closeMenus();
   }
 }

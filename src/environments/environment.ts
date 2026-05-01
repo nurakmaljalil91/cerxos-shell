@@ -3,4 +3,5 @@ export const environment = {
   production: true,
   apiBaseUrl: 'https://api.example.com',
   fileServiceBaseUrl: 'https://files.example.com',
+  notificationServiceBaseUrl: 'https://notifications.example.com',
 };

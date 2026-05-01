@@ -19,15 +19,25 @@ import {
   CxsDataTableComponent,
   CxsDialogComponent,
   CxsInputComponent,
+  CxsTabPanelComponent,
+  CxsTabsComponent,
   CxsToastComponent,
   CxsToastVariant,
 } from 'cerxos-ui';
 import type { CxsDataTableColumn } from 'cerxos-ui';
-import { AddressDto } from '../../../../shared/models/model';
-import { UserProfileDto } from '../../../../shared/models/model';
+import {
+  AddressDto,
+  BaseResponseOfLanguageDto,
+  BaseResponseOfPaginatedEnumerableOfLanguageDto,
+  CreateLanguageCommand,
+  LanguageDto,
+  UpdateLanguageCommand,
+  UserProfileDto,
+} from '../../../../shared/models/model';
 import { UserProfilesService } from '../../services/user-profiles.service';
 import { AddressesService } from '../../services/addresses.service';
 import { FileService } from '../../services/file.service';
+import { LanguagesService } from '../../services/languages.service';
 
 interface SkillEntry {
   id: string;
@@ -55,6 +65,15 @@ interface WorkplaceEntry {
   isCurrent: boolean;
 }
 
+interface ProjectEntry {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  startDate: string;
+  endDate: string;
+}
+
 @Component({
   selector: 'app-profile-page',
   standalone: true,
@@ -69,6 +88,8 @@ interface WorkplaceEntry {
     CxsDataTableComponent,
     CxsDialogComponent,
     CxsInputComponent,
+    CxsTabPanelComponent,
+    CxsTabsComponent,
     CxsToastComponent,
   ],
   templateUrl: './profile-page.html',
@@ -78,6 +99,7 @@ export class ProfilePage implements OnInit {
   private readonly userProfilesService = inject(UserProfilesService);
   private readonly addressesService = inject(AddressesService);
   private readonly fileService = inject(FileService);
+  private readonly languagesService = inject(LanguagesService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -105,6 +127,7 @@ export class ProfilePage implements OnInit {
     birthPlace: [''],
     identityCardNumber: [''],
     passportNumber: [''],
+    taxNumber: [''],
     bio: [''],
     imageUrl: [''],
     tag: [''],
@@ -140,6 +163,7 @@ export class ProfilePage implements OnInit {
       { label: 'User ID', value: this.formatValue(profile.userId) },
       { label: 'Identity card', value: this.formatValue(profile.identityCardNumber) },
       { label: 'Passport', value: this.formatValue(profile.passportNumber) },
+      { label: 'Tax number', value: this.formatValue(profile.taxNumber) },
     ];
   });
 
@@ -188,6 +212,29 @@ export class ProfilePage implements OnInit {
 
   readonly addressData = computed(
     () => this.addresses() as unknown as Array<Record<string, unknown>>,
+  );
+
+  // ---- Languages ----
+  readonly languages = signal<LanguageDto[]>([]);
+  readonly languagesLoading = signal(false);
+  readonly languageModalItem = signal<LanguageDto | null>(null);
+  readonly languageModalOpen = signal(false);
+  readonly languageModalLoading = signal(false);
+  readonly languageModalError = signal<string | null>(null);
+
+  readonly languageForm = this.formBuilder.group({
+    name: [''],
+    level: [''],
+  });
+
+  readonly languageColumns: CxsDataTableColumn[] = [
+    { key: 'name', label: 'Language' },
+    { key: 'level', label: 'Level' },
+    { key: 'actions', label: '', width: '72px' },
+  ];
+
+  readonly languageData = computed(
+    () => this.languages() as unknown as Array<Record<string, unknown>>,
   );
 
   // ---- Skills (local) ----
@@ -266,6 +313,32 @@ export class ProfilePage implements OnInit {
     () => this.workplaces() as unknown as Array<Record<string, unknown>>,
   );
 
+  // ---- Projects (local) ----
+  readonly projects = signal<ProjectEntry[]>([]);
+  readonly projectModalItem = signal<ProjectEntry | null>(null);
+  readonly projectModalOpen = signal(false);
+
+  readonly projectForm = this.formBuilder.group({
+    name: [''],
+    description: [''],
+    url: [''],
+    startDate: [''],
+    endDate: [''],
+  });
+
+  readonly projectColumns: CxsDataTableColumn[] = [
+    { key: 'name', label: 'Project' },
+    { key: 'description', label: 'Description' },
+    { key: 'url', label: 'URL' },
+    { key: 'startDate', label: 'From' },
+    { key: 'endDate', label: 'To' },
+    { key: 'actions', label: '', width: '72px' },
+  ];
+
+  readonly projectData = computed(
+    () => this.projects() as unknown as Array<Record<string, unknown>>,
+  );
+
   ngOnInit(): void {
     this.loadProfile();
   }
@@ -288,6 +361,7 @@ export class ProfilePage implements OnInit {
       birthPlace: profile.birthPlace ?? '',
       identityCardNumber: profile.identityCardNumber ?? '',
       passportNumber: profile.passportNumber ?? '',
+      taxNumber: profile.taxNumber ?? '',
       bio: profile.bio ?? '',
       imageUrl: profile.imageUrl ?? '',
       tag: profile.tag ?? '',
@@ -363,6 +437,7 @@ export class ProfilePage implements OnInit {
       birthPlace: raw.birthPlace || undefined,
       identityCardNumber: raw.identityCardNumber || undefined,
       passportNumber: raw.passportNumber || undefined,
+      taxNumber: raw.taxNumber || undefined,
       bio: raw.bio || undefined,
       imageUrl: raw.imageUrl || undefined,
       tag: raw.tag || undefined,
@@ -685,6 +760,163 @@ export class ProfilePage implements OnInit {
     this.workplaceModalOpen.set(false);
   }
 
+  // ---- Language handlers ----
+
+  onOpenAddLanguage(): void {
+    this.languageModalItem.set(null);
+    this.languageForm.reset({ name: '', level: '' });
+    this.languageModalError.set(null);
+    this.languageModalOpen.set(true);
+  }
+
+  onOpenEditLanguage(id: string): void {
+    const lang = this.languages().find((l) => l.id === id) ?? null;
+    if (!lang) return;
+
+    this.languageModalItem.set(lang);
+    this.languageForm.setValue({ name: lang.name ?? '', level: lang.level ?? '' });
+    this.languageModalError.set(null);
+    this.languageModalOpen.set(true);
+  }
+
+  onCloseLanguageModal(): void {
+    this.languageModalOpen.set(false);
+    this.languageModalError.set(null);
+  }
+
+  onSubmitLanguage(): void {
+    const profile = this.profile();
+    const raw = this.languageForm.getRawValue();
+    const existing = this.languageModalItem();
+
+    this.languageModalLoading.set(true);
+    this.languageModalError.set(null);
+
+    if (existing?.id) {
+      const command: UpdateLanguageCommand = {
+        id: existing.id,
+        name: raw.name || undefined,
+        level: raw.level || undefined,
+      };
+
+      this.languagesService
+        .updateLanguage(existing.id, command)
+        .pipe(
+          finalize(() => this.languageModalLoading.set(false)),
+          takeUntilDestroyed(this.destroyRef),
+        )
+        .subscribe({
+          next: (response: BaseResponseOfLanguageDto) => {
+            if (!response?.success) {
+              this.languageModalError.set(response?.message ?? 'Failed to update language.');
+              return;
+            }
+            const updated = response.data;
+            if (updated) {
+              this.languages.update((list) =>
+                list.map((l) => (l.id === updated.id ? updated : l)),
+              );
+            }
+            this.languageModalOpen.set(false);
+            this.showToast('info', 'Language updated', 'The language has been saved.');
+          },
+          error: (err: { error?: { message?: string } }) => {
+            this.languageModalError.set(err?.error?.message ?? 'Failed to update language.');
+          },
+        });
+    } else {
+      const command: CreateLanguageCommand = {
+        userId: profile?.userId ?? undefined,
+        name: raw.name || undefined,
+        level: raw.level || undefined,
+      };
+
+      this.languagesService
+        .createLanguage(command)
+        .pipe(
+          finalize(() => this.languageModalLoading.set(false)),
+          takeUntilDestroyed(this.destroyRef),
+        )
+        .subscribe({
+          next: (response: BaseResponseOfLanguageDto) => {
+            if (!response?.success) {
+              this.languageModalError.set(response?.message ?? 'Failed to create language.');
+              return;
+            }
+            if (response.data) {
+              this.languages.update((list) => [...list, response.data!]);
+            }
+            this.languageModalOpen.set(false);
+            this.showToast('info', 'Language added', 'The language has been created.');
+          },
+          error: (err: { error?: { message?: string } }) => {
+            this.languageModalError.set(err?.error?.message ?? 'Failed to create language.');
+          },
+        });
+    }
+  }
+
+  // ---- Project handlers ----
+
+  onOpenAddProject(): void {
+    this.projectModalItem.set(null);
+    this.projectForm.reset({ name: '', description: '', url: '', startDate: '', endDate: '' });
+    this.projectModalOpen.set(true);
+  }
+
+  onOpenEditProject(id: string): void {
+    const entry = this.projects().find((p) => p.id === id) ?? null;
+    if (!entry) return;
+
+    this.projectModalItem.set(entry);
+    this.projectForm.setValue({
+      name: entry.name,
+      description: entry.description,
+      url: entry.url,
+      startDate: entry.startDate,
+      endDate: entry.endDate,
+    });
+    this.projectModalOpen.set(true);
+  }
+
+  onCloseProjectModal(): void {
+    this.projectModalOpen.set(false);
+  }
+
+  onSubmitProject(): void {
+    const raw = this.projectForm.getRawValue();
+    const existing = this.projectModalItem();
+
+    if (existing) {
+      this.projects.update((list) =>
+        list.map((p) =>
+          p.id === existing.id
+            ? {
+                ...p,
+                name: raw.name ?? '',
+                description: raw.description ?? '',
+                url: raw.url ?? '',
+                startDate: raw.startDate ?? '',
+                endDate: raw.endDate ?? '',
+              }
+            : p,
+        ),
+      );
+    } else {
+      const newEntry: ProjectEntry = {
+        id: `project-${Date.now()}`,
+        name: raw.name ?? '',
+        description: raw.description ?? '',
+        url: raw.url ?? '',
+        startDate: raw.startDate ?? '',
+        endDate: raw.endDate ?? '',
+      };
+      this.projects.update((list) => [...list, newEntry]);
+    }
+
+    this.projectModalOpen.set(false);
+  }
+
   // ---- Private helpers ----
 
   private loadProfile(): void {
@@ -707,6 +939,7 @@ export class ProfilePage implements OnInit {
           this.profile.set(response.data ?? null);
           if (response.data?.userId) {
             this.loadAddresses(response.data.userId);
+            this.loadLanguages(response.data.userId);
           }
         },
         error: (err: { error?: { message?: string } }) => {
@@ -733,6 +966,27 @@ export class ProfilePage implements OnInit {
         },
         error: () => {
           this.addresses.set([]);
+        },
+      });
+  }
+
+  private loadLanguages(userId: string): void {
+    this.languagesLoading.set(true);
+
+    this.languagesService
+      .getLanguagesByUserId(userId)
+      .pipe(
+        finalize(() => this.languagesLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response: BaseResponseOfPaginatedEnumerableOfLanguageDto) => {
+          if (response?.success) {
+            this.languages.set(response.data?.items ?? []);
+          }
+        },
+        error: () => {
+          this.languages.set([]);
         },
       });
   }
