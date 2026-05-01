@@ -13,6 +13,7 @@ import { TokenService } from './token.service';
 type ThemeMode = 'light' | 'dark' | 'system';
 
 const USER_SESSION_KEY = 'user_session';
+const USER_PREFERENCE_CHANGED_EVENT = 'cxs:user-preference-changed';
 const THEME_PREFERENCE_KEY = 'theme';
 
 @Injectable({
@@ -113,6 +114,7 @@ export class UserSessionService {
       ...session,
       preferences,
     });
+    this.dispatchPreferenceChanged(key, value);
   }
 
   private hydrate(): void {
@@ -132,6 +134,14 @@ export class UserSessionService {
     const cleaned = this.cleanPreferences(data);
     this._session.set(cleaned);
     localStorage.setItem(USER_SESSION_KEY, JSON.stringify(cleaned));
+  }
+
+  private dispatchPreferenceChanged(key: string, value: string): void {
+    window.dispatchEvent(
+      new CustomEvent(USER_PREFERENCE_CHANGED_EVENT, {
+        detail: { key, value },
+      }),
+    );
   }
 
   private getRoles(): string[] {

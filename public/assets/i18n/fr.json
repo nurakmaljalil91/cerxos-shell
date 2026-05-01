@@ -1,0 +1,25 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "required": "Ce champ est obligatoire"
+  },
+  "nav": {
+    "home": "Accueil",
+    "settings": "Paramètres",
+    "profile": "Profil"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "account": "Compte",
+    "preferences": "Préférences",
+    "language": "Langue",
+    "theme": "Thème"
+  },
+  "auth": {
+    "login": "Se connecter",
+    "logout": "Se déconnecter"
+  }
+}

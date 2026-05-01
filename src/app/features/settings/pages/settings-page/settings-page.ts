@@ -9,6 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
+import { TranslocoService } from '@jsverse/transloco';
 import {
   CxsButtonComponent,
   CxsCardComponent,
@@ -59,6 +60,7 @@ const DEFAULT_ACCOUNT: AccountFormValue = {
 export class SettingsPage implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly translocoService = inject(TranslocoService);
   private readonly userPreferencesService = inject(UserPreferencesService);
   private readonly userSessionService = inject(UserSessionService);
   private readonly usersService = inject(UsersService);
@@ -371,8 +373,12 @@ export class SettingsPage implements OnInit {
           : serializedValue,
     }));
 
-    if (controlName === 'theme') {
-      this.userSessionService.setPreference(PREFERENCE_KEYS.theme, serializedValue);
+    if (controlName === 'language') {
+      this.translocoService.setActiveLang(serializedValue);
+    }
+
+    if (this.shouldSyncSessionPreference(controlName)) {
+      this.userSessionService.setPreference(PREFERENCE_KEYS[controlName], serializedValue);
     }
   }
 
@@ -384,8 +390,21 @@ export class SettingsPage implements OnInit {
       return;
     }
 
-    if (controlName === 'theme') {
-      this.userSessionService.setPreference(PREFERENCE_KEYS.theme, preference.value);
+    if (controlName === 'language') {
+      this.userSessionService.setPreference(PREFERENCE_KEYS.language, preference.value);
+      this.translocoService.setActiveLang(preference.value ?? 'en');
     }
+
+    if (this.shouldSyncSessionPreference(controlName)) {
+      this.userSessionService.setPreference(PREFERENCE_KEYS[controlName], preference.value);
+    }
+  }
+
+  private shouldSyncSessionPreference(controlName: PreferenceControlName): boolean {
+    return (
+      controlName === 'dateFormat' ||
+      controlName === 'currencyFormat' ||
+      controlName === 'theme'
+    );
   }
 }
