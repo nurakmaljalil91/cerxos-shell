@@ -1,0 +1,4 @@
+{
+  "planning-mfe": "${PLANNING_MFE_URL}/remoteEntry.json",
+  "financial-mfe": "${FINANCIAL_MFE_URL}/remoteEntry.json"
+}
