@@ -1189,3 +1189,42 @@ export interface BaseResponseOfPaginatedEnumerableOfLanguageDto {
     data?: PaginatedEnumerableOfLanguageDto | undefined;
     errors?: { [key: string]: string[]; } | undefined;
 }
+
+export type FileCategory = 'Image' | 'Video' | 'Audio' | 'Document' | 'Other';
+
+export interface FileRecordDto {
+    id?: number;
+    originalFileName?: string | undefined;
+    key?: string | undefined;
+    url?: string | undefined;
+    contentType?: string | undefined;
+    sizeBytes?: number;
+    category?: FileCategory | undefined;
+    uploadedBy?: string | undefined;
+    uploadedAt?: string | undefined;
+}
+
+export interface PaginatedEnumerableOfFileRecordDto {
+    items?: FileRecordDto[] | undefined;
+    pageNumber?: number;
+    totalPages?: number;
+    totalCount?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export interface BaseResponseOfPaginatedEnumerableOfFileRecordDto {
+    success?: boolean;
+    message?: string | undefined;
+    data?: PaginatedEnumerableOfFileRecordDto | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+export interface FileRecordsQueryRequest {
+    page: number;
+    total: number;
+    sortBy?: string;
+    descending?: boolean;
+    filter?: string;
+    category?: string;
+}

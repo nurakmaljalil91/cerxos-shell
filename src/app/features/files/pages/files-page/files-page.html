@@ -1,0 +1,77 @@
+<section class="space-y-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Files</h1>
+      <p class="text-sm text-gray-500">Manage uploaded files.</p>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+      {{ error() }}
+    </div>
+  }
+
+  <cxs-card>
+    <cxs-data-table
+      caption="All files"
+      [allowOverflow]="true"
+      [bordered]="true"
+      [columnBorders]="true"
+      [columns]="columns"
+      [data]="rows()"
+      [loading]="loading()"
+      [manualFilter]="true"
+      [manualPagination]="true"
+      [manualSort]="true"
+      [pageIndex]="pageIndex()"
+      [pageSize]="pageSize()"
+      [showFilters]="true"
+      [showGlobalSearch]="true"
+      [sortDirection]="sortDirection()"
+      [sortKey]="sortKey()"
+      [striped]="true"
+      [total]="totalCount()"
+      (filterChange)="onFilterChange($event)"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+      (sortChange)="onSortChange($event)"
+    >
+      <ng-template cxsDataTableCell="actions" let-row>
+        <div class="flex justify-end">
+          <a
+            class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+            rel="noopener noreferrer"
+            target="_blank"
+            [href]="$any(row).url"
+          >
+            <svg
+              aria-hidden="true"
+              class="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Download
+          </a>
+        </div>
+      </ng-template>
+    </cxs-data-table>
+  </cxs-card>
+
+  <cxs-toast
+    [duration]="3500"
+    [message]="toastMessage()"
+    [open]="toastOpen()"
+    [title]="toastTitle()"
+    [variant]="toastVariant()"
+    (openChange)="onToastOpenChange($event)"
+  />
+</section>

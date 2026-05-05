@@ -94,7 +94,18 @@ export const routes: Routes = [
           loadRemoteStyles('financial-mfe').then(() =>
             loadRemoteModule('financial-mfe', './Routes').then((m) => m.FINANCIAL_ROUTES)
           ),
-      }
+      },
+      {
+        path: 'files',
+        canActivate: [authorizationGuard],
+        canActivateChild: [authorizationChildGuard],
+        data: {
+          forbiddenMessage: 'You do not have access to Manage Files.',
+          requiredRoles: ['Admin'],
+        },
+        loadComponent: () =>
+          import('./features/files/pages/files-page/files-page').then((m) => m.FilesPage),
+      },
     ],
   },
   {
