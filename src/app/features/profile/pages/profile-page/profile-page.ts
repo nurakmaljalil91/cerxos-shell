@@ -114,6 +114,11 @@ export class ProfilePage implements OnInit {
   readonly uploadLoading = signal(false);
   readonly uploadError = signal<string | null>(null);
 
+  readonly avatarModalOpen = signal(false);
+  readonly avatarPreviewUrl = signal<string | null>(null);
+  readonly avatarSaveLoading = signal(false);
+  readonly avatarSaveError = signal<string | null>(null);
+
   readonly toastOpen = signal(false);
   readonly toastTitle = signal('');
   readonly toastMessage = signal('');
@@ -380,7 +385,22 @@ export class ProfilePage implements OnInit {
     this.editError.set(null);
   }
 
-  onAvatarFileChange(event: Event): void {
+  onOpenAvatarModal(): void {
+    if (!this.profile()) return;
+    this.avatarPreviewUrl.set(null);
+    this.uploadError.set(null);
+    this.avatarSaveError.set(null);
+    this.avatarModalOpen.set(true);
+  }
+
+  onCloseAvatarModal(): void {
+    this.avatarModalOpen.set(false);
+    this.avatarPreviewUrl.set(null);
+    this.uploadError.set(null);
+    this.avatarSaveError.set(null);
+  }
+
+  onAvatarModalFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
@@ -409,13 +429,43 @@ export class ProfilePage implements OnInit {
       .subscribe({
         next: (response) => {
           if (response?.data?.url) {
-            this.editForm.controls.imageUrl.setValue(response.data.url);
+            this.avatarPreviewUrl.set(response.data.url);
           } else {
             this.uploadError.set(response?.message ?? 'Upload failed: no URL returned.');
           }
         },
         error: (err: { error?: { message?: string } }) => {
           this.uploadError.set(err?.error?.message ?? 'Upload failed.');
+        },
+      });
+  }
+
+  onSaveAvatar(): void {
+    const profile = this.profile();
+    const newUrl = this.avatarPreviewUrl();
+    if (!profile?.id || !newUrl) return;
+
+    this.avatarSaveLoading.set(true);
+    this.avatarSaveError.set(null);
+
+    this.userProfilesService
+      .updateUserProfile(profile.id, { id: profile.id, imageUrl: newUrl })
+      .pipe(
+        finalize(() => this.avatarSaveLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response?.success) {
+            this.avatarSaveError.set(response?.message ?? 'Failed to update profile photo.');
+            return;
+          }
+          this.profile.set(response.data ?? null);
+          this.avatarModalOpen.set(false);
+          this.showToast('info', 'Photo updated', 'Your profile photo has been saved.');
+        },
+        error: (err: { error?: { message?: string } }) => {
+          this.avatarSaveError.set(err?.error?.message ?? 'Failed to update profile photo.');
         },
       });
   }

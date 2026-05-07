@@ -39,13 +39,14 @@
     >
       <ng-template cxsDataTableCell="actions" let-row>
         <div class="flex justify-end">
-          <a
-            class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
-            rel="noopener noreferrer"
-            target="_blank"
-            [href]="$any(row).url"
+          <cxs-button
+            size="sm"
+            variant="primary"
+            aria-label="Download file"
+            (click)="onDownload($any(row).id)"
           >
             <svg
+              cxsButtonIcon
               aria-hidden="true"
               class="h-4 w-4"
               fill="none"
@@ -60,7 +61,7 @@
               />
             </svg>
             Download
-          </a>
+          </cxs-button>
         </div>
       </ng-template>
     </cxs-data-table>
