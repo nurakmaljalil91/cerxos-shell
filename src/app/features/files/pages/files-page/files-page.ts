@@ -83,11 +83,11 @@ export class FilesPage implements OnInit {
     this.loadFiles();
   }
 
-  onFilterChange(filters: Record<string, unknown>): void {
-    const globalSearch = filters['_global'] as string | undefined;
-    const category = filters['category'] as string | undefined;
-    this.filter.set(globalSearch ?? undefined);
-    this.categoryFilter.set(category ?? undefined);
+  onFilterChange(filters: { global: string; columns: Record<string, string> }): void {
+    const globalSearch = filters.global || undefined;
+    const category = filters.columns['category'] || undefined;
+    this.filter.set(globalSearch);
+    this.categoryFilter.set(category);
     this.pageIndex.set(1);
     this.loadFiles();
   }
