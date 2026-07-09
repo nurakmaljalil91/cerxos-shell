@@ -2,8 +2,6 @@ import { NgComponentOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, Type, signal } from '@angular/core';
 import { loadRemoteModule } from '@angular-architects/native-federation';
 
-import { loadRemoteStyles } from '../../../../shared/utils/remote-style-loader';
-
 @Component({
   selector: 'app-dashboard-page',
   imports: [NgComponentOutlet],
@@ -15,8 +13,11 @@ export class DashboardPage implements OnInit {
   readonly upcomingWidget = signal<Type<unknown> | null>(null);
 
   ngOnInit(): void {
-    loadRemoteStyles('planning-mfe')
-      .then(() => loadRemoteModule('planning-mfe', './UpcomingEventsWidget'))
+    // UpcomingEventsWidgetComponent uses ViewEncapsulation.ShadowDom and ships its own
+    // styles, so no separate loadRemoteStyles() call is needed (and would otherwise leak
+    // planning-mfe's global stylesheet into the shell's document, breaking the shell's
+    // own Tailwind cascade layers).
+    loadRemoteModule('planning-mfe', './UpcomingEventsWidget')
       .then((m) => this.upcomingWidget.set(m['UpcomingEventsWidgetComponent']))
       .catch(() => {});
   }

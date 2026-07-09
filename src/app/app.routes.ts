@@ -3,7 +3,6 @@ import { authenticationGuard } from './core/guards/authentication.guard';
 import { authorizationChildGuard, authorizationGuard } from './core/guards/authorization.guard';
 import { ApplicationLayout } from './shared/layouts/application-layout/application-layout';
 import { loadRemoteModule } from '@angular-architects/native-federation';
-import { loadRemoteStyles } from './shared/utils/remote-style-loader';
 
 export const routes: Routes = [
   {
@@ -84,16 +83,12 @@ export const routes: Routes = [
         path: 'planning',
         canActivateChild: [authorizationChildGuard],
         loadChildren: () =>
-          loadRemoteStyles('planning-mfe').then(() =>
-            loadRemoteModule('planning-mfe', './Routes').then((m) => m.PLANNING_ROUTES)
-          ),
+          loadRemoteModule('planning-mfe', './Routes').then((m) => m.PLANNING_ROUTES),
       },
       {
         path: 'financial',
         loadChildren: () =>
-          loadRemoteStyles('financial-mfe').then(() =>
-            loadRemoteModule('financial-mfe', './Routes').then((m) => m.FINANCIAL_ROUTES)
-          ),
+          loadRemoteModule('financial-mfe', './Routes').then((m) => m.FINANCIAL_ROUTES),
       },
       {
         path: 'files',
