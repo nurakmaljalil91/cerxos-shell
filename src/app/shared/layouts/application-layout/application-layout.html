@@ -349,3 +349,17 @@
     </main>
   </div>
 </div>
+
+<cxs-dialog
+  description="Let's set up your profile. You can skip this step and edit your profile later."
+  title="Welcome to Cerxos"
+  [closeOnBackdrop]="false"
+  [closeOnEscape]="false"
+  [dismissible]="false"
+  [open]="welcomeOpen()"
+>
+  <p class="text-sm text-(--cxs-color-on-surface)">Tell us a little about yourself to get started.</p>
+  <div cxsDialogActions>
+    <cxs-button (click)="continueProfileSetup()">Continue to profile</cxs-button>
+  </div>
+</cxs-dialog>

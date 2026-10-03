@@ -23,6 +23,7 @@ export class AuthenticationMock {
           expiresAt: new Date(),
           refreshToken: 'mock-refresh-token',
           refreshTokenExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+          showFirstLoginWelcome: false,
         },
       };
       return new Observable<BaseResponseOfLoginResponse>((observer) => {

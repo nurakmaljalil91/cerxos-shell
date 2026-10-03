@@ -10,6 +10,7 @@ import { NgOptimizedImage } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../../../core/services/authentication.service';
+import { OnboardingService } from '../../../../core/services/onboarding.service';
 import {
   CxsAlertComponent,
   CxsButtonComponent,
@@ -38,6 +39,7 @@ import {
 export class LoginPage implements OnInit {
   private formBuilder = inject(FormBuilder);
   private authenticationService = inject(AuthenticationService);
+  private onboardingService = inject(OnboardingService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -73,11 +75,18 @@ export class LoginPage implements OnInit {
       return;
     }
     this.authenticationService.login({ username, password }).subscribe({
-      next: () => {
+      next: (response) => {
+        if (!response?.success) {
+          this.error.set(response?.message ?? 'Login failed. Please try again.');
+          this.loading.set(false);
+          return;
+        }
         void this.router
           .navigate(['/'])
           .then((navigated) => {
-            if (!navigated) {
+            if (navigated && response?.data?.showFirstLoginWelcome) {
+              this.onboardingService.showWelcome();
+            } else if (!navigated) {
               this.loading.set(false);
             }
           })

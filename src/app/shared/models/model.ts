@@ -153,6 +153,8 @@ export interface LoginResponse {
     expiresAt?: Date;
     refreshToken?: string | undefined;
     refreshTokenExpiresAt?: Date;
+    /** Whether this login claimed the account's one-time welcome. */
+    showFirstLoginWelcome?: boolean;
 }
 
 /** Command to authenticate a user. */

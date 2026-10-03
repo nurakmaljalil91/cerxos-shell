@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoginPage } from './login-page';
 import { AuthenticationService } from '../../../../core/services/authentication.service';
+import { OnboardingService } from '../../../../core/services/onboarding.service';
 import { provideRouter, Router } from '@angular/router';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { of, throwError } from 'rxjs';
@@ -10,11 +11,13 @@ describe('LoginPage', () => {
   let fixture: ComponentFixture<LoginPage>;
 
   let authenticationService: jasmine.SpyObj<AuthenticationService>;
+  let onboardingService: jasmine.SpyObj<OnboardingService>;
   let router: Router;
   let navigateSpy: jasmine.Spy;
 
   beforeEach(async () => {
     authenticationService = jasmine.createSpyObj('AuthenticationService', ['login']);
+    onboardingService = jasmine.createSpyObj('OnboardingService', ['showWelcome']);
 
     await TestBed.configureTestingModule({
       imports: [LoginPage],
@@ -22,6 +25,7 @@ describe('LoginPage', () => {
         provideZonelessChangeDetection(),
         provideRouter([]),
         { provide: AuthenticationService, useValue: authenticationService },
+        { provide: OnboardingService, useValue: onboardingService },
       ],
     }).compileComponents();
 
@@ -106,6 +110,32 @@ describe('LoginPage', () => {
     component.onSubmit();
 
     expect(navigateSpy).toHaveBeenCalledWith(['/']);
+  });
+
+  it('shows the welcome only when the login response requests it', async () => {
+    authenticationService.login.and.returnValue(of({
+      success: true,
+      data: { token: 'abc', showFirstLoginWelcome: true },
+    }));
+    component.form.patchValue({ username: 'new-user', password: 'pass123!' });
+
+    component.onSubmit();
+    await Promise.resolve();
+
+    expect(onboardingService.showWelcome).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not show the welcome on an ordinary login', async () => {
+    authenticationService.login.and.returnValue(of({
+      success: true,
+      data: { token: 'abc', showFirstLoginWelcome: false },
+    }));
+    component.form.patchValue({ username: 'existing-user', password: 'pass123!' });
+
+    component.onSubmit();
+    await Promise.resolve();
+
+    expect(onboardingService.showWelcome).not.toHaveBeenCalled();
   });
 
   it('should reset loading when navigation is rejected after successful login', async () => {

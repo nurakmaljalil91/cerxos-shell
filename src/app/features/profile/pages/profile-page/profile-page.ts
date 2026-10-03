@@ -9,7 +9,10 @@ import {
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize } from 'rxjs';
+import { catchError, EMPTY, finalize } from 'rxjs';
+import { Router } from '@angular/router';
+import { OnboardingOutcome, OnboardingService } from '../../../../core/services/onboarding.service';
+import { UserSessionService } from '../../../../core/services/user-session.service';
 import {
   CxsAvatarComponent,
   CxsBadgeComponent,
@@ -102,6 +105,9 @@ export class ProfilePage implements OnInit {
   private readonly languagesService = inject(LanguagesService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly onboardingService = inject(OnboardingService);
+  private readonly router = inject(Router);
+  private readonly userSessionService = inject(UserSessionService);
 
   // ---- Profile ----
   readonly loading = signal(false);
@@ -111,6 +117,9 @@ export class ProfilePage implements OnInit {
   readonly editOpen = signal(false);
   readonly editLoading = signal(false);
   readonly editError = signal<string | null>(null);
+  readonly setupMode = signal(false);
+  readonly outcomeLoading = signal(false);
+  readonly pendingOutcome = signal<OnboardingOutcome | null>(null);
   readonly uploadLoading = signal(false);
   readonly uploadError = signal<string | null>(null);
 
@@ -345,6 +354,7 @@ export class ProfilePage implements OnInit {
   );
 
   ngOnInit(): void {
+    this.setupMode.set(this.onboardingService.consumeProfileSetup());
     this.loadProfile();
   }
 
@@ -381,6 +391,9 @@ export class ProfilePage implements OnInit {
   }
 
   onCloseEdit(): void {
+    if (this.setupMode()) {
+      return;
+    }
     this.editOpen.set(false);
     this.editError.set(null);
   }
@@ -471,6 +484,10 @@ export class ProfilePage implements OnInit {
   }
 
   onSubmitEdit(): void {
+    if (this.pendingOutcome()) {
+      this.recordOutcome(this.pendingOutcome()!);
+      return;
+    }
     const profile = this.profile();
     if (!profile?.id) return;
 
@@ -510,11 +527,61 @@ export class ProfilePage implements OnInit {
             return;
           }
           this.profile.set(response.data ?? null);
-          this.editOpen.set(false);
-          this.showToast('info', 'Profile updated', 'Your profile has been saved.');
+          if (this.setupMode()) {
+            this.recordOutcome('Completed');
+          } else {
+            this.editOpen.set(false);
+            this.showToast('info', 'Profile updated', 'Your profile has been saved.');
+          }
         },
         error: (err: { error?: { message?: string } }) => {
           this.editError.set(err?.error?.message ?? 'Failed to update profile.');
+        },
+      });
+  }
+
+  onSkipSetup(): void {
+    this.recordOutcome('Skipped');
+  }
+
+  retryOutcome(): void {
+    const outcome = this.pendingOutcome();
+    if (outcome) {
+      this.recordOutcome(outcome);
+    }
+  }
+
+  private recordOutcome(outcome: OnboardingOutcome): void {
+    if (this.outcomeLoading()) {
+      return;
+    }
+    this.pendingOutcome.set(outcome);
+    this.outcomeLoading.set(true);
+    this.editError.set(null);
+    this.onboardingService
+      .setOutcome(outcome)
+      .pipe(
+        finalize(() => this.outcomeLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response?.success) {
+            this.editError.set(response?.message ?? 'Could not finish profile setup. Please retry.');
+            return;
+          }
+          this.pendingOutcome.set(null);
+          this.setupMode.set(false);
+          this.editOpen.set(false);
+          if (outcome === 'Completed') {
+            this.userSessionService.refresh()
+              .pipe(catchError(() => EMPTY), takeUntilDestroyed(this.destroyRef))
+              .subscribe();
+          }
+          void this.router.navigate(['/']);
+        },
+        error: (err: { error?: { message?: string } }) => {
+          this.editError.set(err?.error?.message ?? 'Could not finish profile setup. Please retry.');
         },
       });
   }
@@ -987,6 +1054,9 @@ export class ProfilePage implements OnInit {
             return;
           }
           this.profile.set(response.data ?? null);
+          if (this.setupMode()) {
+            this.onOpenEdit();
+          }
           if (response.data?.userId) {
             this.loadAddresses(response.data.userId);
             this.loadLanguages(response.data.userId);

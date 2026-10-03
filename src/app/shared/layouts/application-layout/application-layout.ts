@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { HeroIconHelperPipe } from '../../pipes/hero-icon-helper.pipe';
 import { heroIconHelper } from '../../functions/hero-icon-helper.fx';
 import { LayoutNotifications } from '../layout-notifications/layout-notifications';
 import { LayoutProfileMenu } from '../layout-profile-menu/layout-profile-menu';
 import { UserSessionService } from '../../../core/services/user-session.service';
 import { NgOptimizedImage } from '@angular/common';
-import { CxsBadgeComponent } from 'cerxos-ui';
+import { CxsBadgeComponent, CxsButtonComponent, CxsDialogComponent } from 'cerxos-ui';
+import { OnboardingService } from '../../../core/services/onboarding.service';
 
 type NavigationItem = {
   label: string;
@@ -28,7 +29,9 @@ type NavigationItem = {
     LayoutNotifications,
     LayoutProfileMenu,
     NgOptimizedImage,
-    CxsBadgeComponent
+    CxsBadgeComponent,
+    CxsButtonComponent,
+    CxsDialogComponent,
   ],
   templateUrl: './application-layout.html',
   styleUrl: './application-layout.css',
@@ -37,6 +40,9 @@ export class ApplicationLayout {
   readonly collapsed = signal<boolean>(false);
   readonly drawerOpened = signal<boolean>(false);
   private userSessionService = inject(UserSessionService);
+  private readonly onboardingService = inject(OnboardingService);
+  private readonly router = inject(Router);
+  readonly welcomeOpen = this.onboardingService.welcomeOpen;
   readonly expandedGroups = signal<Record<string, boolean>>({
     'Manage Identity': false,
     Planning: false,
@@ -121,6 +127,15 @@ export class ApplicationLayout {
 
   closeDrawer(): void {
     this.drawerOpened.set(false);
+  }
+
+  continueProfileSetup(): void {
+    this.onboardingService.continueToProfile();
+    void this.router.navigate(['/profile']).then((navigated) => {
+      if (!navigated) {
+        this.onboardingService.clear();
+      }
+    });
   }
 
   toggleGroup(label: string): void {

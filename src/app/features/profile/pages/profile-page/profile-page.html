@@ -1,4 +1,19 @@
 <section class="space-y-6">
+  @if (setupMode()) {
+    <div class="flex flex-wrap items-center justify-between gap-3 rounded-md border border-(--cxs-color-border) bg-(--cxs-color-surface) p-4">
+      <div>
+        <p class="text-sm text-(--cxs-color-on-surface)">Add your profile details now, or skip and edit them later.</p>
+        @if (editError() && !editOpen()) {
+          <p class="mt-2 text-sm text-red-600">{{ editError() }}</p>
+        }
+      </div>
+      @if (pendingOutcome()) {
+        <cxs-button variant="secondary" [loading]="outcomeLoading()" (click)="retryOutcome()">Retry</cxs-button>
+      } @else {
+        <cxs-button variant="secondary" [disabled]="outcomeLoading()" (click)="onSkipSetup()">Skip for now</cxs-button>
+      }
+    </div>
+  }
   <!-- Page header -->
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
@@ -311,9 +326,12 @@
 
 <!-- Edit profile dialog -->
 <cxs-dialog
-  description="Update your personal details."
-  title="Edit profile"
+  [closeOnBackdrop]="!setupMode()"
+  [closeOnEscape]="!setupMode()"
+  [description]="setupMode() ? 'Add any details you want to share. You can skip this step.' : 'Update your personal details.'"
+  [dismissible]="!setupMode()"
   [open]="editOpen()"
+  [title]="setupMode() ? 'Set up your profile' : 'Edit profile'"
   (openChange)="onCloseEdit()"
 >
   <form class="grid gap-4" [formGroup]="editForm" (ngSubmit)="onSubmitEdit()">
@@ -427,11 +445,19 @@
   }
 
   <div cxsDialogActions>
-    <cxs-button variant="secondary" (click)="onCloseEdit()">Cancel</cxs-button>
+    @if (setupMode()) {
+      @if (pendingOutcome()) {
+        <cxs-button variant="secondary" [loading]="outcomeLoading()" (click)="retryOutcome()">Retry</cxs-button>
+      } @else {
+        <cxs-button variant="secondary" [disabled]="editLoading() || outcomeLoading()" (click)="onSkipSetup()">Skip for now</cxs-button>
+      }
+    } @else {
+      <cxs-button variant="secondary" (click)="onCloseEdit()">Cancel</cxs-button>
+    }
     <cxs-button
       type="submit"
-      [disabled]="editLoading()"
-      [loading]="editLoading()"
+      [disabled]="editLoading() || outcomeLoading() || !!pendingOutcome()"
+      [loading]="editLoading() || outcomeLoading()"
       (click)="onSubmitEdit()"
     >
       Save changes
