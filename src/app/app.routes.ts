@@ -91,6 +91,10 @@ export const routes: Routes = [
           loadRemoteModule('financial-mfe', './Routes').then((m) => m.FINANCIAL_ROUTES),
       },
       {
+        path: 'habits',
+        loadChildren: () => loadRemoteModule('habit-mfe', './Routes').then((m) => m.HABIT_ROUTES),
+      },
+      {
         path: 'files',
         canActivate: [authorizationGuard],
         canActivateChild: [authorizationChildGuard],

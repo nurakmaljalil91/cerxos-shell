@@ -81,6 +81,7 @@ export class ApplicationLayout {
     },
     { label: 'Planning', route: '/planning', icon: heroIconHelper('calendar'), requiredRoles: ['User'] },
     { label: 'Financial', route: '/financial', icon: heroIconHelper('banknotes') },
+    { label: 'Habits', route: '/habits', icon: heroIconHelper('check-circle') },
     { label: 'Files', route: '/files', icon: heroIconHelper('folder'), requiredRoles: ['Admin'] },
     { label: 'Settings', route: '/settings', icon: heroIconHelper('cog-6-tooth') },
   ];

@@ -1,15 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SettingsPage } from './settings-page';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { of } from 'rxjs';
 import {
   BaseResponseOfPaginatedEnumerableOfUserPreferenceDto,
   BaseResponseOfUserDto,
   BaseResponseOfUserPreferenceDto,
 } from '../../../../shared/models/model';
+import { AuthenticationService } from '../../../../core/services/authentication.service';
 import { UserSessionService } from '../../../../core/services/user-session.service';
 import { UsersService } from '../../../identity/services/users.service';
 import { UserPreferencesService } from '../../services/user-preferences.service';
+import { detectBrowserTimeZone } from './settings-page.preferences';
 
 describe('SettingsPage', () => {
   let component: SettingsPage;
@@ -19,6 +22,7 @@ describe('SettingsPage', () => {
     session: sessionSignal,
     setPreference: jasmine.createSpy('setPreference'),
   };
+  let authenticationServiceSpy: jasmine.SpyObj<Pick<AuthenticationService, 'refreshTokens'>>;
   let usersServiceSpy: jasmine.SpyObj<Pick<UsersService, 'getMyUser'>>;
   let userPreferencesServiceSpy: jasmine.SpyObj<
     Pick<
@@ -44,6 +48,9 @@ describe('SettingsPage', () => {
         totalCount: 0,
       },
     };
+
+    authenticationServiceSpy = jasmine.createSpyObj('AuthenticationService', ['refreshTokens']);
+    authenticationServiceSpy.refreshTokens.and.returnValue(of({ success: true }));
 
     usersServiceSpy = jasmine.createSpyObj('UsersService', ['getMyUser']);
     usersServiceSpy.getMyUser.and.returnValue(of(userResponse));
@@ -84,6 +91,8 @@ describe('SettingsPage', () => {
         { provide: UsersService, useValue: usersServiceSpy },
         { provide: UserPreferencesService, useValue: userPreferencesServiceSpy },
         { provide: UserSessionService, useValue: userSessionServiceStub },
+        { provide: AuthenticationService, useValue: authenticationServiceSpy },
+        { provide: TranslocoService, useValue: jasmine.createSpyObj('TranslocoService', ['setActiveLang']) },
       ],
     }).compileComponents();
 
@@ -209,5 +218,53 @@ describe('SettingsPage', () => {
       key: 'theme',
       value: 'system',
     });
+  });
+
+  it('should suggest the browser time zone without saving it when none is saved', () => {
+    expect(component.preferencesForm.controls.timeZone.value).toBe(detectBrowserTimeZone());
+    expect(component.timeZoneOptions()).toContain(detectBrowserTimeZone());
+    expect(userPreferencesServiceSpy.createUserPreference).not.toHaveBeenCalled();
+    expect(userPreferencesServiceSpy.updateUserPreference).not.toHaveBeenCalled();
+  });
+
+  it('should load the saved time zone preference', () => {
+    userPreferencesServiceSpy.getMyUserPreferences.and.returnValue(
+      of({
+        success: true,
+        data: {
+          items: [{ id: 'pref-tz', userId: 'user-1', key: 'timezone', value: 'Asia/Kuala_Lumpur' }],
+          totalCount: 1,
+        },
+      }),
+    );
+
+    component.onReloadPreferences();
+
+    expect(component.preferencesForm.controls.timeZone.value).toBe('Asia/Kuala_Lumpur');
+    expect(component.timeZoneOptions()).toContain('Asia/Kuala_Lumpur');
+  });
+
+  it('should save the time zone under the timezone key and refresh the access token', () => {
+    userPreferencesServiceSpy.createUserPreference.and.returnValue(
+      of({
+        success: true,
+        data: { id: 'pref-tz', userId: 'user-1', key: 'timezone', value: 'Asia/Singapore' },
+      }),
+    );
+
+    component.preferencesForm.controls.timeZone.setValue('Asia/Singapore');
+
+    expect(userPreferencesServiceSpy.createUserPreference).toHaveBeenCalledWith({
+      userId: 'user-1',
+      key: 'timezone',
+      value: 'Asia/Singapore',
+    });
+    expect(authenticationServiceSpy.refreshTokens).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not refresh the access token when saving other preferences', () => {
+    component.preferencesForm.controls.defaultLanding.setValue('planning');
+
+    expect(authenticationServiceSpy.refreshTokens).not.toHaveBeenCalled();
   });
 });

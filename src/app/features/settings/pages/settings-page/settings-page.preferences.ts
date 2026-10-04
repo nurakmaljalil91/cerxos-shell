@@ -6,7 +6,8 @@ export type PreferenceControlName =
   | 'theme'
   | 'density'
   | 'compactNavigation'
-  | 'analyticsHints';
+  | 'analyticsHints'
+  | 'timeZone';
 
 export type PreferenceFormValue = {
   language: string;
@@ -17,6 +18,7 @@ export type PreferenceFormValue = {
   density: string;
   compactNavigation: boolean;
   analyticsHints: boolean;
+  timeZone: string;
 };
 
 export const PREFERENCE_KEYS: Record<PreferenceControlName, string> = {
@@ -28,6 +30,7 @@ export const PREFERENCE_KEYS: Record<PreferenceControlName, string> = {
   density: 'ui.density',
   compactNavigation: 'ui.compactNavigation',
   analyticsHints: 'ui.analyticsHints',
+  timeZone: 'timezone',
 };
 
 export const PREFERENCE_KEY_ALIASES: Record<PreferenceControlName, string[]> = {
@@ -39,7 +42,28 @@ export const PREFERENCE_KEY_ALIASES: Record<PreferenceControlName, string[]> = {
   density: ['density'],
   compactNavigation: ['compactNavigation', 'compact_navigation'],
   analyticsHints: ['analyticsHints', 'analytics_hints'],
+  timeZone: [],
 };
+
+const FALLBACK_TIME_ZONE = 'UTC';
+
+/** Returns the browser's IANA time zone, used as the suggested value when none is saved. */
+export function detectBrowserTimeZone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || FALLBACK_TIME_ZONE;
+  } catch {
+    return FALLBACK_TIME_ZONE;
+  }
+}
+
+/** Returns the IANA time zone ids supported by the browser, always including UTC and the given zone. */
+export function getTimeZoneOptions(current: string): string[] {
+  const supported =
+    typeof Intl.supportedValuesOf === 'function' ? Intl.supportedValuesOf('timeZone') : [];
+  return Array.from(new Set([FALLBACK_TIME_ZONE, current, ...supported])).sort((a, b) =>
+    a.localeCompare(b),
+  );
+}
 
 export const DEFAULT_PREFERENCES: PreferenceFormValue = {
   language: 'en',
@@ -50,4 +74,5 @@ export const DEFAULT_PREFERENCES: PreferenceFormValue = {
   density: 'comfortable',
   compactNavigation: true,
   analyticsHints: false,
+  timeZone: detectBrowserTimeZone(),
 };

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  computed,
   inject,
   OnInit,
   signal,
@@ -18,12 +19,14 @@ import {
   CxsSelectComponent,
   CxsToggleComponent,
 } from 'cerxos-ui';
+import { AuthenticationService } from '../../../../core/services/authentication.service';
 import { UserSessionService } from '../../../../core/services/user-session.service';
 import { UserDto, UserPreferenceDto } from '../../../../shared/models/model';
 import { UsersService } from '../../../identity/services/users.service';
 import { UserPreferencesService } from '../../services/user-preferences.service';
 import {
   DEFAULT_PREFERENCES,
+  getTimeZoneOptions,
   PREFERENCE_KEY_ALIASES,
   PREFERENCE_KEYS,
   PreferenceControlName,
@@ -58,6 +61,7 @@ const DEFAULT_ACCOUNT: AccountFormValue = {
   styleUrl: './settings-page.css',
 })
 export class SettingsPage implements OnInit {
+  private readonly authenticationService = inject(AuthenticationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(FormBuilder);
   private readonly translocoService = inject(TranslocoService);
@@ -73,6 +77,7 @@ export class SettingsPage implements OnInit {
   readonly preferenceError = signal<string | null>(null);
   readonly preferenceSavedMessage = signal<string | null>(null);
   readonly preferenceValues = signal<PreferenceFormValue>(DEFAULT_PREFERENCES);
+  readonly timeZoneOptions = computed(() => getTimeZoneOptions(this.preferenceValues().timeZone));
 
   readonly accountForm = this.formBuilder.group({
     username: [{ value: DEFAULT_ACCOUNT.username, disabled: true }],
@@ -89,6 +94,7 @@ export class SettingsPage implements OnInit {
     density: [DEFAULT_PREFERENCES.density],
     compactNavigation: [DEFAULT_PREFERENCES.compactNavigation],
     analyticsHints: [DEFAULT_PREFERENCES.analyticsHints],
+    timeZone: [DEFAULT_PREFERENCES.timeZone],
   });
 
   private readonly preferencesByKey = signal<Record<string, UserPreferenceDto>>({});
@@ -237,6 +243,7 @@ export class SettingsPage implements OnInit {
         this.getPreferenceValue('analyticsHints', preferences),
         DEFAULT_PREFERENCES.analyticsHints,
       ),
+      timeZone: this.getStringPreferenceValue('timeZone', preferences),
     };
 
     this.hydratingPreferences = true;
@@ -293,9 +300,25 @@ export class SettingsPage implements OnInit {
           }));
           this.syncSessionPreference(controlName, response.data);
           this.preferenceSavedMessage.set('Preferences saved.');
+
+          if (controlName === 'timeZone') {
+            this.refreshAccessToken();
+          }
         },
         error: (err) => {
           this.preferenceError.set(err?.error?.message ?? 'Failed to save preference.');
+        },
+      });
+  }
+
+  /** Refreshes the access token so services receive the new `zoneinfo` claim immediately. */
+  private refreshAccessToken(): void {
+    this.authenticationService
+      .refreshTokens()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: () => {
+          // The claim is picked up on the next scheduled refresh; the preference itself is saved.
         },
       });
   }

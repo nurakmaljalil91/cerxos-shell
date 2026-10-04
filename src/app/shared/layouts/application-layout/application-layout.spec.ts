@@ -44,13 +44,15 @@ describe('ApplicationLayout', () => {
   });
 
   it('should define navigation items for dashboard, profile, and settings', () => {
-    expect(component.navigations.length).toBe(8);
+    expect(component.navigations.length).toBe(9);
     expect(component.navigations[0].label).toBe('Dashboard');
     expect(component.navigations[1].label).toBe('Manage Identity');
     expect(component.navigations[2].label).toBe('Profile');
     expect(component.navigations[3].label).toBe('Planning');
     expect(component.navigations[5].label).toBe('Financial');
-    expect(component.navigations[7].label).toBe('Settings');
+    expect(component.navigations[6].label).toBe('Habits');
+    expect(component.navigations[6].route).toBe('/habits');
+    expect(component.navigations[8].label).toBe('Settings');
     expect(component.navigations[1].requiredRoles).toEqual(['Admin']);
     expect(component.navigations[3].children?.map((item) => item.route)).toEqual([
       '/planning',
