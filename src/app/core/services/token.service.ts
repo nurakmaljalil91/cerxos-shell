@@ -4,10 +4,10 @@ const TOKEN_KEY = 'auth_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TokenService {
-  private _token = signal<string | null>(this.get());
+  private readonly _token = signal<string | null>(this.get());
   token = this._token.asReadonly();
 
   get(): string | null {

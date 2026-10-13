@@ -1,5 +1,5 @@
 import { NgComponentOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, Type, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal, Type } from '@angular/core';
 import { loadRemoteModule } from '@angular-architects/native-federation';
 
 @Component({

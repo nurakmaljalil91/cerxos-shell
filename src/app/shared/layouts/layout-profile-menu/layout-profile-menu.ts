@@ -10,14 +10,14 @@ import { UserSessionService } from '../../../core/services/user-session.service'
   imports: [RouterLink, HeroIconHelperPipe, CxsAvatarComponent],
   standalone: true,
   templateUrl: './layout-profile-menu.html',
-  styleUrl: './layout-profile-menu.css'
+  styleUrl: './layout-profile-menu.css',
 })
 export class LayoutProfileMenu {
   authenticationService = inject(AuthenticationService);
   userSessionService = inject(UserSessionService);
   router = inject(Router);
 
-  profileOpen = signal<boolean>(false);
+  readonly profileOpen = signal<boolean>(false);
 
   readonly session = this.userSessionService.session;
   readonly profile = computed(() => this.session()?.profile ?? null);
@@ -41,15 +41,15 @@ export class LayoutProfileMenu {
 
   readonly avatarSrc = computed(() => this.profile()?.imageUrl);
 
-  toggleProfile() {
+  toggleProfile(): void {
     this.profileOpen.update((value) => !value);
   }
 
-  closeMenus() {
+  closeMenus(): void {
     this.profileOpen.set(false);
   }
 
-  signOut() {
+  signOut(): void {
     void this.router.navigate(['/login']).then(() => {
       this.authenticationService.logout();
       this.closeMenus();

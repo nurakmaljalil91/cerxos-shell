@@ -40,15 +40,15 @@
       <ng-template cxsDataTableCell="actions" let-row>
         <div class="flex justify-end">
           <cxs-button
+            aria-label="Download file"
             size="sm"
             variant="primary"
-            aria-label="Download file"
             (click)="onDownload($any(row).id)"
           >
             <svg
-              cxsButtonIcon
               aria-hidden="true"
               class="h-4 w-4"
+              cxsButtonIcon
               fill="none"
               stroke="currentColor"
               stroke-width="1.5"

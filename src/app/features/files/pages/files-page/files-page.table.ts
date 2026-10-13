@@ -2,8 +2,16 @@ import { CxsDataTableColumn } from 'cerxos-ui';
 import { FileRecordDto } from '../../../../shared/models/model';
 
 const CATEGORY_LABEL: Record<string, string> = {
-  '0': 'Image', '1': 'Video', '2': 'Audio', '3': 'Document', '4': 'Other',
-  Image: 'Image', Video: 'Video', Audio: 'Audio', Document: 'Document', Other: 'Other',
+  '0': 'Image',
+  '1': 'Video',
+  '2': 'Audio',
+  '3': 'Document',
+  '4': 'Other',
+  Image: 'Image',
+  Video: 'Video',
+  Audio: 'Audio',
+  Document: 'Document',
+  Other: 'Other',
 };
 
 export const FILE_COLUMNS: CxsDataTableColumn[] = [
@@ -47,8 +55,10 @@ export function toFileTableRow(file: FileRecordDto): Record<string, unknown> {
     contentType: file.contentType ?? '',
     sizeBytes: formatBytes(file.sizeBytes),
     uploadedBy: file.uploadedBy ?? '—',
-    uploadedAt: (() => {
-      if (!file.uploadedAt) return '—';
+    uploadedAt: ((): string => {
+      if (!file.uploadedAt) {
+        return '—';
+      }
       const d = new Date(file.uploadedAt);
       return isNaN(d.getTime()) ? '—' : d.toLocaleDateString();
     })(),

@@ -15,7 +15,6 @@ describe('RegisterPage', () => {
   let navigateSpy: jasmine.Spy;
 
   beforeEach(async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     authenticationService = jasmine.createSpyObj('AuthenticationService', ['register']);
 
     await TestBed.configureTestingModule({
@@ -23,10 +22,9 @@ describe('RegisterPage', () => {
       providers: [
         provideZonelessChangeDetection(),
         provideRouter([]),
-        { provide: AuthenticationService, useValue: authenticationService }
-      ]
-    })
-    .compileComponents();
+        { provide: AuthenticationService, useValue: authenticationService },
+      ],
+    }).compileComponents();
 
     router = TestBed.inject(Router);
     navigateSpy = spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
@@ -45,7 +43,7 @@ describe('RegisterPage', () => {
       username: '',
       email: '',
       password: '',
-      confirmPassword: ''
+      confirmPassword: '',
     });
   });
 
@@ -54,7 +52,6 @@ describe('RegisterPage', () => {
 
     component.onSubmit();
 
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(authenticationService.register).not.toHaveBeenCalled();
   });
 
@@ -66,16 +63,15 @@ describe('RegisterPage', () => {
       username: 'newuser',
       email: 'newuser@example.com',
       password: 'Password1!',
-      confirmPassword: 'Password1!'
+      confirmPassword: 'Password1!',
     });
 
     component.onSubmit();
 
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(authenticationService.register).toHaveBeenCalledWith({
       username: 'newuser',
       email: 'newuser@example.com',
-      password: 'Password1!'
+      password: 'Password1!',
     });
   });
 
@@ -86,7 +82,7 @@ describe('RegisterPage', () => {
       username: 'newuser',
       email: 'newuser@example.com',
       password: 'Password1!',
-      confirmPassword: 'Password1!'
+      confirmPassword: 'Password1!',
     });
 
     component.onSubmit();
@@ -97,15 +93,15 @@ describe('RegisterPage', () => {
   it('should show error message on registration failure', () => {
     authenticationService.register.and.returnValue(
       throwError(() => ({
-        error: { message: 'Registration failed.' }
-      }))
+        error: { message: 'Registration failed.' },
+      })),
     );
 
     component.form.patchValue({
       username: 'bad',
       email: 'bad@example.com',
       password: 'Password1!',
-      confirmPassword: 'Password1!'
+      confirmPassword: 'Password1!',
     });
 
     component.onSubmit();

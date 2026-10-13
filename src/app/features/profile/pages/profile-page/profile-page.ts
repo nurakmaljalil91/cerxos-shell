@@ -1,3 +1,5 @@
+// TODO: Split this page into smaller components and simplify onSubmitAddress.
+/* eslint-disable max-lines, complexity */
 import {
   ChangeDetectionStrategy,
   Component,
@@ -42,23 +44,23 @@ import { AddressesService } from '../../services/addresses.service';
 import { FileService } from '../../services/file.service';
 import { LanguagesService } from '../../services/languages.service';
 
-interface SkillEntry {
+type SkillEntry = {
   id: string;
   name: string;
   level: string;
   years: string;
-}
+};
 
-interface EducationEntry {
+type EducationEntry = {
   id: string;
   institution: string;
   degree: string;
   field: string;
   startYear: string;
   endYear: string;
-}
+};
 
-interface WorkplaceEntry {
+type WorkplaceEntry = {
   id: string;
   company: string;
   position: string;
@@ -66,16 +68,16 @@ interface WorkplaceEntry {
   startDate: string;
   endDate: string;
   isCurrent: boolean;
-}
+};
 
-interface ProjectEntry {
+type ProjectEntry = {
   id: string;
   name: string;
   description: string;
   url: string;
   startDate: string;
   endDate: string;
-}
+};
 
 @Component({
   selector: 'app-profile-page',
@@ -159,7 +161,9 @@ export class ProfilePage implements OnInit {
 
   readonly personalDetails = computed(() => {
     const profile = this.profile();
-    if (!profile) return [];
+    if (!profile) {
+      return [];
+    }
     return [
       { label: 'Display name', value: this.formatValue(profile.displayName) },
       { label: 'First name', value: this.formatValue(profile.firstName) },
@@ -171,7 +175,9 @@ export class ProfilePage implements OnInit {
 
   readonly identityDetails = computed(() => {
     const profile = this.profile();
-    if (!profile) return [];
+    if (!profile) {
+      return [];
+    }
     return [
       { label: 'Profile ID', value: this.formatValue(profile.id) },
       { label: 'User ID', value: this.formatValue(profile.userId) },
@@ -183,7 +189,9 @@ export class ProfilePage implements OnInit {
 
   readonly sizeDetails = computed(() => {
     const profile = this.profile();
-    if (!profile) return [];
+    if (!profile) {
+      return [];
+    }
     return [
       { label: 'Shoe size', value: this.formatValue(profile.shoeSize) },
       { label: 'Clothing size', value: this.formatValue(profile.clothingSize) },
@@ -224,9 +232,7 @@ export class ProfilePage implements OnInit {
     { key: 'actions', label: '', width: '72px' },
   ];
 
-  readonly addressData = computed(
-    () => this.addresses() as unknown as Array<Record<string, unknown>>,
-  );
+  readonly addressData = computed(() => this.addresses() as unknown as Record<string, unknown>[]);
 
   // ---- Languages ----
   readonly languages = signal<LanguageDto[]>([]);
@@ -247,9 +253,7 @@ export class ProfilePage implements OnInit {
     { key: 'actions', label: '', width: '72px' },
   ];
 
-  readonly languageData = computed(
-    () => this.languages() as unknown as Array<Record<string, unknown>>,
-  );
+  readonly languageData = computed(() => this.languages() as unknown as Record<string, unknown>[]);
 
   // ---- Skills (local) ----
   readonly skills = signal<SkillEntry[]>([]);
@@ -269,9 +273,7 @@ export class ProfilePage implements OnInit {
     { key: 'actions', label: '', width: '72px' },
   ];
 
-  readonly skillData = computed(
-    () => this.skills() as unknown as Array<Record<string, unknown>>,
-  );
+  readonly skillData = computed(() => this.skills() as unknown as Record<string, unknown>[]);
 
   // ---- Education (local) ----
   readonly educations = signal<EducationEntry[]>([]);
@@ -296,7 +298,7 @@ export class ProfilePage implements OnInit {
   ];
 
   readonly educationData = computed(
-    () => this.educations() as unknown as Array<Record<string, unknown>>,
+    () => this.educations() as unknown as Record<string, unknown>[],
   );
 
   // ---- Workplace (local) ----
@@ -324,7 +326,7 @@ export class ProfilePage implements OnInit {
   ];
 
   readonly workplaceData = computed(
-    () => this.workplaces() as unknown as Array<Record<string, unknown>>,
+    () => this.workplaces() as unknown as Record<string, unknown>[],
   );
 
   // ---- Projects (local) ----
@@ -349,9 +351,7 @@ export class ProfilePage implements OnInit {
     { key: 'actions', label: '', width: '72px' },
   ];
 
-  readonly projectData = computed(
-    () => this.projects() as unknown as Array<Record<string, unknown>>,
-  );
+  readonly projectData = computed(() => this.projects() as unknown as Record<string, unknown>[]);
 
   ngOnInit(): void {
     this.setupMode.set(this.onboardingService.consumeProfileSetup());
@@ -366,7 +366,9 @@ export class ProfilePage implements OnInit {
 
   onOpenEdit(): void {
     const profile = this.profile();
-    if (!profile) return;
+    if (!profile) {
+      return;
+    }
 
     this.editForm.setValue({
       displayName: profile.displayName ?? '',
@@ -399,7 +401,9 @@ export class ProfilePage implements OnInit {
   }
 
   onOpenAvatarModal(): void {
-    if (!this.profile()) return;
+    if (!this.profile()) {
+      return;
+    }
     this.avatarPreviewUrl.set(null);
     this.uploadError.set(null);
     this.avatarSaveError.set(null);
@@ -416,7 +420,9 @@ export class ProfilePage implements OnInit {
   onAvatarModalFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     const allowedTypes: readonly string[] = ['image/jpeg', 'image/png', 'image/webp'];
     const maxSizeBytes = 5 * 1024 * 1024;
@@ -456,7 +462,9 @@ export class ProfilePage implements OnInit {
   onSaveAvatar(): void {
     const profile = this.profile();
     const newUrl = this.avatarPreviewUrl();
-    if (!profile?.id || !newUrl) return;
+    if (!profile?.id || !newUrl) {
+      return;
+    }
 
     this.avatarSaveLoading.set(true);
     this.avatarSaveError.set(null);
@@ -489,7 +497,9 @@ export class ProfilePage implements OnInit {
       return;
     }
     const profile = this.profile();
-    if (!profile?.id) return;
+    if (!profile?.id) {
+      return;
+    }
 
     this.editLoading.set(true);
     this.editError.set(null);
@@ -567,21 +577,29 @@ export class ProfilePage implements OnInit {
       .subscribe({
         next: (response) => {
           if (!response?.success) {
-            this.editError.set(response?.message ?? 'Could not finish profile setup. Please retry.');
+            this.editError.set(
+              response?.message ?? 'Could not finish profile setup. Please retry.',
+            );
             return;
           }
           this.pendingOutcome.set(null);
           this.setupMode.set(false);
           this.editOpen.set(false);
           if (outcome === 'Completed') {
-            this.userSessionService.refresh()
-              .pipe(catchError(() => EMPTY), takeUntilDestroyed(this.destroyRef))
+            this.userSessionService
+              .refresh()
+              .pipe(
+                catchError(() => EMPTY),
+                takeUntilDestroyed(this.destroyRef),
+              )
               .subscribe();
           }
           void this.router.navigate(['/']);
         },
         error: (err: { error?: { message?: string } }) => {
-          this.editError.set(err?.error?.message ?? 'Could not finish profile setup. Please retry.');
+          this.editError.set(
+            err?.error?.message ?? 'Could not finish profile setup. Please retry.',
+          );
         },
       });
   }
@@ -590,14 +608,26 @@ export class ProfilePage implements OnInit {
 
   onOpenAddAddress(): void {
     this.addressModalItem.set(null);
-    this.addressForm.reset({ label: '', type: '', line1: '', line2: '', city: '', state: '', postalCode: '', country: '', isDefault: false });
+    this.addressForm.reset({
+      label: '',
+      type: '',
+      line1: '',
+      line2: '',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: '',
+      isDefault: false,
+    });
     this.addressModalError.set(null);
     this.addressModalOpen.set(true);
   }
 
   onOpenEditAddress(id: string): void {
     const address = this.addresses().find((a) => a.id === id) ?? null;
-    if (!address) return;
+    if (!address) {
+      return;
+    }
 
     this.addressModalItem.set(address);
     this.addressForm.setValue({
@@ -656,9 +686,7 @@ export class ProfilePage implements OnInit {
             }
             const updated = response.data;
             if (updated) {
-              this.addresses.update((list) =>
-                list.map((a) => (a.id === updated.id ? updated : a)),
-              );
+              this.addresses.update((list) => list.map((a) => (a.id === updated.id ? updated : a)));
             }
             this.addressModalOpen.set(false);
             this.showToast('info', 'Address updated', 'The address has been saved.');
@@ -716,7 +744,9 @@ export class ProfilePage implements OnInit {
 
   onOpenEditSkill(id: string): void {
     const skill = this.skills().find((s) => s.id === id) ?? null;
-    if (!skill) return;
+    if (!skill) {
+      return;
+    }
 
     this.skillModalItem.set(skill);
     this.skillForm.setValue({ name: skill.name, level: skill.level, years: skill.years });
@@ -756,13 +786,21 @@ export class ProfilePage implements OnInit {
 
   onOpenAddEducation(): void {
     this.educationModalItem.set(null);
-    this.educationForm.reset({ institution: '', degree: '', field: '', startYear: '', endYear: '' });
+    this.educationForm.reset({
+      institution: '',
+      degree: '',
+      field: '',
+      startYear: '',
+      endYear: '',
+    });
     this.educationModalOpen.set(true);
   }
 
   onOpenEditEducation(id: string): void {
     const entry = this.educations().find((e) => e.id === id) ?? null;
-    if (!entry) return;
+    if (!entry) {
+      return;
+    }
 
     this.educationModalItem.set(entry);
     this.educationForm.setValue({
@@ -817,13 +855,22 @@ export class ProfilePage implements OnInit {
 
   onOpenAddWorkplace(): void {
     this.workplaceModalItem.set(null);
-    this.workplaceForm.reset({ company: '', position: '', department: '', startDate: '', endDate: '', isCurrent: false });
+    this.workplaceForm.reset({
+      company: '',
+      position: '',
+      department: '',
+      startDate: '',
+      endDate: '',
+      isCurrent: false,
+    });
     this.workplaceModalOpen.set(true);
   }
 
   onOpenEditWorkplace(id: string): void {
     const entry = this.workplaces().find((w) => w.id === id) ?? null;
-    if (!entry) return;
+    if (!entry) {
+      return;
+    }
 
     this.workplaceModalItem.set(entry);
     this.workplaceForm.setValue({
@@ -888,7 +935,9 @@ export class ProfilePage implements OnInit {
 
   onOpenEditLanguage(id: string): void {
     const lang = this.languages().find((l) => l.id === id) ?? null;
-    if (!lang) return;
+    if (!lang) {
+      return;
+    }
 
     this.languageModalItem.set(lang);
     this.languageForm.setValue({ name: lang.name ?? '', level: lang.level ?? '' });
@@ -930,9 +979,7 @@ export class ProfilePage implements OnInit {
             }
             const updated = response.data;
             if (updated) {
-              this.languages.update((list) =>
-                list.map((l) => (l.id === updated.id ? updated : l)),
-              );
+              this.languages.update((list) => list.map((l) => (l.id === updated.id ? updated : l)));
             }
             this.languageModalOpen.set(false);
             this.showToast('info', 'Language updated', 'The language has been saved.');
@@ -983,7 +1030,9 @@ export class ProfilePage implements OnInit {
 
   onOpenEditProject(id: string): void {
     const entry = this.projects().find((p) => p.id === id) ?? null;
-    if (!entry) return;
+    if (!entry) {
+      return;
+    }
 
     this.projectModalItem.set(entry);
     this.projectForm.setValue({
@@ -1119,7 +1168,9 @@ export class ProfilePage implements OnInit {
   }
 
   private formatValue(value?: string): string {
-    if (!value) return 'N/A';
+    if (!value) {
+      return 'N/A';
+    }
     const trimmed = value.trim();
     return trimmed.length > 0 ? trimmed : 'N/A';
   }

@@ -1,16 +1,24 @@
 <section class="space-y-6">
   @if (setupMode()) {
-    <div class="flex flex-wrap items-center justify-between gap-3 rounded-md border border-(--cxs-color-border) bg-(--cxs-color-surface) p-4">
+    <div
+      class="flex flex-wrap items-center justify-between gap-3 rounded-md border border-(--cxs-color-border) bg-(--cxs-color-surface) p-4"
+    >
       <div>
-        <p class="text-sm text-(--cxs-color-on-surface)">Add your profile details now, or skip and edit them later.</p>
+        <p class="text-sm text-(--cxs-color-on-surface)">
+          Add your profile details now, or skip and edit them later.
+        </p>
         @if (editError() && !editOpen()) {
           <p class="mt-2 text-sm text-red-600">{{ editError() }}</p>
         }
       </div>
       @if (pendingOutcome()) {
-        <cxs-button variant="secondary" [loading]="outcomeLoading()" (click)="retryOutcome()">Retry</cxs-button>
+        <cxs-button variant="secondary" [loading]="outcomeLoading()" (click)="retryOutcome()"
+          >Retry</cxs-button
+        >
       } @else {
-        <cxs-button variant="secondary" [disabled]="outcomeLoading()" (click)="onSkipSetup()">Skip for now</cxs-button>
+        <cxs-button variant="secondary" [disabled]="outcomeLoading()" (click)="onSkipSetup()"
+          >Skip for now</cxs-button
+        >
       }
     </div>
   }
@@ -38,7 +46,6 @@
 
   <!-- Two-column layout -->
   <div class="grid gap-6 lg:grid-cols-[320px_1fr] items-start">
-
     <!-- LEFT COLUMN -->
     <div class="lg:sticky lg:top-6">
       @if (loading()) {
@@ -55,29 +62,43 @@
       } @else if (profile()) {
         <cxs-card ariaLabel="Profile summary">
           <div class="space-y-5">
-
             <!-- Profile header -->
             <div class="flex flex-col items-center gap-3 text-center">
               <button
-                type="button"
-                class="relative group rounded-full focus:outline-none"
-                (click)="onOpenAvatarModal()"
                 aria-label="Change profile photo"
+                class="relative group rounded-full focus:outline-none"
+                type="button"
+                (click)="onOpenAvatarModal()"
               >
-                <cxs-avatar
-                  size="lg"
-                  [name]="displayName()"
-                  [src]="profile()?.imageUrl"
-                />
-                <div class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                <cxs-avatar size="lg" [name]="displayName()" [src]="profile()?.imageUrl" />
+                <div
+                  class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                >
+                  <svg
+                    class="h-6 w-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
                   </svg>
                 </div>
               </button>
               <div class="space-y-1">
-                <h2 class="text-base font-semibold text-gray-900 dark:text-white">{{ displayName() }}</h2>
+                <h2 class="text-base font-semibold text-gray-900 dark:text-white">
+                  {{ displayName() }}
+                </h2>
                 <div class="flex flex-wrap items-center justify-center gap-1.5">
                   @if (profile()?.tag) {
                     <cxs-badge variant="neutral">{{ profile()?.tag }}</cxs-badge>
@@ -91,10 +112,11 @@
             </div>
 
             <div class="border-t pt-5 space-y-5">
-
               <!-- Personal -->
               <div class="space-y-2">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Personal</h3>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Personal
+                </h3>
                 <dl class="space-y-2">
                   @for (item of personalDetails(); track item.label) {
                     <div class="flex items-start justify-between gap-3 text-sm">
@@ -107,12 +129,18 @@
 
               <!-- Identifiers -->
               <div class="space-y-2">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Identifiers</h3>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Identifiers
+                </h3>
                 <dl class="space-y-2">
                   @for (item of identityDetails(); track item.label) {
                     <div class="flex items-start justify-between gap-3 text-sm">
                       <dt class="text-gray-500 shrink-0">{{ item.label }}</dt>
-                      <dd class="font-mono text-xs truncate max-w-[160px] text-right text-gray-900 dark:text-white">{{ item.value }}</dd>
+                      <dd
+                        class="font-mono text-xs truncate max-w-[160px] text-right text-gray-900 dark:text-white"
+                      >
+                        {{ item.value }}
+                      </dd>
                     </div>
                   }
                 </dl>
@@ -123,8 +151,12 @@
                 <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Sizing</h3>
                 <div class="grid grid-cols-3 gap-2">
                   @for (item of sizeDetails(); track item.label) {
-                    <div class="rounded-lg bg-gray-50 dark:bg-gray-800 p-2 text-center flex flex-col items-center">
-                      <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ item.value }}</span>
+                    <div
+                      class="rounded-lg bg-gray-50 dark:bg-gray-800 p-2 text-center flex flex-col items-center"
+                    >
+                      <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+                        item.value
+                      }}</span>
                       <span class="text-xs text-gray-400">{{ item.label }}</span>
                     </div>
                   }
@@ -136,8 +168,6 @@
                 <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400">Bio</h3>
                 <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{{ bio() }}</p>
               </div>
-
-
             </div>
           </div>
         </cxs-card>
@@ -147,7 +177,6 @@
     <!-- RIGHT COLUMN -->
     <cxs-card>
       <cxs-tabs ariaLabel="Profile sections">
-
         <!-- Addresses -->
         <cxs-tab-panel id="addresses" label="Addresses">
           <div class="space-y-4">
@@ -162,17 +191,19 @@
               <p class="text-sm text-gray-400">Loading...</p>
             } @else {
               <cxs-data-table
-                [columns]="addressColumns"
-                [data]="addressData()"
                 [bordered]="true"
+                [columns]="addressColumns"
                 [compact]="true"
-                [showGlobalSearch]="false"
-                [showFilters]="false"
+                [data]="addressData()"
                 [showColumnVisibility]="false"
+                [showFilters]="false"
+                [showGlobalSearch]="false"
                 [showPagination]="false"
               >
                 <ng-template cxsDataTableCell="actions" let-row>
-                  <cxs-button size="sm" variant="ghost" (click)="onOpenEditAddress($any(row['id']))">Edit</cxs-button>
+                  <cxs-button size="sm" variant="ghost" (click)="onOpenEditAddress($any(row['id']))"
+                    >Edit</cxs-button
+                  >
                 </ng-template>
               </cxs-data-table>
             }
@@ -193,17 +224,22 @@
               <p class="text-sm text-gray-400">Loading...</p>
             } @else {
               <cxs-data-table
-                [columns]="languageColumns"
-                [data]="languageData()"
                 [bordered]="true"
+                [columns]="languageColumns"
                 [compact]="true"
-                [showGlobalSearch]="false"
-                [showFilters]="false"
+                [data]="languageData()"
                 [showColumnVisibility]="false"
+                [showFilters]="false"
+                [showGlobalSearch]="false"
                 [showPagination]="false"
               >
                 <ng-template cxsDataTableCell="actions" let-row>
-                  <cxs-button size="sm" variant="ghost" (click)="onOpenEditLanguage($any(row['id']))">Edit</cxs-button>
+                  <cxs-button
+                    size="sm"
+                    variant="ghost"
+                    (click)="onOpenEditLanguage($any(row['id']))"
+                    >Edit</cxs-button
+                  >
                 </ng-template>
               </cxs-data-table>
             }
@@ -221,17 +257,19 @@
               <cxs-button size="sm" variant="primary" (click)="onOpenAddSkill()">Add</cxs-button>
             </div>
             <cxs-data-table
-              [columns]="skillColumns"
-              [data]="skillData()"
               [bordered]="true"
+              [columns]="skillColumns"
               [compact]="true"
-              [showGlobalSearch]="false"
-              [showFilters]="false"
+              [data]="skillData()"
               [showColumnVisibility]="false"
+              [showFilters]="false"
+              [showGlobalSearch]="false"
               [showPagination]="false"
             >
               <ng-template cxsDataTableCell="actions" let-row>
-                <cxs-button size="sm" variant="ghost" (click)="onOpenEditSkill($any(row['id']))">Edit</cxs-button>
+                <cxs-button size="sm" variant="ghost" (click)="onOpenEditSkill($any(row['id']))"
+                  >Edit</cxs-button
+                >
               </ng-template>
             </cxs-data-table>
           </div>
@@ -245,20 +283,24 @@
                 <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Education</h3>
                 <p class="text-xs text-gray-500">Academic background and qualifications.</p>
               </div>
-              <cxs-button size="sm" variant="primary" (click)="onOpenAddEducation()">Add</cxs-button>
+              <cxs-button size="sm" variant="primary" (click)="onOpenAddEducation()"
+                >Add</cxs-button
+              >
             </div>
             <cxs-data-table
-              [columns]="educationColumns"
-              [data]="educationData()"
               [bordered]="true"
+              [columns]="educationColumns"
               [compact]="true"
-              [showGlobalSearch]="false"
-              [showFilters]="false"
+              [data]="educationData()"
               [showColumnVisibility]="false"
+              [showFilters]="false"
+              [showGlobalSearch]="false"
               [showPagination]="false"
             >
               <ng-template cxsDataTableCell="actions" let-row>
-                <cxs-button size="sm" variant="ghost" (click)="onOpenEditEducation($any(row['id']))">Edit</cxs-button>
+                <cxs-button size="sm" variant="ghost" (click)="onOpenEditEducation($any(row['id']))"
+                  >Edit</cxs-button
+                >
               </ng-template>
             </cxs-data-table>
           </div>
@@ -272,20 +314,24 @@
                 <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Work Experience</h3>
                 <p class="text-xs text-gray-500">Employment history and current positions.</p>
               </div>
-              <cxs-button size="sm" variant="primary" (click)="onOpenAddWorkplace()">Add</cxs-button>
+              <cxs-button size="sm" variant="primary" (click)="onOpenAddWorkplace()"
+                >Add</cxs-button
+              >
             </div>
             <cxs-data-table
-              [columns]="workplaceColumns"
-              [data]="workplaceData()"
               [bordered]="true"
+              [columns]="workplaceColumns"
               [compact]="true"
-              [showGlobalSearch]="false"
-              [showFilters]="false"
+              [data]="workplaceData()"
               [showColumnVisibility]="false"
+              [showFilters]="false"
+              [showGlobalSearch]="false"
               [showPagination]="false"
             >
               <ng-template cxsDataTableCell="actions" let-row>
-                <cxs-button size="sm" variant="ghost" (click)="onOpenEditWorkplace($any(row['id']))">Edit</cxs-button>
+                <cxs-button size="sm" variant="ghost" (click)="onOpenEditWorkplace($any(row['id']))"
+                  >Edit</cxs-button
+                >
               </ng-template>
             </cxs-data-table>
           </div>
@@ -302,25 +348,25 @@
               <cxs-button size="sm" variant="primary" (click)="onOpenAddProject()">Add</cxs-button>
             </div>
             <cxs-data-table
-              [columns]="projectColumns"
-              [data]="projectData()"
               [bordered]="true"
+              [columns]="projectColumns"
               [compact]="true"
-              [showGlobalSearch]="false"
-              [showFilters]="false"
+              [data]="projectData()"
               [showColumnVisibility]="false"
+              [showFilters]="false"
+              [showGlobalSearch]="false"
               [showPagination]="false"
             >
               <ng-template cxsDataTableCell="actions" let-row>
-                <cxs-button size="sm" variant="ghost" (click)="onOpenEditProject($any(row['id']))">Edit</cxs-button>
+                <cxs-button size="sm" variant="ghost" (click)="onOpenEditProject($any(row['id']))"
+                  >Edit</cxs-button
+                >
               </ng-template>
             </cxs-data-table>
           </div>
         </cxs-tab-panel>
-
       </cxs-tabs>
     </cxs-card>
-
   </div>
 </section>
 
@@ -328,7 +374,11 @@
 <cxs-dialog
   [closeOnBackdrop]="!setupMode()"
   [closeOnEscape]="!setupMode()"
-  [description]="setupMode() ? 'Add any details you want to share. You can skip this step.' : 'Update your personal details.'"
+  [description]="
+    setupMode()
+      ? 'Add any details you want to share. You can skip this step.'
+      : 'Update your personal details.'
+  "
   [dismissible]="!setupMode()"
   [open]="editOpen()"
   [title]="setupMode() ? 'Set up your profile' : 'Edit profile'"
@@ -447,9 +497,16 @@
   <div cxsDialogActions>
     @if (setupMode()) {
       @if (pendingOutcome()) {
-        <cxs-button variant="secondary" [loading]="outcomeLoading()" (click)="retryOutcome()">Retry</cxs-button>
+        <cxs-button variant="secondary" [loading]="outcomeLoading()" (click)="retryOutcome()"
+          >Retry</cxs-button
+        >
       } @else {
-        <cxs-button variant="secondary" [disabled]="editLoading() || outcomeLoading()" (click)="onSkipSetup()">Skip for now</cxs-button>
+        <cxs-button
+          variant="secondary"
+          [disabled]="editLoading() || outcomeLoading()"
+          (click)="onSkipSetup()"
+          >Skip for now</cxs-button
+        >
       }
     } @else {
       <cxs-button variant="secondary" (click)="onCloseEdit()">Cancel</cxs-button>
@@ -467,9 +524,9 @@
 
 <!-- Address dialog -->
 <cxs-dialog
-  [title]="addressModalItem() ? 'Edit Address' : 'Add Address'"
   description="Enter the address details."
   [open]="addressModalOpen()"
+  [title]="addressModalItem() ? 'Edit Address' : 'Add Address'"
   (openChange)="onCloseAddressModal()"
 >
   <form class="grid gap-4" [formGroup]="addressForm" (ngSubmit)="onSubmitAddress()">
@@ -533,7 +590,7 @@
     </div>
 
     <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-      <input type="checkbox" formControlName="isDefault" class="rounded border-gray-300" />
+      <input class="rounded border-gray-300" formControlName="isDefault" type="checkbox" />
       Set as default address
     </label>
   </form>
@@ -558,9 +615,9 @@
 
 <!-- Skill dialog -->
 <cxs-dialog
-  [title]="skillModalItem() ? 'Edit Skill' : 'Add Skill'"
   description="Enter the skill details."
   [open]="skillModalOpen()"
+  [title]="skillModalItem() ? 'Edit Skill' : 'Add Skill'"
   (openChange)="onCloseSkillModal()"
 >
   <form class="grid gap-4" [formGroup]="skillForm" (ngSubmit)="onSubmitSkill()">
@@ -594,9 +651,9 @@
 
 <!-- Education dialog -->
 <cxs-dialog
-  [title]="educationModalItem() ? 'Edit Education' : 'Add Education'"
   description="Enter the education details."
   [open]="educationModalOpen()"
+  [title]="educationModalItem() ? 'Edit Education' : 'Add Education'"
   (openChange)="onCloseEducationModal()"
 >
   <form class="grid gap-4" [formGroup]="educationForm" (ngSubmit)="onSubmitEducation()">
@@ -644,9 +701,9 @@
 
 <!-- Workplace dialog -->
 <cxs-dialog
-  [title]="workplaceModalItem() ? 'Edit Workplace' : 'Add Workplace'"
   description="Enter the workplace details."
   [open]="workplaceModalOpen()"
+  [title]="workplaceModalItem() ? 'Edit Workplace' : 'Add Workplace'"
   (openChange)="onCloseWorkplaceModal()"
 >
   <form class="grid gap-4" [formGroup]="workplaceForm" (ngSubmit)="onSubmitWorkplace()">
@@ -685,7 +742,7 @@
       />
     </div>
     <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-      <input type="checkbox" formControlName="isCurrent" class="rounded border-gray-300" />
+      <input class="rounded border-gray-300" formControlName="isCurrent" type="checkbox" />
       Currently working here
     </label>
   </form>
@@ -698,9 +755,9 @@
 
 <!-- Project dialog -->
 <cxs-dialog
-  [title]="projectModalItem() ? 'Edit Project' : 'Add Project'"
   description="Enter the project details."
   [open]="projectModalOpen()"
+  [title]="projectModalItem() ? 'Edit Project' : 'Add Project'"
   (openChange)="onCloseProjectModal()"
 >
   <form class="grid gap-4" [formGroup]="projectForm" (ngSubmit)="onSubmitProject()">
@@ -746,9 +803,9 @@
 
 <!-- Language dialog -->
 <cxs-dialog
-  [title]="languageModalItem() ? 'Edit Language' : 'Add Language'"
   description="Enter the language details."
   [open]="languageModalOpen()"
+  [title]="languageModalItem() ? 'Edit Language' : 'Add Language'"
   (openChange)="onCloseLanguageModal()"
 >
   <form class="grid gap-4" [formGroup]="languageForm" (ngSubmit)="onSubmitLanguage()">
@@ -786,16 +843,16 @@
 
 <!-- Change profile photo dialog -->
 <cxs-dialog
-  title="Change profile photo"
   description="Upload a new photo. JPG, PNG or WebP — max 5 MB."
+  title="Change profile photo"
   [open]="avatarModalOpen()"
   (openChange)="onCloseAvatarModal()"
 >
   <input
     #avatarModalInput
-    type="file"
     accept="image/jpeg,image/png,image/webp"
     class="hidden"
+    type="file"
     (change)="onAvatarModalFileChange($event)"
   />
 
@@ -807,9 +864,9 @@
     />
     <div class="space-y-1 text-center">
       <cxs-button
+        size="sm"
         type="button"
         variant="secondary"
-        size="sm"
         [loading]="uploadLoading()"
         (click)="avatarModalInput.click()"
       >
@@ -841,9 +898,9 @@
 </cxs-dialog>
 
 <cxs-toast
+  [message]="toastMessage()"
   [open]="toastOpen()"
   [title]="toastTitle()"
-  [message]="toastMessage()"
   [variant]="toastVariant()"
   (openChange)="toastOpen.set($event)"
 />

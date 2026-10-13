@@ -1,8 +1,10 @@
+// TODO: Split this page into smaller components.
+/* eslint-disable max-lines */
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   computed,
+  DestroyRef,
   inject,
   OnInit,
   signal,
@@ -425,9 +427,7 @@ export class SettingsPage implements OnInit {
 
   private shouldSyncSessionPreference(controlName: PreferenceControlName): boolean {
     return (
-      controlName === 'dateFormat' ||
-      controlName === 'currencyFormat' ||
-      controlName === 'theme'
+      controlName === 'dateFormat' || controlName === 'currencyFormat' || controlName === 'theme'
     );
   }
 }

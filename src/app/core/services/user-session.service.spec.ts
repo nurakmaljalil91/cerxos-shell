@@ -50,6 +50,7 @@ describe('UserSessionService', () => {
       ],
     });
     service = TestBed.inject(UserSessionService);
+    service.initialize();
 
     expect(service.session()).toEqual(stored);
   });

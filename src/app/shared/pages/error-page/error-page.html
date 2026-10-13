@@ -1,4 +1,6 @@
-<div class="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-50 flex items-center justify-center px-4">
+<div
+  class="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-50 flex items-center justify-center px-4"
+>
   <div class="max-w-lg w-full text-center">
     <p class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 mb-2">
       Error {{ statusCode }}
@@ -19,15 +21,17 @@
 
     <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
       <a
+        class="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white transition"
         routerLink="/"
-        class="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white transition">
+      >
         Go back home
       </a>
 
       <button
-        type="button"
         class="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-        (click)="location.reload()">
+        type="button"
+        (click)="location.reload()"
+      >
         Try again
       </button>
     </div>

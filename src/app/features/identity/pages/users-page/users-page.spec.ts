@@ -59,6 +59,7 @@ describe('UsersPage', () => {
       total: 10,
       sortBy: 'username',
       descending: false,
+      filter: undefined,
     });
     expect(component).toBeTruthy();
   });
