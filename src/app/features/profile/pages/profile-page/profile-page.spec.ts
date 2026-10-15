@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { OnboardingService } from '../../../../core/services/onboarding.service';
@@ -42,7 +42,10 @@ describe('ProfilePage', () => {
         { provide: OnboardingService, useValue: onboarding },
         {
           provide: UserSessionService,
-          useValue: { refresh: (): ReturnType<UserSessionService['refresh']> => of({ success: true }) },
+          useValue: {
+            refresh: (): ReturnType<UserSessionService['refresh']> => of({ success: true }),
+            session: signal({ user: { email: 'user@example.com' } }),
+          },
         },
         {
           provide: AddressesService,

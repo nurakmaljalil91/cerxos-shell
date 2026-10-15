@@ -70,7 +70,12 @@
                 type="button"
                 (click)="onOpenAvatarModal()"
               >
-                <cxs-avatar size="lg" [name]="displayName()" [src]="profile()?.imageUrl" />
+                <cxs-avatar
+                  class="h-28! w-28! text-3xl!"
+                  size="lg"
+                  [name]="displayName()"
+                  [src]="profile()?.imageUrl"
+                />
                 <div
                   class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
                 >
@@ -107,7 +112,7 @@
                     <cxs-badge variant="primary">Blood {{ profile()?.bloodType }}</cxs-badge>
                   }
                 </div>
-                <p class="text-xs text-gray-400">{{ profile()?.userId ?? 'N/A' }}</p>
+                <p class="text-xs text-gray-400">{{ email() }}</p>
               </div>
             </div>
 

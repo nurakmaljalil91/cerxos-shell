@@ -159,6 +159,8 @@ export class ProfilePage implements OnInit {
     return fullName || profile?.displayName || 'Profile';
   });
 
+  readonly email = computed(() => this.userSessionService.session()?.user?.email ?? 'N/A');
+
   readonly personalDetails = computed(() => {
     const profile = this.profile();
     if (!profile) {
@@ -179,8 +181,6 @@ export class ProfilePage implements OnInit {
       return [];
     }
     return [
-      { label: 'Profile ID', value: this.formatValue(profile.id) },
-      { label: 'User ID', value: this.formatValue(profile.userId) },
       { label: 'Identity card', value: this.formatValue(profile.identityCardNumber) },
       { label: 'Passport', value: this.formatValue(profile.passportNumber) },
       { label: 'Tax number', value: this.formatValue(profile.taxNumber) },
