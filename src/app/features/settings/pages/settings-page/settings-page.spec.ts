@@ -12,6 +12,7 @@ import { AuthenticationService } from '../../../../core/services/authentication.
 import { UserSessionService } from '../../../../core/services/user-session.service';
 import { UsersService } from '../../../identity/services/users.service';
 import { UserPreferencesService } from '../../services/user-preferences.service';
+import { PersonalAccessTokensService } from '../../services/personal-access-tokens.service';
 import { detectBrowserTimeZone } from './settings-page.preferences';
 
 describe('SettingsPage', () => {
@@ -84,12 +85,20 @@ describe('SettingsPage', () => {
       }),
     );
 
+    const personalAccessTokensServiceSpy = jasmine.createSpyObj('PersonalAccessTokensService', [
+      'getScopes',
+      'getMyTokens',
+    ]);
+    personalAccessTokensServiceSpy.getScopes.and.returnValue(of({ success: true, data: [] }));
+    personalAccessTokensServiceSpy.getMyTokens.and.returnValue(of({ success: true, data: [] }));
+
     await TestBed.configureTestingModule({
       imports: [SettingsPage],
       providers: [
         provideZonelessChangeDetection(),
         { provide: UsersService, useValue: usersServiceSpy },
         { provide: UserPreferencesService, useValue: userPreferencesServiceSpy },
+        { provide: PersonalAccessTokensService, useValue: personalAccessTokensServiceSpy },
         { provide: UserSessionService, useValue: userSessionServiceStub },
         { provide: AuthenticationService, useValue: authenticationServiceSpy },
         { provide: TranslocoService, useValue: jasmine.createSpyObj('TranslocoService', ['setActiveLang']) },

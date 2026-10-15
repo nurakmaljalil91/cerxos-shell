@@ -1230,3 +1230,58 @@ export interface FileRecordsQueryRequest {
     filter?: string;
     category?: string;
 }
+
+/** Metadata about a personal access token. Never contains the secret. */
+export interface PersonalAccessTokenDto {
+    id?: string;
+    name?: string;
+    /** Leading characters of the secret, shown so the token can be recognized. */
+    displayPrefix?: string;
+    scopes?: string[];
+    createdAt?: string | undefined;
+    expiresAt?: string | undefined;
+    lastUsedAt?: string | undefined;
+    revokedAt?: string | undefined;
+    isActive?: boolean;
+}
+
+/** A newly created personal access token; `token` is the secret and is only returned once. */
+export interface CreatedPersonalAccessTokenDto extends PersonalAccessTokenDto {
+    token?: string;
+}
+
+/** Request to create a personal access token. */
+export interface CreatePersonalAccessTokenCommand {
+    name: string;
+    scopes: string[];
+    /** ISO 8601 date-time, or omitted for no expiry. */
+    expiresAt?: string | undefined;
+}
+
+export interface BaseResponseOfPersonalAccessTokenDto {
+    success?: boolean;
+    message?: string | undefined;
+    data?: PersonalAccessTokenDto | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+export interface BaseResponseOfCreatedPersonalAccessTokenDto {
+    success?: boolean;
+    message?: string | undefined;
+    data?: CreatedPersonalAccessTokenDto | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+export interface BaseResponseOfPersonalAccessTokenDtoList {
+    success?: boolean;
+    message?: string | undefined;
+    data?: PersonalAccessTokenDto[] | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+export interface BaseResponseOfStringList {
+    success?: boolean;
+    message?: string | undefined;
+    data?: string[] | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}

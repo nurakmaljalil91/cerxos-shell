@@ -26,6 +26,7 @@ import { UserSessionService } from '../../../../core/services/user-session.servi
 import { UserDto, UserPreferenceDto } from '../../../../shared/models/model';
 import { UsersService } from '../../../identity/services/users.service';
 import { UserPreferencesService } from '../../services/user-preferences.service';
+import { PersonalAccessTokens } from '../../components/personal-access-tokens/personal-access-tokens';
 import {
   DEFAULT_PREFERENCES,
   getTimeZoneOptions,
@@ -58,6 +59,7 @@ const DEFAULT_ACCOUNT: AccountFormValue = {
     CxsCheckboxComponent,
     CxsInputComponent,
     CxsSelectComponent,
+    PersonalAccessTokens,
   ],
   templateUrl: './settings-page.html',
   styleUrl: './settings-page.css',

@@ -1,0 +1,127 @@
+<cxs-card ariaLabel="Personal access tokens" size="lg">
+  <div class="space-y-4">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h2 class="text-base font-semibold text-gray-900 dark:text-white">Personal access tokens</h2>
+        <p class="text-sm text-gray-500">
+          Let scripts and AI assistants such as Claude use the Cerxos API on your behalf. Grant only the
+          scopes they need. Revoked tokens can keep working for up to 15 minutes.
+        </p>
+      </div>
+      <cxs-button size="sm" (click)="onOpenCreate()">New token</cxs-button>
+    </div>
+
+    @if (error()) {
+      <cxs-alert variant="danger">{{ error() }}</cxs-alert>
+    }
+
+    <cxs-data-table
+      caption="Personal access tokens"
+      emptyMessage="No personal access tokens yet"
+      [bordered]="true"
+      [columns]="columns"
+      [data]="rows()"
+      [loading]="loading()"
+      [showFilters]="false"
+      [showGlobalSearch]="false"
+      [showPagination]="false"
+      [showToolbar]="false"
+    >
+      <ng-template cxsDataTableCell="prefix" let-row>
+        <code class="text-xs">{{ $any(row).prefix }}</code>
+      </ng-template>
+      <ng-template cxsDataTableCell="actions" let-row>
+        @if ($any(row).isActive) {
+          <button
+            class="rounded px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+            type="button"
+            [attr.aria-label]="'Revoke ' + $any(row).name"
+            (click)="onRequestRevoke($any(row).id)"
+          >
+            Revoke
+          </button>
+        }
+      </ng-template>
+    </cxs-data-table>
+  </div>
+</cxs-card>
+
+<cxs-dialog
+  description="Choose what the token can access. You will see the token once, right after it is created."
+  title="New personal access token"
+  [open]="createOpen()"
+  (openChange)="onCloseCreate()"
+>
+  <form class="grid gap-4" [formGroup]="createForm" (ngSubmit)="onSubmitCreate()">
+    <cxs-input formControlName="name" label="Name" placeholder="e.g. Claude Code" />
+    <cxs-multi-select
+      formControlName="scopes"
+      label="Scopes"
+      placeholder="Select scopes"
+      [options]="scopeOptions()"
+    />
+    <cxs-datepicker formControlName="expiresOn" label="Expires on" [min]="minExpiry" />
+  </form>
+
+  @if (createError()) {
+    <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+      {{ createError() }}
+    </div>
+  }
+
+  <div cxsDialogActions>
+    <cxs-button variant="secondary" (click)="onCloseCreate()">Cancel</cxs-button>
+    <cxs-button
+      type="submit"
+      [disabled]="creating()"
+      [loading]="creating()"
+      (click)="onSubmitCreate()"
+    >
+      Create token
+    </cxs-button>
+  </div>
+</cxs-dialog>
+
+<cxs-dialog
+  title="Copy your new token"
+  [closeOnBackdrop]="false"
+  [open]="!!createdSecret()"
+  (openChange)="onCloseSecret()"
+>
+  <div class="space-y-3">
+    <cxs-alert title="This is the only time you will see this token" variant="info">
+      Store it somewhere safe, such as your MCP client's configuration. If you lose it, revoke it and
+      create a new one.
+    </cxs-alert>
+    <code
+      class="block break-all rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs dark:border-gray-700 dark:bg-gray-900"
+      data-testid="pat-secret"
+      >{{ createdSecret() }}</code
+    >
+  </div>
+  <div cxsDialogActions>
+    <cxs-button variant="secondary" (click)="onCopySecret()">
+      {{ copied() ? 'Copied' : 'Copy token' }}
+    </cxs-button>
+    <cxs-button (click)="onCloseSecret()">Done</cxs-button>
+  </div>
+</cxs-dialog>
+
+<cxs-dialog
+  title="Revoke token?"
+  [description]="'Revoke “' + (revokeTarget()?.name ?? '') + '”? Anything using it will stop working within 15 minutes.'"
+  [open]="!!revokeTarget()"
+  (openChange)="onCancelRevoke()"
+>
+  <div cxsDialogActions>
+    <cxs-button variant="secondary" (click)="onCancelRevoke()">Cancel</cxs-button>
+    <cxs-button
+      variant="danger"
+      [disabled]="revoking()"
+      [loading]="revoking()"
+      (click)="onConfirmRevoke()"
+    >
+      Revoke
+    </cxs-button>
+  </div>
+</cxs-dialog>
