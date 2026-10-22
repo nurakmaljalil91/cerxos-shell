@@ -1,0 +1,92 @@
+<div class="space-y-4">
+  <div class="flex items-center justify-between gap-3">
+    <div>
+      <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Skills</h3>
+      <p class="text-xs text-gray-500">Proficiencies and areas of expertise.</p>
+    </div>
+    <cxs-button size="sm" variant="primary" (click)="openAdd()">Add</cxs-button>
+  </div>
+
+  @if (loading()) {
+    <p class="text-sm text-gray-400">Loading...</p>
+  } @else if (loadError()) {
+    <div class="flex items-center justify-between gap-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+      <span>{{ loadError() }}</span>
+      <cxs-button size="sm" variant="secondary" (click)="load()">Retry</cxs-button>
+    </div>
+  } @else {
+    <cxs-data-table
+      emptyMessage="No skills yet. Use Add to record one."
+      [bordered]="true"
+      [columns]="columns"
+      [compact]="true"
+      [data]="tableData()"
+      [showColumnVisibility]="false"
+      [showFilters]="false"
+      [showGlobalSearch]="false"
+      [showPagination]="false"
+    >
+      <ng-template cxsDataTableCell="actions" let-row>
+        <div class="flex gap-1">
+          <cxs-button size="sm" variant="ghost" (click)="openEdit($any(row['id']))">Edit</cxs-button>
+          <cxs-button size="sm" variant="ghost" (click)="requestDelete($any(row['id']))">Delete</cxs-button>
+        </div>
+      </ng-template>
+    </cxs-data-table>
+  }
+</div>
+
+<cxs-dialog
+  description="Enter the skill details."
+  [open]="modalOpen()"
+  [title]="editing() ? 'Edit Skill' : 'Add Skill'"
+  (openChange)="closeModal()"
+>
+  <form class="grid gap-4" [formGroup]="form" (ngSubmit)="submit()">
+    <cxs-input
+      formControlName="name"
+      label="Skill name"
+      placeholder="e.g. TypeScript"
+      [invalid]="showInvalid('name')"
+      [required]="true"
+    >
+      <span cxsInputError>Skill name is required.</span>
+    </cxs-input>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <cxs-input formControlName="proficiency" label="Proficiency" placeholder="e.g. Advanced" />
+      <cxs-input
+        formControlName="yearsOfExperience"
+        inputmode="numeric"
+        label="Years of experience"
+        placeholder="e.g. 5"
+        type="number"
+        [invalid]="showInvalid('yearsOfExperience')"
+      >
+        <span cxsInputError>Enter a whole number of years (0 or more).</span>
+      </cxs-input>
+    </div>
+  </form>
+
+  @if (modalError()) {
+    <div class="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+      {{ modalError() }}
+    </div>
+  }
+
+  <div cxsDialogActions>
+    <cxs-button variant="secondary" (click)="closeModal()">Cancel</cxs-button>
+    <cxs-button [disabled]="form.invalid || saving()" [loading]="saving()" (click)="submit()">Save</cxs-button>
+  </div>
+</cxs-dialog>
+
+<cxs-dialog
+  title="Delete skill"
+  [description]="'Delete ' + (deleteTarget()?.name ?? 'this skill') + '? This cannot be undone.'"
+  [open]="!!deleteTarget()"
+  (openChange)="cancelDelete()"
+>
+  <div cxsDialogActions>
+    <cxs-button variant="secondary" (click)="cancelDelete()">Cancel</cxs-button>
+    <cxs-button variant="danger" [disabled]="deleting()" [loading]="deleting()" (click)="confirmDelete()">Delete</cxs-button>
+  </div>
+</cxs-dialog>

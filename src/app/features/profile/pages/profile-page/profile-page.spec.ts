@@ -1,13 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { provideRouter, Router } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { OnboardingService } from '../../../../core/services/onboarding.service';
 import { UserSessionService } from '../../../../core/services/user-session.service';
 import { UserProfilesService } from '../../services/user-profiles.service';
 import { AddressesService } from '../../services/addresses.service';
 import { LanguagesService } from '../../services/languages.service';
 import { FileService } from '../../services/file.service';
+import { EducationsService } from '../../services/educations.service';
+import { ProjectsService } from '../../services/projects.service';
+import { SkillsService } from '../../services/skills.service';
+import { WorkExperiencesService } from '../../services/work-experiences.service';
 import { ProfilePage } from './profile-page';
 
 describe('ProfilePage', () => {
@@ -23,6 +27,10 @@ describe('ProfilePage', () => {
     displayName: 'Test Profile',
     firstName: 'Test',
     lastName: 'User',
+  };
+
+  const careerService = {
+    listMine: (): Observable<{ success: boolean; data: unknown[] }> => of({ success: true, data: [] }),
   };
 
   beforeEach(async () => {
@@ -58,6 +66,10 @@ describe('ProfilePage', () => {
             of({ success: true, data: { items: [] } }) },
         },
         { provide: FileService, useValue: {} },
+        { provide: WorkExperiencesService, useValue: careerService },
+        { provide: EducationsService, useValue: careerService },
+        { provide: SkillsService, useValue: careerService },
+        { provide: ProjectsService, useValue: careerService },
       ],
     }).compileComponents();
 
@@ -123,5 +135,23 @@ describe('ProfilePage', () => {
     component.retryOutcome();
     expect(onboarding.setOutcome).toHaveBeenCalledTimes(2);
     expect(navigate).toHaveBeenCalledWith(['/']);
+  });
+
+  it('creates the four career tabs and loads each from its service', () => {
+    const listMine = spyOn(careerService, 'listMine').and.callThrough();
+    createPage();
+
+    // Inactive tab panels are not attached to the DOM, but every career tab is created and loads on page open.
+    expect(listMine).toHaveBeenCalledTimes(4);
+  });
+
+  it('shows a toast for notices raised by a career tab', () => {
+    createPage();
+
+    component.onCareerNotice({ variant: 'info', title: 'Skill added', message: 'Angular has been saved.' });
+
+    expect(component.toastOpen()).toBeTrue();
+    expect(component.toastTitle()).toBe('Skill added');
+    expect(component.toastMessage()).toBe('Angular has been saved.');
   });
 });

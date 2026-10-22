@@ -43,41 +43,11 @@ import { UserProfilesService } from '../../services/user-profiles.service';
 import { AddressesService } from '../../services/addresses.service';
 import { FileService } from '../../services/file.service';
 import { LanguagesService } from '../../services/languages.service';
-
-type SkillEntry = {
-  id: string;
-  name: string;
-  level: string;
-  years: string;
-};
-
-type EducationEntry = {
-  id: string;
-  institution: string;
-  degree: string;
-  field: string;
-  startYear: string;
-  endYear: string;
-};
-
-type WorkplaceEntry = {
-  id: string;
-  company: string;
-  position: string;
-  department: string;
-  startDate: string;
-  endDate: string;
-  isCurrent: boolean;
-};
-
-type ProjectEntry = {
-  id: string;
-  name: string;
-  description: string;
-  url: string;
-  startDate: string;
-  endDate: string;
-};
+import { CareerTabNotice } from '../../components/career-tab.base';
+import { ProfileEducationTab } from '../../components/profile-education-tab/profile-education-tab';
+import { ProfileProjectsTab } from '../../components/profile-projects-tab/profile-projects-tab';
+import { ProfileSkillsTab } from '../../components/profile-skills-tab/profile-skills-tab';
+import { ProfileWorkExperienceTab } from '../../components/profile-work-experience-tab/profile-work-experience-tab';
 
 @Component({
   selector: 'app-profile-page',
@@ -96,6 +66,10 @@ type ProjectEntry = {
     CxsTabPanelComponent,
     CxsTabsComponent,
     CxsToastComponent,
+    ProfileEducationTab,
+    ProfileProjectsTab,
+    ProfileSkillsTab,
+    ProfileWorkExperienceTab,
   ],
   templateUrl: './profile-page.html',
   styleUrl: './profile-page.css',
@@ -254,104 +228,6 @@ export class ProfilePage implements OnInit {
   ];
 
   readonly languageData = computed(() => this.languages() as unknown as Record<string, unknown>[]);
-
-  // ---- Skills (local) ----
-  readonly skills = signal<SkillEntry[]>([]);
-  readonly skillModalItem = signal<SkillEntry | null>(null);
-  readonly skillModalOpen = signal(false);
-
-  readonly skillForm = this.formBuilder.group({
-    name: [''],
-    level: [''],
-    years: [''],
-  });
-
-  readonly skillColumns: CxsDataTableColumn[] = [
-    { key: 'name', label: 'Skill' },
-    { key: 'level', label: 'Level' },
-    { key: 'years', label: 'Years' },
-    { key: 'actions', label: '', width: '72px' },
-  ];
-
-  readonly skillData = computed(() => this.skills() as unknown as Record<string, unknown>[]);
-
-  // ---- Education (local) ----
-  readonly educations = signal<EducationEntry[]>([]);
-  readonly educationModalItem = signal<EducationEntry | null>(null);
-  readonly educationModalOpen = signal(false);
-
-  readonly educationForm = this.formBuilder.group({
-    institution: [''],
-    degree: [''],
-    field: [''],
-    startYear: [''],
-    endYear: [''],
-  });
-
-  readonly educationColumns: CxsDataTableColumn[] = [
-    { key: 'institution', label: 'Institution' },
-    { key: 'degree', label: 'Degree' },
-    { key: 'field', label: 'Field' },
-    { key: 'startYear', label: 'From' },
-    { key: 'endYear', label: 'To' },
-    { key: 'actions', label: '', width: '72px' },
-  ];
-
-  readonly educationData = computed(
-    () => this.educations() as unknown as Record<string, unknown>[],
-  );
-
-  // ---- Workplace (local) ----
-  readonly workplaces = signal<WorkplaceEntry[]>([]);
-  readonly workplaceModalItem = signal<WorkplaceEntry | null>(null);
-  readonly workplaceModalOpen = signal(false);
-
-  readonly workplaceForm = this.formBuilder.group({
-    company: [''],
-    position: [''],
-    department: [''],
-    startDate: [''],
-    endDate: [''],
-    isCurrent: [false],
-  });
-
-  readonly workplaceColumns: CxsDataTableColumn[] = [
-    { key: 'company', label: 'Company' },
-    { key: 'position', label: 'Position' },
-    { key: 'department', label: 'Department' },
-    { key: 'startDate', label: 'From' },
-    { key: 'endDate', label: 'To' },
-    { key: 'isCurrent', label: 'Current', formatter: (v) => (v ? 'Yes' : '') },
-    { key: 'actions', label: '', width: '72px' },
-  ];
-
-  readonly workplaceData = computed(
-    () => this.workplaces() as unknown as Record<string, unknown>[],
-  );
-
-  // ---- Projects (local) ----
-  readonly projects = signal<ProjectEntry[]>([]);
-  readonly projectModalItem = signal<ProjectEntry | null>(null);
-  readonly projectModalOpen = signal(false);
-
-  readonly projectForm = this.formBuilder.group({
-    name: [''],
-    description: [''],
-    url: [''],
-    startDate: [''],
-    endDate: [''],
-  });
-
-  readonly projectColumns: CxsDataTableColumn[] = [
-    { key: 'name', label: 'Project' },
-    { key: 'description', label: 'Description' },
-    { key: 'url', label: 'URL' },
-    { key: 'startDate', label: 'From' },
-    { key: 'endDate', label: 'To' },
-    { key: 'actions', label: '', width: '72px' },
-  ];
-
-  readonly projectData = computed(() => this.projects() as unknown as Record<string, unknown>[]);
 
   ngOnInit(): void {
     this.setupMode.set(this.onboardingService.consumeProfileSetup());
@@ -734,196 +610,6 @@ export class ProfilePage implements OnInit {
     }
   }
 
-  // ---- Skill handlers ----
-
-  onOpenAddSkill(): void {
-    this.skillModalItem.set(null);
-    this.skillForm.reset({ name: '', level: '', years: '' });
-    this.skillModalOpen.set(true);
-  }
-
-  onOpenEditSkill(id: string): void {
-    const skill = this.skills().find((s) => s.id === id) ?? null;
-    if (!skill) {
-      return;
-    }
-
-    this.skillModalItem.set(skill);
-    this.skillForm.setValue({ name: skill.name, level: skill.level, years: skill.years });
-    this.skillModalOpen.set(true);
-  }
-
-  onCloseSkillModal(): void {
-    this.skillModalOpen.set(false);
-  }
-
-  onSubmitSkill(): void {
-    const raw = this.skillForm.getRawValue();
-    const existing = this.skillModalItem();
-
-    if (existing) {
-      this.skills.update((list) =>
-        list.map((s) =>
-          s.id === existing.id
-            ? { ...s, name: raw.name ?? '', level: raw.level ?? '', years: raw.years ?? '' }
-            : s,
-        ),
-      );
-    } else {
-      const newSkill: SkillEntry = {
-        id: `skill-${Date.now()}`,
-        name: raw.name ?? '',
-        level: raw.level ?? '',
-        years: raw.years ?? '',
-      };
-      this.skills.update((list) => [...list, newSkill]);
-    }
-
-    this.skillModalOpen.set(false);
-  }
-
-  // ---- Education handlers ----
-
-  onOpenAddEducation(): void {
-    this.educationModalItem.set(null);
-    this.educationForm.reset({
-      institution: '',
-      degree: '',
-      field: '',
-      startYear: '',
-      endYear: '',
-    });
-    this.educationModalOpen.set(true);
-  }
-
-  onOpenEditEducation(id: string): void {
-    const entry = this.educations().find((e) => e.id === id) ?? null;
-    if (!entry) {
-      return;
-    }
-
-    this.educationModalItem.set(entry);
-    this.educationForm.setValue({
-      institution: entry.institution,
-      degree: entry.degree,
-      field: entry.field,
-      startYear: entry.startYear,
-      endYear: entry.endYear,
-    });
-    this.educationModalOpen.set(true);
-  }
-
-  onCloseEducationModal(): void {
-    this.educationModalOpen.set(false);
-  }
-
-  onSubmitEducation(): void {
-    const raw = this.educationForm.getRawValue();
-    const existing = this.educationModalItem();
-
-    if (existing) {
-      this.educations.update((list) =>
-        list.map((e) =>
-          e.id === existing.id
-            ? {
-                ...e,
-                institution: raw.institution ?? '',
-                degree: raw.degree ?? '',
-                field: raw.field ?? '',
-                startYear: raw.startYear ?? '',
-                endYear: raw.endYear ?? '',
-              }
-            : e,
-        ),
-      );
-    } else {
-      const newEntry: EducationEntry = {
-        id: `edu-${Date.now()}`,
-        institution: raw.institution ?? '',
-        degree: raw.degree ?? '',
-        field: raw.field ?? '',
-        startYear: raw.startYear ?? '',
-        endYear: raw.endYear ?? '',
-      };
-      this.educations.update((list) => [...list, newEntry]);
-    }
-
-    this.educationModalOpen.set(false);
-  }
-
-  // ---- Workplace handlers ----
-
-  onOpenAddWorkplace(): void {
-    this.workplaceModalItem.set(null);
-    this.workplaceForm.reset({
-      company: '',
-      position: '',
-      department: '',
-      startDate: '',
-      endDate: '',
-      isCurrent: false,
-    });
-    this.workplaceModalOpen.set(true);
-  }
-
-  onOpenEditWorkplace(id: string): void {
-    const entry = this.workplaces().find((w) => w.id === id) ?? null;
-    if (!entry) {
-      return;
-    }
-
-    this.workplaceModalItem.set(entry);
-    this.workplaceForm.setValue({
-      company: entry.company,
-      position: entry.position,
-      department: entry.department,
-      startDate: entry.startDate,
-      endDate: entry.endDate,
-      isCurrent: entry.isCurrent,
-    });
-    this.workplaceModalOpen.set(true);
-  }
-
-  onCloseWorkplaceModal(): void {
-    this.workplaceModalOpen.set(false);
-  }
-
-  onSubmitWorkplace(): void {
-    const raw = this.workplaceForm.getRawValue();
-    const existing = this.workplaceModalItem();
-
-    if (existing) {
-      this.workplaces.update((list) =>
-        list.map((w) =>
-          w.id === existing.id
-            ? {
-                ...w,
-                company: raw.company ?? '',
-                position: raw.position ?? '',
-                department: raw.department ?? '',
-                startDate: raw.startDate ?? '',
-                endDate: raw.endDate ?? '',
-                isCurrent: raw.isCurrent ?? false,
-              }
-            : w,
-        ),
-      );
-    } else {
-      const newEntry: WorkplaceEntry = {
-        id: `work-${Date.now()}`,
-        company: raw.company ?? '',
-        position: raw.position ?? '',
-        department: raw.department ?? '',
-        startDate: raw.startDate ?? '',
-        endDate: raw.endDate ?? '',
-        isCurrent: raw.isCurrent ?? false,
-      };
-      this.workplaces.update((list) => [...list, newEntry]);
-    }
-
-    this.workplaceModalOpen.set(false);
-  }
-
   // ---- Language handlers ----
 
   onOpenAddLanguage(): void {
@@ -1020,69 +706,6 @@ export class ProfilePage implements OnInit {
     }
   }
 
-  // ---- Project handlers ----
-
-  onOpenAddProject(): void {
-    this.projectModalItem.set(null);
-    this.projectForm.reset({ name: '', description: '', url: '', startDate: '', endDate: '' });
-    this.projectModalOpen.set(true);
-  }
-
-  onOpenEditProject(id: string): void {
-    const entry = this.projects().find((p) => p.id === id) ?? null;
-    if (!entry) {
-      return;
-    }
-
-    this.projectModalItem.set(entry);
-    this.projectForm.setValue({
-      name: entry.name,
-      description: entry.description,
-      url: entry.url,
-      startDate: entry.startDate,
-      endDate: entry.endDate,
-    });
-    this.projectModalOpen.set(true);
-  }
-
-  onCloseProjectModal(): void {
-    this.projectModalOpen.set(false);
-  }
-
-  onSubmitProject(): void {
-    const raw = this.projectForm.getRawValue();
-    const existing = this.projectModalItem();
-
-    if (existing) {
-      this.projects.update((list) =>
-        list.map((p) =>
-          p.id === existing.id
-            ? {
-                ...p,
-                name: raw.name ?? '',
-                description: raw.description ?? '',
-                url: raw.url ?? '',
-                startDate: raw.startDate ?? '',
-                endDate: raw.endDate ?? '',
-              }
-            : p,
-        ),
-      );
-    } else {
-      const newEntry: ProjectEntry = {
-        id: `project-${Date.now()}`,
-        name: raw.name ?? '',
-        description: raw.description ?? '',
-        url: raw.url ?? '',
-        startDate: raw.startDate ?? '',
-        endDate: raw.endDate ?? '',
-      };
-      this.projects.update((list) => [...list, newEntry]);
-    }
-
-    this.projectModalOpen.set(false);
-  }
-
   // ---- Private helpers ----
 
   private loadProfile(): void {
@@ -1158,6 +781,10 @@ export class ProfilePage implements OnInit {
           this.languages.set([]);
         },
       });
+  }
+
+  onCareerNotice(notice: CareerTabNotice): void {
+    this.showToast(notice.variant, notice.title, notice.message);
   }
 
   private showToast(variant: CxsToastVariant, title: string, message: string): void {

@@ -1285,3 +1285,277 @@ export interface BaseResponseOfStringList {
     data?: string[] | undefined;
     errors?: { [key: string]: string[]; } | undefined;
 }
+
+/** A work experience record owned by the current user. */
+export interface WorkExperienceDto {
+    /** Gets the work experience record identifier. */
+    id?: string;
+    /** Gets the owning user identifier. */
+    userId?: string;
+    /** Gets the name of the company or organisation. */
+    company?: string | undefined;
+    /** Gets the job title or position held. */
+    position?: string | undefined;
+    /** Gets the department or team within the organisation. */
+    department?: string | undefined;
+    /** Gets the start date (yyyy-MM-dd). */
+    startDate?: string | undefined;
+    /** Gets the end date (yyyy-MM-dd); empty for a current position. */
+    endDate?: string | undefined;
+    /** Gets a description of the role. */
+    description?: string | undefined;
+    /** Gets the location of the workplace. */
+    location?: string | undefined;
+}
+
+/** Command to create a work experience record for the current user. */
+export interface CreateWorkExperienceCommand {
+    /** Gets or sets the name of the company or organisation. */
+    company?: string | undefined;
+    /** Gets or sets the job title or position held. */
+    position?: string | undefined;
+    /** Gets or sets the department or team within the organisation. */
+    department?: string | undefined;
+    /** Gets or sets the start date (yyyy-MM-dd). */
+    startDate?: string | undefined;
+    /** Gets or sets the end date (yyyy-MM-dd); empty for a current position. */
+    endDate?: string | undefined;
+    /** Gets or sets a description of the role. */
+    description?: string | undefined;
+    /** Gets or sets the location of the workplace. */
+    location?: string | undefined;
+}
+
+/** Command to update a work experience record. Omitted fields are unchanged; an empty string clears an optional value. */
+export interface UpdateWorkExperienceCommand {
+    /** Gets or sets the work experience record identifier. */
+    id?: string;
+    /** Gets or sets the name of the company or organisation. */
+    company?: string | undefined;
+    /** Gets or sets the job title or position held. */
+    position?: string | undefined;
+    /** Gets or sets the department or team within the organisation. */
+    department?: string | undefined;
+    /** Gets or sets the start date (yyyy-MM-dd). */
+    startDate?: string | undefined;
+    /** Gets or sets the end date (yyyy-MM-dd); empty for a current position. */
+    endDate?: string | undefined;
+    /** Gets or sets a description of the role. */
+    description?: string | undefined;
+    /** Gets or sets the location of the workplace. */
+    location?: string | undefined;
+}
+
+/** Standard response wrapping a WorkExperienceDto. */
+export interface BaseResponseOfWorkExperienceDto {
+    success?: boolean;
+    message?: string | undefined;
+    data?: WorkExperienceDto | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Standard response wrapping a list of WorkExperienceDto. */
+export interface BaseResponseOfWorkExperienceDtoList {
+    success?: boolean;
+    message?: string | undefined;
+    data?: WorkExperienceDto[] | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** A education record owned by the current user. */
+export interface EducationDto {
+    /** Gets the education record identifier. */
+    id?: string;
+    /** Gets the owning user identifier. */
+    userId?: string;
+    /** Gets the name of the institution. */
+    institution?: string | undefined;
+    /** Gets the degree or qualification. */
+    degree?: string | undefined;
+    /** Gets the field of study. */
+    fieldOfStudy?: string | undefined;
+    /** Gets the start date (yyyy-MM-dd). */
+    startDate?: string | undefined;
+    /** Gets the end date (yyyy-MM-dd). */
+    endDate?: string | undefined;
+    /** Gets the grade or result. */
+    grade?: string | undefined;
+    /** Gets a description of the studies. */
+    description?: string | undefined;
+}
+
+/** Command to create a education record for the current user. */
+export interface CreateEducationCommand {
+    /** Gets or sets the name of the institution. */
+    institution?: string | undefined;
+    /** Gets or sets the degree or qualification. */
+    degree?: string | undefined;
+    /** Gets or sets the field of study. */
+    fieldOfStudy?: string | undefined;
+    /** Gets or sets the start date (yyyy-MM-dd). */
+    startDate?: string | undefined;
+    /** Gets or sets the end date (yyyy-MM-dd). */
+    endDate?: string | undefined;
+    /** Gets or sets the grade or result. */
+    grade?: string | undefined;
+    /** Gets or sets a description of the studies. */
+    description?: string | undefined;
+}
+
+/** Command to update a education record. Omitted fields are unchanged; an empty string clears an optional value. */
+export interface UpdateEducationCommand {
+    /** Gets or sets the education record identifier. */
+    id?: string;
+    /** Gets or sets the name of the institution. */
+    institution?: string | undefined;
+    /** Gets or sets the degree or qualification. */
+    degree?: string | undefined;
+    /** Gets or sets the field of study. */
+    fieldOfStudy?: string | undefined;
+    /** Gets or sets the start date (yyyy-MM-dd). */
+    startDate?: string | undefined;
+    /** Gets or sets the end date (yyyy-MM-dd). */
+    endDate?: string | undefined;
+    /** Gets or sets the grade or result. */
+    grade?: string | undefined;
+    /** Gets or sets a description of the studies. */
+    description?: string | undefined;
+}
+
+/** Standard response wrapping a EducationDto. */
+export interface BaseResponseOfEducationDto {
+    success?: boolean;
+    message?: string | undefined;
+    data?: EducationDto | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Standard response wrapping a list of EducationDto. */
+export interface BaseResponseOfEducationDtoList {
+    success?: boolean;
+    message?: string | undefined;
+    data?: EducationDto[] | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** A skill owned by the current user. */
+export interface SkillDto {
+    /** Gets the skill identifier. */
+    id?: string;
+    /** Gets the owning user identifier. */
+    userId?: string;
+    /** Gets the skill name. */
+    name?: string | undefined;
+    /** Gets the proficiency level. */
+    proficiency?: string | undefined;
+    /** Gets the number of years of experience. */
+    yearsOfExperience?: number | undefined;
+}
+
+/** Command to create a skill for the current user. */
+export interface CreateSkillCommand {
+    /** Gets or sets the skill name. */
+    name?: string | undefined;
+    /** Gets or sets the proficiency level. */
+    proficiency?: string | undefined;
+    /** Gets or sets the number of years of experience. */
+    yearsOfExperience?: number | undefined;
+}
+
+/** Command to update a skill. Omitted fields are unchanged; an empty string clears an optional value. */
+export interface UpdateSkillCommand {
+    /** Gets or sets the skill identifier. */
+    id?: string;
+    /** Gets or sets the skill name. */
+    name?: string | undefined;
+    /** Gets or sets the proficiency level. */
+    proficiency?: string | undefined;
+    /** Gets or sets the number of years of experience. */
+    yearsOfExperience?: number | undefined;
+}
+
+/** Standard response wrapping a SkillDto. */
+export interface BaseResponseOfSkillDto {
+    success?: boolean;
+    message?: string | undefined;
+    data?: SkillDto | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Standard response wrapping a list of SkillDto. */
+export interface BaseResponseOfSkillDtoList {
+    success?: boolean;
+    message?: string | undefined;
+    data?: SkillDto[] | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** A project owned by the current user. */
+export interface ProjectDto {
+    /** Gets the project identifier. */
+    id?: string;
+    /** Gets the owning user identifier. */
+    userId?: string;
+    /** Gets the project title. */
+    title?: string | undefined;
+    /** Gets the project description. */
+    description?: string | undefined;
+    /** Gets the start date (yyyy-MM-dd). */
+    startDate?: string | undefined;
+    /** Gets the end date (yyyy-MM-dd). */
+    endDate?: string | undefined;
+    /** Gets the project URL. */
+    url?: string | undefined;
+    /** Gets the technologies used. */
+    techStack?: string | undefined;
+}
+
+/** Command to create a project for the current user. */
+export interface CreateProjectCommand {
+    /** Gets or sets the project title. */
+    title?: string | undefined;
+    /** Gets or sets the project description. */
+    description?: string | undefined;
+    /** Gets or sets the start date (yyyy-MM-dd). */
+    startDate?: string | undefined;
+    /** Gets or sets the end date (yyyy-MM-dd). */
+    endDate?: string | undefined;
+    /** Gets or sets the project URL. */
+    url?: string | undefined;
+    /** Gets or sets the technologies used. */
+    techStack?: string | undefined;
+}
+
+/** Command to update a project. Omitted fields are unchanged; an empty string clears an optional value. */
+export interface UpdateProjectCommand {
+    /** Gets or sets the project identifier. */
+    id?: string;
+    /** Gets or sets the project title. */
+    title?: string | undefined;
+    /** Gets or sets the project description. */
+    description?: string | undefined;
+    /** Gets or sets the start date (yyyy-MM-dd). */
+    startDate?: string | undefined;
+    /** Gets or sets the end date (yyyy-MM-dd). */
+    endDate?: string | undefined;
+    /** Gets or sets the project URL. */
+    url?: string | undefined;
+    /** Gets or sets the technologies used. */
+    techStack?: string | undefined;
+}
+
+/** Standard response wrapping a ProjectDto. */
+export interface BaseResponseOfProjectDto {
+    success?: boolean;
+    message?: string | undefined;
+    data?: ProjectDto | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}
+
+/** Standard response wrapping a list of ProjectDto. */
+export interface BaseResponseOfProjectDtoList {
+    success?: boolean;
+    message?: string | undefined;
+    data?: ProjectDto[] | undefined;
+    errors?: { [key: string]: string[]; } | undefined;
+}
